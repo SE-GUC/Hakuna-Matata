@@ -122,4 +122,13 @@ function add_report(id,report){
 function checkAdult(obj) {
     return obj.consultancy_agency_id === 0;
   };
+
+router.get('/show_consulted_tasks/:partner_id/:task_id',(req,res)=>{
+    taskConsulted.forEach(element => {
+        if(element.partner_id===parseInt(req.params.partner_id)&&element.id===parseInt(req.params.task_id)&&element.consultancy_agency_id>0){
+            res.write(JSON.stringify(element));
+        }
+    });
+    res.end();
+});
   module.exports = router
