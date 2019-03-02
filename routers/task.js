@@ -10,7 +10,68 @@ const platform= require('../arrays/platform.js');
 const members= require('../arrays/members.js');
 const {Send_Task_Notification} = require("../arrays/Notifications.js");
 
+//create task
+router.post('/create/:id',(req,res)=>{
+    
+    const schema={
+        description:Joi.string().required(),
+        consult_needed:Joi.boolean(),
+        time:Joi.string(),
+	    level_of_commitment:Joi.number().integer().min(1).max(5),
+	    experiance_level:Joi.number().integer().min(1).max(5),
+        monetory_compensation:Joi.number(),
+        required_skills:Joi.array(),
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+    
+if (req.body.consult_needed===false){
 
+    const schema={
+        description:Joi.string().required(),
+        consult_needed:false,
+	    time:Joi.string().required(),
+	    level_of_commitment:Joi.number().integer().min(1).max(5).required(),
+	    experiance_level:Joi.number().integer().min(1).max(5).required(),
+        monetory_compensation:Joi.number().required(),
+        required_skills:Joi.array().required(),
+
+    };
+
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+
+    tasks.push(  
+        new task(tasks.length+1,parseInt(req.params.id),0,0,0,
+                 [{Memeber_id:null , date_of_apply:null}
+                    ],
+                req.body.description,req.body.required_skills,req.body.monetory_compensation,
+                req.body.time,null,null,null,req.body.experiance_level,req.body.level_of_commitment,
+                null,null,null,null,null,false,[]
+                )
+
+                );
+res.send({data : tasks});
+return;
+}
+taskConsulted.push(  
+    new task(tasks.length+1,parseInt(req.params.id),0,0,0,
+             [{Memeber_id:null , date_of_apply:null}
+                ],
+            req.body.description,req.body.required_skills,req.body.monetory_compensation,
+            req.body.time,null,null,null,req.body.experiance_level,req.body.level_of_commitment,
+            null,null,null,null,null,false,[]
+            ));
+
+res.send(taskConsulted);
+}
+);
 
 // Update a tasks's state (taskID =>taskId , adminId=> admin who reject or accept the task)
 router.put('/:adminId/edit/:taskID', (req, res) => {
@@ -181,4 +242,37 @@ router.put('/:id/updateworkcycle',(request,response)=>{
     response.send(tasks);
     
 });
+
+// Delete Certine task from Array
+router.delete('/:id/deletetask', (req, res) => {
+    const taskId = req.params.id
+    //router.listen( () => console.log(memberId))
+    const task = tasks.find(task=>parseInt( task.id)=== parseInt(taskId))
+    if(task!==undefined){
+    tasks.splice(tasks.indexOf(task),1)
+    platform.splice(platform.indexOf(taskId),1)
+    res.send('Done')}
+    else{
+        res.send('this id is not on the System')
+    }
+})
+
+// delete a certin task by his partner (id =>taskId , partner_id=> owner of the task)
+router.delete("/:id/delete/:partner_id",(req,res) =>{
+    const task =tasks.find(m=>m.id===parseInt(req.params.id)&&m.partner_id===parseInt(req.params.partner_id));    
+    if(task!==undefined){
+        if(task.accepted===false){
+            tasks.splice(task);
+        } 
+        else {
+            res.send('U CANT DELETE THIS TASK')
+        }
+
+    }else{
+    res.send('this task is not available ');   
+    }
+
+    res.send(tasks);
+});
+
 module.exports = router
