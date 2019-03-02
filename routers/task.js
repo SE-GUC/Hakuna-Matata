@@ -108,7 +108,7 @@ router.put('/:adminId/edit/:taskID', (req, res) => {
 })
 
 // get a specific task      (id =>taskId)
-router.get("/:id" ,(req,res)=>{
+router.get("/:id/admin" ,(req,res)=>{
     const task =tasks.find(m=>m.id===parseInt(req.params.id));
     res.send(task)
 });
@@ -277,6 +277,22 @@ router.get('/:id/viewCycle', (req, res) => {
     }
 
 })
+
+
+// Delete Certine task from Array
+router.delete('/:id/deletetask', (req, res) => {
+    const taskId = req.params.id
+    //router.listen( () => console.log(memberId))
+    const task = tasks.find(task=>parseInt( task.id)=== parseInt(taskId))
+    if(task!==undefined){
+    tasks.splice(tasks.indexOf(task),1)
+    platform.splice(platform.indexOf(taskId),1)
+    res.send('Done')}
+    else{
+        res.send('this id is not on the System')
+    }
+})
+
 
 
 module.exports = router
