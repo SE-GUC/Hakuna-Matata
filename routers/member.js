@@ -19,6 +19,30 @@ router.get('/tasks', (req, res) => {
 
 
 
+//update rating (id =>memberId)
+router.put('/:id/ratemember',(request,response)=>{
+    var id=request.params.id;
+    const newrate = request.body.newrate;
+    var nooftasks;
+const schema={
+
+    newrate: Joi.number().integer().max(5).required(),
+  
+}
+const result=Joi.validate(request.body,schema);
+if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+ for(let object of Memberarray){
+     if(object.id==id){
+         nooftasks=object.allratedtasks;
+         object.allratedtasks=object.allratedtasks+1;
+         object.Rating=Math.floor(((object.Rating*nooftasks)+newrate)/object.allratedtasks);
+        
+
+     }
+ }
+ response.sendStatus(200);
+});
+
 
 
 
