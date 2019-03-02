@@ -41,14 +41,6 @@ router.post("/create/:partner_id",(req,res)=>{
     res.send({data:coworking_spaces});
 
 });
-
-//(id  => coworking_spaces)
-router.delete("/:id/delete",(req,res)=>{
-    const co =coworking_spaces.find(m=>m.id===parseInt(req.params.id));    
-    coworking_spaces.splice(co);
-    res.send(coworking_spaces);
-
-});
 //(id  => coworking_spaces)
 router.get("/:id",(req,res)=>{
 
