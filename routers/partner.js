@@ -1,3 +1,40 @@
+const express = require('express')
+const router = express.Router()
+
+// We will be connecting using database 
+const partner = require('../models/partner')
+const notObject = require("../arrays/Notifications.js");
+const projects=require('../arrays/projects')
+// temporary data created as if it was pulled out of the database ...
+const  partners = require('../arrays/partners')
+
+const {notificationSummaries} = require("../arrays/Notifications.js");
+
+//show my project (id =>partnerId)
+router.get('/:id/show_projects',(req,res)=>{
+    projects.forEach(element => {
+        if(element.partner_id===parseInt(req.params.partner_id)){
+            res.write(JSON.stringify(element));
+        }
+    });
+    res.end();
+});
+
+router.get('/:id/show_accpted_task_notify',(request,response)=>{
+    const not = notificationSummaries.find(not=> not.sent_to === parseInt(request.params.id)&&not.title==="Your task has been accepted");
+   
+    response.send(not);
+});
+router.get('/:id/show_assigned_task_notify',(request,response)=>{
+    const not = notificationSummaries.find(not=> not.sent_to === parseInt(request.params.id)&&not.title==="You task has been assigned to a member!");
+   
+    response.send(not);
+});
+
+
+
+
+
 // Get all partner
 router.get('/', (req, res) => {
     res.send(partners)
