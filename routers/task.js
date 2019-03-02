@@ -168,22 +168,5 @@ router.delete('/:id/deletetask', (req, res) => {
     }
 })
 
-// delete a certin task by his partner (id =>taskId , partner_id=> owner of the task)
-router.delete("/:id/delete/:partner_id",(req,res) =>{
-    const task =tasks.find(m=>m.id===parseInt(req.params.id)&&m.partner_id===parseInt(req.params.partner_id));    
-    if(task!==undefined){
-        if(task.accepted===false){
-            tasks.splice(task);
-        } 
-        else {
-            res.send('U CANT DELETE THIS TASK')
-        }
-
-    }else{
-    res.send('this task is not available ');   
-    }
-
-    res.send(tasks);
-});
 
 module.exports = router
