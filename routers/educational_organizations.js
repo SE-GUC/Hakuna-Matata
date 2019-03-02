@@ -25,6 +25,9 @@ const educators=require('../models/educators.js');
 const educational_organizations = require('../arrays/educational_organizations.js');
 
 
+router.get("/",(req,res)=>{
+    res.send("afssa");
+});
 
 
 //delete educational_organization,course,certificate,educator,master_class,training_programs (id  => educational_organizationId)
@@ -36,6 +39,7 @@ router.delete("/:id/delete_educational_organization",(req,res) =>{
     res.send({data:educational_organizations});
     
 }); 
+
 //reserve workshop for course  
 router.put('/:id/accept_reservation/:room_id',(req,res)=>{
  
@@ -247,6 +251,376 @@ router.put("/update_educator/:id/:educator_id",(req,res)=>{
 
 
 
+//URL to create certificates  (id  => educational_organizationId)
+router.post("/:id/create_certificates",(req,res)=>{
+    const schema={
+               
+        name:Joi.string().required(),
+        type:Joi.string().required(),
+        accreditation:Joi.string().required()
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+    const educ =educational_organizations.find(m=>m.id===parseInt(req.params.id));
+    
+    const certificate =new certificates(educ.certificates.length+1, req.body.name,req.body.type,
+        req.body.accreditation)
+    educ.certificates.push(certificate);
+    res.send({data:educational_organizations});
+});
+
+
+//URL to add trainings programs  (id  => educational_organizationId)
+router.post("/:id/add_programs",(req,res)=>{
+
+    const schema={
+       name:Joi.string().required(),
+       educator_id:Joi.string().required(),
+       educator_name:Joi.string().required(),
+       description:Joi.string().required(),
+       type:Joi.string().required(),
+       duration:Joi.string().required(),
+       apply_due_date:Joi.string().required(),
+       start_date:Joi.string().required(),
+       required_skills:Joi.string().required()
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));
+
+    const training = new training_programs (
+        education.training_programs.length+1,
+        req.body.name,
+        req.body.educator_id,
+        req.body.educator_name,
+        req.body.description,
+        req.body.type,
+        req.body.duration,
+        req.body.apply_due_date,
+        req.body.start_date,
+        req.body.required_skills
+    )
+
+education.certificates.push(training);
+
+
+
+
+res.send({data:educational_organizations});
+});
+
+//(id  => educational_organizationId  ,certificate_id => certificateId)
+router.delete("/:id/delete_certificate/:certificate_id",(req,res) =>{
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));    
+    const certifacate =education.certificates.find(c=>c.id===parseInt(req.params.certificate_id));
+    education.certificates.splice(certifacate);
+
+    res.send({data:educational_organizations});
+    
+});
+
+//(id  => educational_organizationId  ,training_program_id => trainingProgramId)
+router.delete("/:id/delete_training_programs/:training_program_id",(req,res) =>{
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));    
+    const training_program =education.training_programs.find(c=>c.id===parseInt(req.params.certificate_id));
+    education.training_programs.splice(training_program);
+
+    res.send({data:educational_organizations});
+    
+});
+//(id  => educational_organizationId  ,course_id => courseId)
+router.delete("/:id/delete_courses/:course_id",(req,res) =>{
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));    
+    const course =education.courses.find(c=>c.id===parseInt(req.params.course_id));
+    education.courses.splice(course);
+
+    res.send({data:educational_organizations});
+    
+});
+//(id  => educational_organizationId  ,master_class_id => masterClassId)
+router.delete("/:id/delete_master_class/:master_class_id",(req,res) =>{
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));    
+    const master_class =education.master_class.find(c=>c.id===parseInt(req.params.master_class_id));
+    education.master_class.splice(master_class);
+
+    res.send({data:educational_organizations});
+    
+});
+//show info about educators,courses,master_chasses,training-programs,certificates
+//(id  => educational_organizationId)
+router.get("/:id/show_educational_organization",(req,res) =>{
+    res.send(educational_organizations.find(m=>m.id===parseInt(req.params.id)));
+});
+
+//(id  => educational_organizationId)
+router.get("/:id/show_courses",(req,res) =>{
+    
+    res.send(educational_organizations.find(m=>m.id===parseInt(req.params.id)).courses);
+    
+});
+//(id  => educational_organizationId)
+router.get("/:id/show_master_classes",(req,res) =>{
+    
+    res.send(educational_organizations.find(m=>m.id===parseInt(req.params.id)).master_class);
+    
+});
+//(id  => educational_organizationId)
+router.get("/:id/show_training_programs",(req,res) =>{
+    
+    res.send(educational_organizations.find(m=>m.id===parseInt(req.params.id)).training_programs);
+    
+});
+
+//(id  => educational_organizationId)
+router.get("/:id/show_certificates",(req,res) =>{
+    
+    res.send(educational_organizations.find(m=>m.id===parseInt(req.params.id)).certificates);
+    
+});
+
+//update educational organization ,master_class,training_program,course,certificate,educator
+//(id  => educational_organizationId)
+router.put("/:id/update_educational",(req,res)=>{
+    const schema={
+        name:Joi.string()
+      
+     };
+     const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    };
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));
+    if(req.body.name!=null){
+        education.name=req.body.name;
+    }
+    res.send(educational_organizations);
+});
+//(id  => educational_organizationId  ,course_id => courseId)
+router.put("/:id/update_course/:course_id",(req,res)=>{
+    const schema={
+        name:Joi.string(),
+        
+        educator_id:Joi.number().integer(),
+        educator_name:Joi.string(),
+        places:Joi.number().integer(),
+        available_places:Joi.number().integer(),
+        payment:Joi.string(),
+        description:Joi.string(),
+        students_assigened:Joi.array(),
+        course_duration:Joi.string(),
+        start_date:Joi.string(),
+        end_date:Joi.string(),
+        level_of_students:Joi.string(),
+        effort:Joi.string(),
+        available:Joi.boolean()
+      
+     };
+     const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    };
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));
+    const course= education.courses.find(m=>m.id===parseInt(req.params.course_id));
+    if(req.body.name!=null){
+        course.name=req.body.name;
+    }
+    if(req.body.educator_id!=null){
+        course.educator_id=req.body.educator_id;
+    }
+    if(req.body.educator_name!=null){
+        course.educator_name=req.educator_name;
+    }
+    if(req.body.places!=null){
+        course.places=req.body.places;
+    }
+    if(req.body.available_places!=null){
+        course.available_places=req.body.available_places;
+    }
+    if(req.body.payment!=null){
+        course.payment=req.body.payment;
+    }
+    if(req.body.description!=null){
+        course.description=req.body.description;
+    }
+    if(req.body.students_assigened!=null){
+        course.students_assigened=req.body.students_assigened;
+    }
+    if(req.body.course_duration!=null){
+        course.course_duration=req.body.course_duration;
+    }
+    if(req.body.start_date!=null){
+        course.start_date=req.body.start_date;
+    }
+    if(req.body.end_date!=null){
+        course.end_date=req.body.end_date;
+    }
+    if(req.body.level_of_students!=null){
+        course.level_of_students=req.body.level_of_students;
+    }
+    if(req.body.effort!=null){
+        course.effort=req.body.effort;
+    }
+    if(req.body.available!=null){
+        course.available=req.body.available;
+    }
+
+    res.send(educational_organizations);
+});
+//(id  => educational_organizationId  ,master_class_id => masterClassId)
+router.put("/:id/update_master/:master_class_id",(req,res)=>{
+    const schema={
+        name:Joi.string(),
+        
+       
+        places:Joi.number().integer(),
+        available_places:Joi.number().integer(),
+        payment:Joi.string(),
+        description:Joi.string(),
+        courses:Joi.array(),
+        course_duration:Joi.string(),
+        start_date:Joi.string(),
+        end_date:Joi.string(),
+        level_of_students:Joi.string(),
+        effort:Joi.string(),
+        available:Joi.boolean()
+      
+     };
+     const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    };
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));
+    const master= education.master_class.find(m=>m.id===parseInt(req.params.master_class_id));
+    if(req.body.name!=null){
+        master.name=req.body.name;
+    }
+  
+    if(req.body.places!=null){
+        master.places=req.body.places;
+    }
+    if(req.body.available_places!=null){
+        master.available_places=req.body.available_places;
+    }
+    if(req.body.courses!=null){
+        master.courses=req.body.courses;
+    }
+    if(req.body.payment!=null){
+        master.payment=req.body.payment;
+    }
+    if(req.body.description!=null){
+        master.description=req.body.description;
+    }
+   
+    if(req.body.course_duration!=null){
+        master.course_duration=req.body.course_duration;
+    }
+    if(req.body.start_date!=null){
+        master.start_date=req.body.start_date;
+    }
+    if(req.body.end_date!=null){
+        master.end_date=req.body.end_date;
+    }
+    if(req.body.level_of_students!=null){
+        master.level_of_students=req.body.level_of_students;
+    }
+    if(req.body.effort!=null){
+        master.effort=req.body.effort;
+    }
+    if(req.body.available!=null){
+        master.available=req.body.available;
+    }
+
+    res.send(educational_organizations);
+    
+});
+//(id  => educational_organizationId  ,certificate_id => certificateId)
+router.put("/:id/update_certificate/:certificate_id",(req,res)=>{
+    const schema={
+        name:Joi.string(),
+        type:Joi.string(),
+        accreditation:Joi.string()
+     };
+     const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    };
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));
+    const certifacatee=education.certificates.find(m=>m.id===parseInt(req.params.certificate_id));
+    if(req.body.name!=null){
+        certifacatee.name=req.body.name;
+    }
+    if(req.body.type!=null){
+        certifacatee.type=req.body.type;
+    }
+    if(req.body.available!=null){
+        certifacatee.accreditation=req.body.accreditation;
+    }
+    res.send(educational_organizations);
+});
+
+//(id  => educational_organizationId  ,programs_id => programsId)
+router.put("/:id/update_programs/:programs_id",(req,res)=>{
+    const schema={
+        name:Joi.string(),
+        trainer_id:Joi.string(),
+        trainer_name:Joi.string(),
+        description:Joi.string(),
+        type:Joi.string(),
+        duration:Joi.string(),
+        apply_due_date:Joi.string(),
+        start_date:Joi.string(),
+        required_skills:Joi.string(),
+     };
+     const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    };
+
+    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));
+    const program=education.training_programs.find(m=>m.id===parseInt(req.params.programs_id));
+    if(req.body.name!=null){
+        program.name=req.body.name;
+    }
+    if(req.body.trainer_id!=null){
+        program.trainer_id=req.body.trainer_id;
+    }
+    if(req.body.trainer_name!=null){
+        program.trainer_name=req.body.trainer_name;
+    }
+    if(req.body.description!=null){
+        program.description=req.body.description;
+    }
+    if(req.body.type!=null){
+        program.type=req.body.type;
+    }
+    if(req.body.duration!=null){
+        program.duration=req.body.duration;
+    }
+    if(req.body.apply_due_date!=null){
+        program.apply_due_date=req.body.apply_due_date;
+    }
+    if(req.body.start_date!=null){
+        program.start_date=req.body.start_date;
+    }
+    if(req.body.required_skills!=null){
+        program.required_skills=req.body.required_skills;
+    }
+   
+   
+    
+    res.send(educational_organizations);
+});
 
 module.exports = router
 
