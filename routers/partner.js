@@ -11,3 +11,10 @@ router.get('/:id', (req, res) => {
     if(partner!==undefined)
         res.send(partner)
 })
+
+
+router.post('/:id/editrequest',(request,response)=>{
+    var id=request.params.id;
+    var e= notObject.SendToAdminRequestNotification("Partner "+id+" wants to edit his profile");
+    response.sendStatus(200);
+});
