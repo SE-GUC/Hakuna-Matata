@@ -91,13 +91,13 @@ router.get('/:id/admin', (req, res) => {
       }
      
       });
-
+//get all members
       router.get('/', (req, res) => {
         res.send(Memberarray)
     })
 /*ask to edit profile marina*/
 //(id =>memberId)
-router.post('/:id/editrequest/admin',(request,response)=>{
+router.post('/:id/editrequest',(request,response)=>{
     var id=request.params.id;
     var e= notObject.SendToAdminRequestNotification("Member "+id+" wants to edit his profile");
     response.sendStatus(200);
@@ -116,3 +116,6 @@ router.get('/:id', (req, res) => {
       }
      
       });
+
+	  
+	  module.exports = router
