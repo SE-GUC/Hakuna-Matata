@@ -20,6 +20,19 @@ function getexplevel(id) {
   }}
 
 
+//show admin notifications for editing profile requests
+router.get('/admin', (request,response)=>{
+    var newaray=[];
+    for (const object of notificationSummaries){
+        if(object.sent_to=="admin"){
+          
+            newaray.push(object);
+        }
+    }
+    response.send(newaray);
+    
+    });
+
 // show notifications for specific member
 router.get('/', (request,response)=>{
 const not_id=request.query.notification_id;
@@ -66,5 +79,28 @@ else{
 response.send(newArray)
 });
 
+
+
+// for admin to approve user by id he got in the title of the request
+router.post('/approveUser',(request,response)=>{
+var user_id=request.body.user_id;
+var approved=request.body.approved;
+const schema={
+    user_id: Joi.number().required(),
+    approved: Joi.boolean().required()
+   
+ };
+ const result=Joi.validate(request.body,schema);
+ if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+if (approved){
+    var e=SendToUserRequestNotification("You have been approved to edit",user_id);
+}
+else{
+    var e=SendToUserRequestNotification("You have been disapproved to edit",user_id);
+}
+response.sendStatus(200);
+
+
+});
 
 module.exports = router;
