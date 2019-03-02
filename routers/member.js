@@ -68,10 +68,22 @@ else{
 
 });
 
+// Delete Certine Member from Array  (id =>memberId)
+router.delete('/:id/deleteMember', (req, res) => {
+    const memberId = req.params.id
+    //router.listen( () => console.log(memberId))
+    const member = Memberarray.find(member=> parseInt(member.id) === parseInt(memberId))
+    if(member!==undefined){
+        Memberarray.splice(Memberarray.indexOf(member),1)
+        res.send('Done')}
+    else{
+        res.send('this id is not on the System')
+    }
+})
 
 
 // Get a certain member (id =>memberId)
-router.get('/:id', (req, res) => {
+router.get('/:id/admin', (req, res) => {
     for (const object of Memberarray){
         if(object.id==req.params.id){
             res.send(object);
@@ -85,8 +97,22 @@ router.get('/:id', (req, res) => {
     })
 /*ask to edit profile marina*/
 //(id =>memberId)
-router.post('/:id/editrequest',(request,response)=>{
+router.post('/:id/editrequest/admin',(request,response)=>{
     var id=request.params.id;
     var e= notObject.SendToAdminRequestNotification("Member "+id+" wants to edit his profile");
     response.sendStatus(200);
 });
+router.get('/', (req, res) => {
+    res.send(Memberarray)
+})
+
+
+// Get a certain member (id =>memberId)
+router.get('/:id', (req, res) => {
+    for (const object of Memberarray){
+        if(object.id==req.params.id){
+            res.send(object);
+      }
+      }
+     
+      });
