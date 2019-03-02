@@ -44,3 +44,5 @@ router.put('/:id/applyforacourse',(request,response)=>{
  }
  response.sendStatus(200);
 });
+
+module.exports = router;
