@@ -46,6 +46,10 @@ function show_agencies(){
 }
 router.get('/show/:agency_id', (req, res) =>{
      var x= constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id));
+     if(!x){
+        res.send("consultancy agency not found");
+        return;
+    }
      res.send(x);
 });
 router.post('/add_agency/:partner_id',(req,res)=>{
@@ -76,6 +80,11 @@ function add_agencies(name,information,parteners,members,reports){
 };
 
 router.put('/update_agency/:agency_id',(req,res)=>{
+    var x= constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id));
+    if(!x){
+        res.send("consultancy agency not found");
+        return;
+    }
     const schema={
         name:Joi.string(),
         information:Joi.string(),
@@ -88,7 +97,6 @@ router.put('/update_agency/:agency_id',(req,res)=>{
         res.status(400).send(result.error.details[0].message);
         return;
     };
-    var x= constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id));
     if(req.body.name!=null){
         x.name=req.body.name;
     }
@@ -106,18 +114,24 @@ router.put('/update_agency/:agency_id',(req,res)=>{
     }
 });
 router.delete('/delete_agency/:agency_id',(req,res)=>{
+    if(!constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id))){
+        res.send("consultancy agency not found");
+        return;
+    }
     const indx=constultancy_agencies.indexOf(constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id)));
     constultancy_agencies.splice(indx,1);
 res.send(constultancy_agencies);
 });
 
 router.post('/add_report/:id',(req,res)=>{
-    add_report(parseInt(req.params.id),req.body.report);
+    const x=constultancy_agencies.find(m => m.id===parseInt(req.params.id));
+    if(!x){
+        res.send("constultancy agency not found");
+        return;
+    }
+    x.reports.push(req.body.report);
     res.send(constultancy_agencies);
 });
-function add_report(id,report){
-    constultancy_agencies.find(m => m.id===id).reports.push(report);
-};
 
 function checkAdult(obj) {
     return obj.consultancy_agency_id === 0;
