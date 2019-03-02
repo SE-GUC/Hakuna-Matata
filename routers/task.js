@@ -56,8 +56,98 @@ router.get("/:id" ,(req,res)=>{
 router.get("/",(req,res)=>{
     res.send(tasks);
 });
+// Assignig a member to a certain task (id =>taskId , memberId=> member who will be assigned to a task)
+router.put('/:id/assTask/:memberId', (req, res) => {
+    const task_Id = req.params.id 
+    const member_Id=req.params.memberId
+    const task = tasks.find(task => parseInt(task.id) ===parseInt( task_Id))
+  
+if (task.applied_id==null){
+    res.status(400);
+res.send('No members applied yet');
+}
+else{
+
+    if(task.accepted===true&&(task.member_id===null||task.member_id.length===0)){
+        const appliedtoit=task.applied_id
+        const check=appliedtoit.find(check=>check===parseInt(member_Id))
+        if(check!==undefined){
+            const member = members.find(member => parseInt(member.id) ===parseInt( member_Id))
+            if(member!== undefined){
+                task.work_cycle=0
+               // member.appliedtask.push(task_Id)
+                task.member_id=member_Id
+                platform.splice(platform.indexOf(task_Id),1)
+                res.send(task)
+                var e=Send_Task_Notification(task_Id,member_Id,"You have been assigned!");
+                var e=Send_Task_Notification(task_Id,task.partner_id,"You task has been assigned to a member!");
+
+            }
+            else{
+                res.send("This member is Deleted")
+            }
+            
+        }
+         else
+            res.send("This member not one of the applied members")
 
 
+    }else{
+        if(task.accepted!==true)
+            res.send("This Task not accepted")
+        else
+        res.send("This Task is already assigned to a member ")
+    }
+
+}
+}
+)
+
+// Assignig a member to a certain task (id =>taskId , memberId=> member who will be assigned to a task)
+router.put('/:id/forceAssTask/:memberId', (req, res) => {
+    const task_Id = req.params.id 
+    const member_Id=req.params.memberId
+    const task = tasks.find(task => task.id === task_Id)
+    if(task.accepted&&task.member_id.length==0){
+            const member = members.find(member => member.id === member_Id)
+            if(member!== undefined){
+                member.appliedtask.push(task_Id)
+                task.member_id=member_Id
+                res.send(task)
+            }
+            else{
+                res.send("This member is Deleted")
+            }
+    }
+})
+//View task Cycle (id =>taskId )
+router.get('/:id/viewCycle', (req, res) => {
+    const task =tasks.find(task=>task.id===parseInt(req.params.id));
+    if(task !==undefined)
+    res.send(task.workcycle)
+    else{
+        res.send('This task not Found !')
+    }
+
+})
+// Get a All member of specific task
+router.get('/:id/membersTasks', (req, res) => {
+    const taskId = req.params.id
+    //router.listen( () => console.log(taskId))
+    const task = tasks.find(task=>parseInt( task.id)=== parseInt(taskId))
+    var routerliedmembers=[]
+   
+    if(task.applied_id!==null){
+    for(var member of task.applied_id){
+        //console.log(memberId)
+        const member1 = members.find(member1=> member1.id=== member)    
+        routerliedmembers.push(member1)
+    }
+    res.send(routerliedmembers)
+    }else{
+        res.send('No members applied yo this task')
+    }
+})
 
 router.put('/:id/updateworkcycle',(request,response)=>{
     
@@ -86,3 +176,9 @@ router.put('/:id/updateworkcycle',(request,response)=>{
         }
 
     }
+     
+   
+    response.send(tasks);
+    
+});
+module.exports = router
