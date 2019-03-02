@@ -1,3 +1,32 @@
+const express = require('express');
+const router = express.Router();
+var moment = require('moment');
+const Joi = require('joi');
+
+
+// Models
+const courses = require('../arrays/Courses');
+
+// Get all course
+router.get('/',(request,response)=>{
+
+ response.send(courses);
+});
+
+// Get course by id
+//(id  => courseId)
+router.get('/:id/',(request,response)=>{
+    const course_id=request.params.id;
+    
+    for(let object of courses){
+        if(object.id==course_id){
+         response.send(object);
+
+    }}
+  
+
+   });
+   
 router.put('/:id/applyforacourse',(request,response)=>{
     const course_id=request.params.id;
     const member_id= request.body.member_id;
