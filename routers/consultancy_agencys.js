@@ -147,14 +147,25 @@ router.get('/show_consulted_tasks/:partner_id/:task_id',(req,res)=>{
     });
     res.end();
 });
-router.post('/accept_consulted_tasks/:partner_id/:task_id/:con_id',(req,res)=>{
+//(id  => constultancyAgencysId, partner_id  => partnerId, task_id=>taskId,)
+router.post('/:id/accept_consulted_tasks/:partner_id/:task_id',(req,res)=>{
     taskConsulted.forEach(element => {
-        if(element.partner_id===parseInt(req.params.partner_id)&&element.id===parseInt(req.params.task_id)&&element.consultancy_agency_id===parseInt(req.params.con_id)){
+        if(element.partner_id===parseInt(req.params.partner_id)&&element.id===parseInt(req.params.task_id)&&element.consultancy_agency_id===parseInt(req.params.id)){
             tasks.push(element);
+            var e=Send_Task_Notification(req.params.task_id,element.consultancy_agency_id,"Your consultancy has been accepted!");
             delete_consulted(element.id);
         }
     });
     //res.send(taskConsulted);
     res.send(tasks);
+    
+function delete_consulted(task_id){
+    for (i = taskConsulted.length - 1; i >= 0; i -= 1) {
+        if (taskConsulted[i].id === task_id ) {
+            taskConsulted.splice(i, 1);
+        }
+    }
+};
+    
 });
   module.exports = router
