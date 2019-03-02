@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const agency = require('../models/consultancy_agency'); 
+
 const Joi = require('joi');
-const taskConsulted = require('../models/taskConsulted'); 
-const constultancy_agencies = require('../models/constultancy_agency1'); 
- 
+
+const agency = require('../models/consultancy_agency'); 
 const tasker=require('../models/task');
-const tasks=require('../models/task1')
+const {Send_Task_Notification} = require("../arrays/Notifications.js");
+const taskConsulted = require('../arrays/taskConsulted'); 
+const constultancy_agencies = require('../arrays/constultancy_agencys'); 
+const tasks=require('../arrays/tasks')
 
 router.get('/show_unconsultedtasks',(req,res)=>{
     res.send(show_uncosultedtasks());
@@ -144,5 +146,15 @@ router.get('/show_consulted_tasks/:partner_id/:task_id',(req,res)=>{
         }
     });
     res.end();
+});
+router.post('/accept_consulted_tasks/:partner_id/:task_id/:con_id',(req,res)=>{
+    taskConsulted.forEach(element => {
+        if(element.partner_id===parseInt(req.params.partner_id)&&element.id===parseInt(req.params.task_id)&&element.consultancy_agency_id===parseInt(req.params.con_id)){
+            tasks.push(element);
+            delete_consulted(element.id);
+        }
+    });
+    //res.send(taskConsulted);
+    res.send(tasks);
 });
   module.exports = router
