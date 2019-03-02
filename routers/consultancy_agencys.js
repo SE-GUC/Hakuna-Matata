@@ -139,6 +139,7 @@ function checkAdult(obj) {
     return obj.consultancy_agency_id === 0;
   };
 
+//(partner_id  => partnerId, task_id=>taskId)
 router.get('/show_consulted_tasks/:partner_id/:task_id',(req,res)=>{
     taskConsulted.forEach(element => {
         if(element.partner_id===parseInt(req.params.partner_id)&&element.id===parseInt(req.params.task_id)&&element.consultancy_agency_id>0){
