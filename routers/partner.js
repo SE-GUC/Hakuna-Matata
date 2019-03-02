@@ -20,6 +20,32 @@ router.get('/:id/show_projects',(req,res)=>{
     res.end();
 });
 
+// Get all partner
+router.get('/adminpartner', (req, res) => {
+    res.send(partners)
+})
+
+
+// Get a certain partner (id =>partnerId)
+router.get('/:id/adminpartner', (req, res) => {
+    const partnerId = req.params.id
+    const partner = partners.find(partner=> partner.id === partnerId)
+    if(partner!==undefined)
+        res.send(partner)
+})
+
+
+
+// Delete Certine partner from Array (id =>partnerId)
+router.delete('/:id/deletepartner/adminpartner', (req, res) => {
+    const partnerId = req.params.id
+    //router.listen( () => console.log(partnerId))
+    const partner = partners.find(partner=> partner.id === partnerId)
+    partners.splice(partners.indexOf(partner),1)
+})
+
+
+
 router.get('/:id/show_accpted_task_notify',(request,response)=>{
     const not = notificationSummaries.find(not=> not.sent_to === parseInt(request.params.id)&&not.title==="Your task has been accepted");
    
@@ -32,7 +58,29 @@ router.get('/:id/show_assigned_task_notify',(request,response)=>{
 });
 
 
+// Get all partner
+router.get('/', (req, res) => {
+    res.send(partners)
+})
 
+
+// Get a certain partner (id =>partnerId)
+router.get('/:id', (req, res) => {
+    const partnerId = req.params.id
+    const partner = partners.find(partner=> partner.id === partnerId)
+    if(partner!==undefined)
+        res.send(partner)
+})
+
+
+
+// Delete Certine partner from Array (id =>partnerId)
+router.delete('/:id/deletepartner', (req, res) => {
+    const partnerId = req.params.id
+    //router.listen( () => console.log(partnerId))
+    const partner = partners.find(partner=> partner.id === partnerId)
+    partners.splice(partners.indexOf(partner),1)
+})
 
 
 // Get all partner
