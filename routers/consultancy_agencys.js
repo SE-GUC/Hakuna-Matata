@@ -159,13 +159,6 @@ router.post('/:id/accept_consulted_tasks/:partner_id/:task_id',(req,res)=>{
     //res.send(taskConsulted);
     res.send(tasks);
     
-function delete_consulted(task_id){
-    for (i = taskConsulted.length - 1; i >= 0; i -= 1) {
-        if (taskConsulted[i].id === task_id ) {
-            taskConsulted.splice(i, 1);
-        }
-    }
-};
     
 });
   module.exports = router
