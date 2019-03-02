@@ -168,5 +168,115 @@ router.delete('/:id/deletetask', (req, res) => {
     }
 })
 
+// delete a certin task by his partner (id =>taskId , partner_id=> owner of the task)
+router.delete("/:id/delete/:partner_id",(req,res) =>{
+    const task =tasks.find(m=>m.id===parseInt(req.params.id)&&m.partner_id===parseInt(req.params.partner_id));    
+    if(task!==undefined){
+        if(task.accepted===null ){
+            tasks.splice(task);
+            res.send('Task deleted');
+        } 
+        else {
+            
+            res.send('U CANT DELETE THIS TASK')
+        }
+
+    }else{
+    res.send('this task is not available ');   
+    }
+
+   
+});
+
+
+// rate a task by his partner (id =>taskId , partner_id=> owner of the task)
+router.post("/:id/give_rate/:partner_id",(req,res)=>{
+    const task = tasks.find(m=>m.id===parseInt(req.params.id));
+if(task.partner_id===parseInt(req.params.partner_id)){
+    const schema={
+	   rate:Joi.number().integer().min(1).max(5).required(),
+	  
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+    task.rate=req.body.rate;
+    res.send(tasks);
+    return;
+}
+res.send("YOU CANT RATE THIS TASK");
+});
+
+
+
+// update a task (id =>taskId)
+router.put("/:id/update_task",(req,res) =>{
+    const schema={
+        description:Joi.string(),
+        required_skills:Joi.string(),
+        monetary_compensation:Joi.string(),
+        deadline:Joi.string(),
+        deadline_for_apply:Joi.string(),
+        experience_level:Joi.number().integer().min(1).max(5),
+        commit_level:Joi.number().integer().min(1).max(5)
+
+    };
+
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    };
+    var x= tasks.find(m => m.id===parseInt(req.params.id));
+    if(x.accepted===false){
+    if(req.body.description!=null){
+        x.description=req.body.description;
+        }
+    if(req.body.required_skills!=null){
+        x.required_skills=req.body.required_skills;
+        }
+    if(req.body.monetary_compensation!=null){
+    x.monetary_compensation=req.body.monetary_compensation;
+        }
+    if(req.body.deadline!=null){
+    x.deadline=req.body.deadline;
+        }
+    if(req.body.deadline_for_apply!=null){
+    x.deadline_for_apply=req.body.deadline_for_apply;
+        }
+    if(req.body.experience_level!=null){
+        x.experience_level=req.body.experience_level;
+        } 
+    if(req.body.commit_level!=null){
+        x.commit_level=req.body.commit_level;
+        } }
+        else{
+            res.send("YOU CAN NOT UPDATE!!!!!");
+        }    
+        
+        });
+
+// get a specific task      (id =>taskId)
+router.get("/:id" ,(req,res)=>{
+    const task =tasks.find(m=>m.id===parseInt(req.params.id));
+    res.send(task)
+});
+
+
+
+
+//View task Cycle (id =>taskId )
+router.get('/:id/viewCycle', (req, res) => {
+    const task =tasks.find(task=>task.id===parseInt(req.params.id));
+    if(task !==undefined)
+    res.send(task.workcycle)
+    else{
+        res.send('This task not Found !')
+    }
+
+})
+
 
 module.exports = router
