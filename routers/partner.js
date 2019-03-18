@@ -103,3 +103,4 @@ router.post('/:id/editrequest',(request,response)=>{
     var e= notObject.SendToAdminRequestNotification("Partner "+id+" wants to edit his profile");
     response.sendStatus(200);
 });
+module.exports=router;
