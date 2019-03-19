@@ -4,7 +4,7 @@ const Joi = require('joi');
 
 const task = require('../models/task.js'); 
 
-const taskConsulted = require('../arrays/taskConsulted.js'); 
+//const taskConsulted = require('../arrays/taskConsulted.js'); 
 const tasks= require('../arrays/tasks.js');
 const platform= require('../arrays/platform.js');
 const members= require('../arrays/members.js');
@@ -60,7 +60,7 @@ if (req.body.consult_needed===false){
 res.send({data : tasks});
 return;
 }
-taskConsulted.push(  
+tasks.push(  
     new task(tasks.length+1,parseInt(req.params.id),0,0,0,
              [{Memeber_id:null , date_of_apply:null}
                 ],
@@ -69,7 +69,7 @@ taskConsulted.push(
             null,null,null,null,null,false,[]
             ));
 
-res.send(taskConsulted);
+res.send(tasks);
 }
 );
 
