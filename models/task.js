@@ -21,7 +21,7 @@ class task{
         accepted,
         rate,
         consulty_needed,
-        consulty_members)
+        cunsulties_done)
         {
                 this.id=id;
                 this.partner_id=partner_id;
@@ -44,7 +44,7 @@ class task{
                 this.accepted=accepted;
                 this.rate=rate;
                 this.consulty_needed=consulty_needed;
-                this.consulty_members=consulty_members;}
+                this.cunsulties_done=cunsulties_done;}
         };
 
         module.exports = task
