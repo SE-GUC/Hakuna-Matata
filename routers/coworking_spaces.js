@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
-
+const mongoose = require('mongoose')
 
 const room = require('../models/room'); 
 const coworking_space = require('../models/coworking_space'); 
@@ -99,11 +99,15 @@ router.put("/:id/update",(req,res)=>{
     res.send(co);
 
 });
-
+// create room
 router.post("/add_room/:id",(req,res)=>{
     
     const schema={
-        capacity:Joi.number().integer().required()       
+        reserved_id:Joi.string(),
+        capacity:Joi.number().integer().required(),
+        reserved_date:Joi.date(),
+        end_of_reservation:Joi.date(),
+        reserved:Joi.boolean()     
 
     };
     const result =Joi.validate(req.body,schema);
@@ -111,15 +115,35 @@ router.post("/add_room/:id",(req,res)=>{
         res.status(400).send(result.error.details[0].message);
         return;
     }
-    const co =coworking_spaces.find(m=>m.id===parseInt(req.params.id));    
-if(co.max_no_rooms>co.rooms.length){
-    const rooom = new room(null,co.rooms.length+1,null,req.body.capacity,null,false);
-co.rooms.push(rooom);
-    res.send(co);
-return;
-}
-res.send("YOU CANT ADD ROOM");
 
+coworking_space.findById(req.params.id, function(err, co) {
+          
+        if(!err){
+            
+            if(co.max_no_rooms>co.rooms.length){
+           const rooom =  new room ({
+            reserved_id:req.params.reserved_id,
+            capacity:req.body.capacity,
+            reserved_date:req.body.reserved_date,
+            end_of_reservation:req.body.end_of_reservation,
+            reserved:req.body.reserved
+            
+            
+        });
+        room.create(rooom);
+        co.rooms.push(rooom);
+            res.send(co);
+            co.save();
+        return;
+        }
+        res.send("YOU CANT ADD ROOM");
+        
+          }
+          else{
+            res.status(404).send('Not found');
+
+          }
+      });
 });
 
 //accept reservation for co-working 
@@ -153,63 +177,116 @@ router.put('/accept_reservation/:id/:room_id',(req,res)=>{
     res.send("this room is not available");
 })
 
-//(id  => coworking_spaces)
+//(id  => coworking_spaces) // show all rooms
 router.get('/:id/show_rooms',(req,res)=>{
-    const co =coworking_spaces.find(m=>m.id===parseInt(req.params.id));    
   
-    res.send(co.rooms);
-});
+    coworking_space.findById(req.params.id, function(err, co) {
+              
+        if(!err){
+            
+           
+            res.send(co.rooms);
+        
+        }
+        
+     
+          else{
+            res.status(404).send('Not found');
+    
+          }
+      });
+    
+    });
 
-//(id  => coworking_spaces, room_id=>roomId)
+//(id  => coworking_spaces, room_id=>roomId) // show specific room
 router.get('/:id/show_room/:room_id',(req,res)=>{
     
+    coworking_space.findById(req.params.id, function(err, co) {
+              
+        if(!err){
+            
+           
+            const ro = co.rooms.find(m=>m._id==req.params.room_id);
+            res.send(ro);
+           
+        }
+        
+     
+          else{
+            res.status(404).send('Not found');
     
-    const co =coworking_spaces.find(m=>m.id===parseInt(req.params.id));    
-  const romm = co.rooms.find(m=>m.id===parseInt(req.params.room_id));
-    res.send(romm);
-});
+          }
+      });
+    
+    });
+    
 
-//(id  => coworking_spaces, room_id=>roomId)
+//(id  => coworking_spaces, room_id=>roomId) // delete room
 router.delete('/:id/delete_room/:room_id',(req,res)=>{
-    const co =coworking_spaces.find(m=>m.id===parseInt(req.params.id));    
-    const romm = co.rooms.find(m=>m.id===parseInt(req.params.room_id));
-     co.rooms.splice(romm);
-     res.send(co);
+    coworking_space.findById(req.params.id, function(err, co) {
+          
+        if(!err){
+            
+           
+            const ro = co.rooms.find(m=>m._id==req.params.room_id);
+            co.rooms.remove(ro)
+            co.save();
+            res.send(co);
+           
+        }
+        
+     
+          else{
+            res.status(404).send('Not found');
+    
+          }
+      });
 
 });
 
-//(id  => coworking_spaces, room_id=>roomId)
-router.put('/:id/update_room/:room_id',(req,res)=>{
+//(id  => coworking_spaces, room_id=>roomId) // update room
+router.put('/:id/update_room/:room_id',async (req,res)=>{
  
     const schema={
         capacity:Joi.number().integer(),
         reserved:Joi.boolean(),
         reserved_date:Joi.string(),
         end_of_reservation:Joi.string(),
-        reserved_id:Joi.number().integer()
+        reserved_id:Joi.string()
     };
     const result =Joi.validate(req.body,schema);
     if(result.error){
         res.status(400).send(result.error.details[0].message);
         return;
     }
-   
-    const co = coworking_spaces.find(m=>m.id===parseInt(req.params.id));
-    const roooms = co.rooms;
-    const room = roooms.find(m=>m.id===parseInt(req.params.room_id));
-    if(req.body.capacity!=null)  {  
-    room.capacity = req.body.capacity;}
-    if(req.body.reserved!=null)       { 
-    room.reserved=req.body.reserved;}
-    if(req.body.capacity!=null)      {  
-    room.reserved_date=req.body.reserved_date;}
-    if(req.body.capacity!=null)        {
-    room.end_of_reservation=req.body.end_of_reservation;}
-    if(req.body.reserved_id!=null)        {
-        room.reserved_id=req.body.reserved_id;}
+    coworking_space.findById(req.params.id, async function(err, co) {
+          
+        if(!err){
+            
+           
+            const ro = co.rooms.find(m=>m._id==req.params.room_id);
+            if(req.body.capacity!=null)  {  
+                ro.capacity = req.body.capacity;}
+                if(req.body.reserved!=null)       { 
+                ro.reserved=req.body.reserved;}
+                if(req.body.reserved_date!=null)      {  
+                ro.reserved_date=req.body.reserved_date;}
+                if(req.body.end_of_reservation!=null)        {
+                ro.end_of_reservation=req.body.end_of_reservation;}
+                if(req.body.reserved_id!=null)        {
+                    ro.reserved_id=req.body.reserved_id;}
+            await room.findOneAndUpdate({'_id':req.params.room_id},{"capacity":ro.capacity,"reserved":ro.reserved,"reserved_date":ro.reserved_date,"end_of_reservation":ro.end_of_reservation,"reserved_id":ro.reserved_id})
+           await coworking_space.findOneAndUpdate({'_id':req.params.id},{"rooms":co.rooms});
+            res.send(co);
+
+        }
         
-        res.send(room);
-        
+     
+          else{
+            res.status(404).send('Not found');
+    
+          }
+      });
 })
 
 module.exports = router

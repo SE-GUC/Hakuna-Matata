@@ -1,12 +1,29 @@
-class room{
-    constructor(reserved_id,id,reserved_date,capacity,end_of_reservation,reserved){
-        this.id=id;
-        this.reserved_id=reserved_id;
-        
-        this.capacity=capacity;
-        this.end_of_reservation=end_of_reservation;
-        this.reserved_date=reserved_date;
-        this.reserved=reserved;
-    }
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+
+// Create the schema
+const roomSchema = new Schema({
+ reserved_id : {
+        type: String,
+        required: false
+},
+reserved_date : {
+    type: Date,
+    required: false
+},
+capacity : {
+    type: number,
+    required: true
+},
+
+end_of_reservation : {
+    type: Date,
+    required: false
+},
+
+reserved : {
+    type: boolean,
+    required: false
 }
-module.exports=room
+})
+module.exports = Room = mongoose.model('rooms', roomSchema)
