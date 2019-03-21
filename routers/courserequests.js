@@ -1,3 +1,5 @@
+
+
 // Dependencies
 const express = require('express');
 const router = express.Router();
@@ -6,31 +8,86 @@ const Joi = require('joi');
 
 
 // Models
-const coursemodel = require('../models/Courserequest.js');
+const Courserequest = require('../models/Courserequest.js');
+const Notification = require('../models/Notification.js');
 
-const notObject = require("../arrays/Notifications.js");
-const courserequests = require('../arrays/Courserequests.js');
-var members = require('../arrays/members.js');
-// Get all course
-router.get('/',(request,response)=>{
+ //create course request
 
- response.send(courserequests);
-});
-   
-   // Get courserequest by id
-//(id  => courserequestsId)
-router.get('/:id', (request,response)=>{
-    
-    for (const object of courserequests){
-      if(object.id==request.params.id){
-         response.send(object);
-    }
-    }
-    
+
+router.post("/newCourseRequest",(request,response, next) => {
+
+    const Joi = require('joi');
+    const schema = Joi.object().keys({
+        description:Joi.string(),
+        categories:Joi.string(),
+        applyingmember_id:Joi.string()
     });
 
- 
+   const result= Joi.validate(request.body,schema); 
 
+        if (result.error) {
+           return response.status(400).send({error:result.error.details[0].message})
+        } else {
+           const courserequest = new Courserequest({
+            description:request.body.description,
+            applyingmember_id:request.body.applyingmember_id,
+            categories:request.body.categories,
+            recomendations:[]
+           });
+           
+            courserequest.save(function(err,room) {
+              
+                Notification.Send_CourseRequest_Notification(room.id,"HELPPPP MEEEE GUYSSS");
+             });
+            response.sendStatus(200);
+          
+        }
+});
+
+// get all course requests 
+router.get('/',(request,response)=>{
+Courserequest.find({},function(err,courserequests){
+    if(!err){
+        response.send(courserequests)
+        }
+        else {
+         response.status(404).send("not found") 
+        }
+});
+})
+
+// get course request by id 
+router.get('/:id',(request,response)=>{
+   Courserequest.findById(request.params.id,function(err,courserequests){
+       if(!err){
+       response.send(courserequests)
+       }
+       else {
+        response.status(404).send("not found") 
+       }
+   })
+    })
+    
+// delete a course request 
+router.delete('/delete/:id', function(req,res){
+
+    Courserequest.findByIdAndRemove(
+        req.params.id,
+        function(err) {
+          if(!err){
+            res.sendStatus(200);
+
+          }
+          else{
+            res.status(404).send('Not found');
+
+          }
+        }
+    );
+ 
+  });
+
+/*
 // as an expert i can give a recomendation
 //(id  => courserequestsId)
 router.put('/:id/giverecomendation',(request,response)=>{
@@ -63,7 +120,8 @@ router.put('/:id/giverecomendation',(request,response)=>{
 
  response.sendStatus(200);
 });
-   
+  */
+ /* 
 //rating a recomendations
 //(id  => courserequestsId,recId=> recomendationId)
 router.put('/:id/raterecomendation/:recId',(request,response)=>{
@@ -109,20 +167,7 @@ router.put('/:id/raterecomendation/:recId',(request,response)=>{
  }
  response.sendStatus(200);
 });
-
-router.post("/newCourseRequest",(request,response)=>{
-    id=courserequests.length+1;
-    description=request.body.description;
-    dateofsubmission=moment().format("MMMM Do YYYY, h:mm:ss a");
-    applyingmember_id=request.body.applyingmember_id;
-    categories=null;
-    recomendations=[];
-    active=true;
-    courserequests.push(new coursemodel(id, description, dateofsubmission, applyingmember_id, categories, recomendations, active));
-    var e=notObject.Send_CourseRequest_Notification(id,"HELPPPP MEEEE GUYSSS");
-    response.send(courserequests);
-
-});
+*/
 
       
 

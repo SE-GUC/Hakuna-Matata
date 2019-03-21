@@ -20,9 +20,19 @@ const memberSchema = new mongoose.Schema({
     skills:[{type:String}]
 })
 const Member=mongoose.model('Member',memberSchema);
+module.exports.Member=Member;
 
-module.exports=Member;
-
+function getexplevel(id) {
+    return Member
+        .findOne({_id: id})
+        .then(function(member) {
+            return member.levelofexpreience;
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+}
+module.exports.getexplevel=getexplevel;
 
 
 
