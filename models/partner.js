@@ -1,21 +1,18 @@
+const mongoose = require ('mongoose');
+mongoose.connect('mongodb://localhost/newmongo',{ useNewUrlParser: true })
+.then(()=>console.log('connected to mongo'))
+.catch(err => console.error('coudnt connect to mongo',err))
 
-class parteners_profile{
-    constructor(id,name,information,partners,field_of_work,projects,feedback_form){
-        
-        this.id=id;
-        
-        this.name=name;
-        
-        this.information=information;
-        
-        this.partners=partners;
-        
-        this.field_of_work=field_of_work;
-        
-        this.projects=projects;
-        
-        this.feedback_form=feedback_form;
-        
-    }
-}
-module.exports=parteners_profile;
+const partnerSchema = new mongoose.Schema({
+
+    name:{type:String ,required:true},
+    information:{type:String },
+    partners:[{type:String}],
+    field_of_work:String,
+    projects:[{type:String}],
+    feedback_form:String
+
+})
+const Partner=mongoose.model('Partner',partnerSchema);
+
+module.exports=Partner;
