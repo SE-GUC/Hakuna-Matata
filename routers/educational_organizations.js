@@ -8,7 +8,9 @@ const express = require('express');
 const router = express.Router();
 router.use(express.json());
 const Joi = require('joi');
+const mongoose=require('mongoose');
 
+const validator = require('../validations/CourseValidations')
 
 const room = require('../models/room'); 
 const coworking_space = require('../models/coworking_space'); 
@@ -85,39 +87,25 @@ router.post("/create_educational_organization/:partner_id",(req,res)=>{
     educational_organizations.push(edu);
 });
 
-//URL to add courses (id  => educational_organizationId)
-router.post("/:id/add_course",(req,res)=>{
-    
-    const schema={
-               
-        name:Joi.string().required(),
-        educator_id:Joi.string().required(),
-        educator_name:Joi.string().required(),
-        description:Joi.string().required(),
-        students_assigened:Joi.array(),
-        places:Joi.number().integer().required(),
+//update create course using mongo (id  => educational_organizationId)
+router.post("/:id/add_course",async(req,res)=>{
+    try{
+        const isValidated = validator.createValidation(req.body);
+        if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+        const course = await courses.create(req.body) 
         
-        payment:Joi.string().required(),
-        course_duration:Joi.string().required(),
-        start_date:Joi.string().required(),
-        end_date:Joi.string().required(),
-        level_of_students:Joi.string().required(),
-        effort:Joi.string().required(),
-        available:Joi.boolean().required()
-    };
-    const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
+        res.json({msg:'Book was created successfully', data: course})
     }
-    const educ =educational_organizations.find(m=>m.id===parseInt(req.params.id));    
+      
 
-    const course = new courses(educ.courses.length+1,req.body.name,req.body.educator_id,req.body.educator_name,
-                                 req.body.description,req.body.students_assigened,req.body.places,req.body.payment,
-                                 null,req.body.course_duration,req.body.start_date,req.body.end_date,
-                                 req.body.level_of_students,req.body.effort,req.body.available);
-    educ.courses.push(course);
-    res.send({data:educational_organizations});
+   
+  
+    catch(error){
+        console.log(error)
+    }
+
+
+
 });
 
 //URL to create master classes   (id  => educational_organizationId)
@@ -335,12 +323,18 @@ router.delete("/:id/delete_training_programs/:training_program_id",(req,res) =>{
     
 });
 //(id  => educational_organizationId  ,course_id => courseId)
-router.delete("/:id/delete_courses/:course_id",(req,res) =>{
-    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));    
-    const course =education.courses.find(c=>c.id===parseInt(req.params.course_id));
-    education.courses.splice(course);
-
-    res.send({data:educational_organizations});
+//delete course using mongo
+router.delete("/:id/delete_courses/:course_id",async(req,res) =>{
+    try{
+    const id=req.params.course_id;
+    const deletedcourse=await courses.findByIdAndRemove(id);
+    if(!deletedcourse) return res.status(404).send({error: 'Course does not exist'})
+    res.json({msg:'course was deleted successfully', data: deletedcourse})
+}
+catch(error)
+  {
+      console.log(error)
+  }
     
 });
 //(id  => educational_organizationId  ,master_class_id => masterClassId)
@@ -358,10 +352,19 @@ router.get("/:id/show_educational_organization",(req,res) =>{
     res.send(educational_organizations.find(m=>m.id===parseInt(req.params.id)));
 });
 
-//(id  => educational_organizationId)
-router.get("/:id/show_courses",(req,res) =>{
-    
-    res.send(educational_organizations.find(m=>m.id===parseInt(req.params.id)).courses);
+//(id  => CourseId)
+//get course by id using mongo
+router.get("/:id/show_courses",async(req,res) =>{
+    try{
+    const id =req.params.id
+    const coursefind=await courses.findById(id);
+    if(!coursefind) return res.status(404).send({error: 'course does not exist'})
+    res.json({msg:'You get the course',data :coursefind})
+    }
+    catch(error){
+        console.log(error)
+    }
+   
     
 });
 //(id  => educational_organizationId)
@@ -402,78 +405,26 @@ router.put("/:id/update_educational",(req,res)=>{
     }
     res.send(educational_organizations);
 });
+//update course using mongo
 //(id  => educational_organizationId  ,course_id => courseId)
-router.put("/:id/update_course/:course_id",(req,res)=>{
-    const schema={
-        name:Joi.string(),
+//router.put("/:id/update_course/:course_id",async(req,res)=>{
+  //  try{
+    //    const id = req.params.id
         
-        educator_id:Joi.number().integer(),
-        educator_name:Joi.string(),
-        places:Joi.number().integer(),
-        available_places:Joi.number().integer(),
-        payment:Joi.string(),
-        description:Joi.string(),
-        students_assigened:Joi.array(),
-        course_duration:Joi.string(),
-        start_date:Joi.string(),
-        end_date:Joi.string(),
-        level_of_students:Joi.string(),
-        effort:Joi.string(),
-        available:Joi.boolean()
-      
-     };
-     const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    };
-    const education =educational_organizations.find(m=>m.id===parseInt(req.params.id));
-    const course= education.courses.find(m=>m.id===parseInt(req.params.course_id));
-    if(req.body.name!=null){
-        course.name=req.body.name;
-    }
-    if(req.body.educator_id!=null){
-        course.educator_id=req.body.educator_id;
-    }
-    if(req.body.educator_name!=null){
-        course.educator_name=req.educator_name;
-    }
-    if(req.body.places!=null){
-        course.places=req.body.places;
-    }
-    if(req.body.available_places!=null){
-        course.available_places=req.body.available_places;
-    }
-    if(req.body.payment!=null){
-        course.payment=req.body.payment;
-    }
-    if(req.body.description!=null){
-        course.description=req.body.description;
-    }
-    if(req.body.students_assigened!=null){
-        course.students_assigened=req.body.students_assigened;
-    }
-    if(req.body.course_duration!=null){
-        course.course_duration=req.body.course_duration;
-    }
-    if(req.body.start_date!=null){
-        course.start_date=req.body.start_date;
-    }
-    if(req.body.end_date!=null){
-        course.end_date=req.body.end_date;
-    }
-    if(req.body.level_of_students!=null){
-        course.level_of_students=req.body.level_of_students;
-    }
-    if(req.body.effort!=null){
-        course.effort=req.body.effort;
-    }
-    if(req.body.available!=null){
-        course.available=req.body.available;
-    }
+       // const course=await courses.findById({id})
+        //if(!course) return res.status(404).send({error: 'course does not exist'})
+        //const isValidated = validator.updateValidations(req.body)
+        //if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+        //const updatedcourse = await course.updateOne(req.body)
+        //res.json({msg: 'Book updated successfully',data:updatedcourse})
+    //}
+  //catch(error){
+    //    console.log(error)
+  //}
 
-    res.send(educational_organizations);
-});
+    
+//});
+
 //(id  => educational_organizationId  ,master_class_id => masterClassId)
 router.put("/:id/update_master/:master_class_id",(req,res)=>{
     const schema={

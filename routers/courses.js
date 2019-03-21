@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 var moment = require('moment');
 const Joi = require('joi');
-
+const course=require('../models/courses.js');
 
 // Models
 const courses = require('../arrays/Courses');
