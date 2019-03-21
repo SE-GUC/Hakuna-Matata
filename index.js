@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const mongoose= require('mongoose'); 
 app.use(express.json());
 const task = require('./routers/task.js'); 
 const coworking_spaces =require('./routers/coworking_spaces');
@@ -25,6 +26,13 @@ app.get('/', (req, res) => {
     <a href="/coworking_space">Co-working Spaces</a> 
     `);
 })
+const db = require('./config/keys').mongoURI
+
+
+mongoose
+    .connect(db)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
 
 
 
