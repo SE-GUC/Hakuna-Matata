@@ -1,12 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const Joi = require('joi');
+var moment = require('moment');
 
 // We will be connecting using database 
 //const member = require('../models/member.js')
 //const members = require('../arrays/members')
 // temporary data created as if it was pulled out of the database ...
-
+const membermodel = require('../models/member.js');
 const notObject = require("../arrays/Notifications.js");
 const courseRequestArray = require("../arrays/Courserequests.js");
 const Memberarray = require("../arrays/members.js");
@@ -141,5 +142,44 @@ router.get('/:id', (req, res) => {
      
       });
 
+
+
+router.post('/create_member',(req,res)=>{
+          const id=Memberarray[Memberarray.length-1].id+1;
+          const fullname=req.body.fullname;
+          var splitted = fullname.split(" ");
+          var webname=splitted[0];
+          const datejoined=moment().format('MMMM Do YYYY, h:mm:ss a');
+          const deactivated=false;
+          const completed_task_id=[];
+          const appliedtask=[];
+          const levelofexpreience=0;
+          const Rating=0;
+          const all_rated_reco=0;
+          const avreage_reco_rate=0;
+          const allratedtasks=0;
+          const skills=req.body.skills
+
+          const m=new membermodel(id,fullname,webname,datejoined,deactivated,completed_task_id,appliedtask,levelofexpreience,
+            Rating,all_rated_reco,avreage_reco_rate,allratedtasks,skills);
+            Memberarray.push(m);
+            res.send(m);
+
+
+
+      })
+     
+
+
+      router.put('/:id/update', (req, res) => {
+        for (const object of Memberarray){
+            if(object.id==req.params.id){
+                name=req.body.fullname;
+                object.fullname=name;
+                res.send(object);
+          }
+          }
+         
+          });
 	  
 	  module.exports = router
