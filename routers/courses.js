@@ -5,7 +5,7 @@ const Joi = require('joi');
 
 
 // Models
-const courses = require('../arrays/Courses');
+//const courses = require('../arrays/Courses');
 
 // Get all course
 router.get('/',(request,response)=>{
