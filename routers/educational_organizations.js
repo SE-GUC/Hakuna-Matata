@@ -14,16 +14,12 @@ const room = require('../models/room');
 const coworking_space = require('../models/coworking_space'); 
 
 
-const coworking_spaces = require('../arrays/coworking_spaces'); 
 const educational_organization = require('../models/educational_organization.js');
 const master_class=require('../models/master_class.js');
 const courses=require('../models/courses.js');
 const training_programs=require('../models/training_programs.js');
 const certificates=require('../models/certificates.js');
 const educators=require('../models/educators.js');
-
-const educational_organizations = require('../arrays/educational_organizations.js');
-
 
 router.get("/",(req,res)=>{
     res.send("afssa");
@@ -338,8 +334,27 @@ catch(error)
       console.log(error)
   }
     
-});
+});/*
+router.get("/:id/show_educational_organization/:course_id/Show_Course",async(req,res) =>{
+    try{
+        const id =req.params.id
+        const CourseId=req.params.course_id
+        const organizationfind=await educational_organization.findById(id);
+        if(!organizationfind) return res.status(404).send({error: 'educational_organization does not exist'})
+        const coursee=organizationfind.courses.find(returnedMC=>returnedMC._id ==CourseId)
+        if(coursee!==undefined)
+        res.json({msg:'You get the Course', Course})
+        else
+        res.json({msg:'this Course not Found'})
 
+
+    }
+        catch(error){
+            console.log(error)
+        }
+       
+        
+    });*/
     // End of Course CRUDS
 
 

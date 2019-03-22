@@ -1,10 +1,15 @@
 
 // The Courserequest model
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/lirtenhub',{useNewUrlParser:true})
-.then(()=>console.log('connected to mongo'))
-.catch(err=>console.log("there is error",err))
-//recomendations Schema
+// DB Config
+const db = require('../config/keys').mongoURI
+
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+
 const RecomendationsSchema = new mongoose.Schema({
     course_id:String,rating:{type:Number,enum:[1,2,3,4,5]} ,numberofratings:Number
 })
