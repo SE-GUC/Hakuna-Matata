@@ -16,6 +16,9 @@ router.get('/show_unconsultedtasks',(req,res)=>{
 function show_uncosultedtasks(){
     return tasks.filter(checkAdult) ;
 };
+function checkAdult(obj) {
+    return (obj.consultancy_agency_id === 0 ||obj.consultancy_agency_id==null) && obj.consulty_needed==true;
+  };
 
 
 router.post('/feedback/:agency_id/:id',(req,res)=>{
@@ -41,20 +44,26 @@ function add_consultedtask(taskid,consultancy_agency_id,description,required_ski
     taask.cunsulties_done.push(task_created);
 };
 
-
-router.get('/show', (req, res) => res.json(show_agencies()));
-function show_agencies(){
-    return {data: constultancy_agencies} ;
-}
-router.get('/show/:agency_id', (req, res) =>{
-     var x= constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id));
+//show all agencies
+router.get('/show', async (req, res) =>{
+    const agencies = await agency.find();
+    res.json(agencies);
+});
+//show agency with id equal agency_id
+router.get('/show/:agency_id', async (req, res) =>{
+    const id=req.params.agency_id
+    var x= await agency.find({"_id" :id});
      if(!x){
         res.send("consultancy agency not found");
         return;
     }
      res.send(x);
 });
-router.post('/add_agency/:partner_id',(req,res)=>{
+
+//create agency
+router.post('/add_agency/:partner_id',async (req,res)=>{
+    try{
+        //res.json("creating");
     const schema={
         name:Joi.string().required(),
         information:Joi.string().required(),
@@ -67,22 +76,33 @@ router.post('/add_agency/:partner_id',(req,res)=>{
         res.status(400).send(result.error.details[0].message);
         return;
     }
-    var x=[parseInt(req.params.partner_id)];
-    if(req.body.parteners!=null){
-    req.body.parteners.forEach(element => {
-        x.push(element);
+    //var x=req.params.partner_id;
+    //req.params.parteners.push(x);
+    //add_agencies(req.body.name,req.body.information,x,req.body.members,req.body.reports);
+    req.body.parteners.push(req.params.partner_id);
+    const agent=new agency({
+        name:req.body.name,
+        rate:null,
+        information:req.body.information,
+        parteners:req.body.parteners,
+        members:req.body.members,
+        reports:req.body.reports
     });
-    };
-    add_agencies(req.body.name,req.body.information,x,req.body.members,req.body.reports);
-    res.send(constultancy_agencies);
+    await agency.insertMany(agent);
+    //const newagency= await agency.create(req.body);
+    const agencies = await agency.find();
+    res.json(agencies);
+    }
+    catch(error){
+        console.log(error);
+    }
 });
-function add_agencies(name,information,parteners,members,reports){
-    const agency_input=new agency(constultancy_agencies.length+1,name,null,information,parteners,members,reports);
-    constultancy_agencies.push(agency_input);
-};
 
-router.put('/update_agency/:agency_id',(req,res)=>{
-    var x= constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id));
+//update agency with id equal agency_id
+router.put('/update_agency/:agency_id',async (req,res)=>{
+    try{
+        const id=req.params.agency_id
+        var x= await agency.find({"_id" :id});
     if(!x){
         res.send("consultancy agency not found");
         return;
@@ -99,7 +119,7 @@ router.put('/update_agency/:agency_id',(req,res)=>{
         res.status(400).send(result.error.details[0].message);
         return;
     };
-    if(req.body.name!=null){
+    /*if(req.body.name!=null){
         x.name=req.body.name;
     }
     if(req.body.information!=null){
@@ -113,31 +133,53 @@ router.put('/update_agency/:agency_id',(req,res)=>{
     }
     if(req.body.reports!=null){
         x.reports=req.body.reports;
-    }
-});
-router.delete('/delete_agency/:agency_id',(req,res)=>{
-    if(!constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id))){
-        res.send("consultancy agency not found");
-        return;
-    }
-    const indx=constultancy_agencies.indexOf(constultancy_agencies.find(m => m.id===parseInt(req.params.agency_id)));
-    constultancy_agencies.splice(indx,1);
-res.send(constultancy_agencies);
+    }*/
+    const query = await agency.findOneAndUpdate({'_id':req.params.agency_id},req.body)
+    const agencies = await agency.find();
+    res.json(agencies);
+}
+catch(error){
+    console.log(error);
+};
 });
 
-router.post('/add_report/:id',(req,res)=>{
-    const x=constultancy_agencies.find(m => m.id===parseInt(req.params.id));
-    if(!x){
-        res.send("constultancy agency not found");
-        return;
+//delete agency with id equal agency_id
+router.delete('/delete_agency/:agency_id',async (req,res)=>{
+
+    try{
+        const id=req.params.agency_id
+        var x= await agency.find({'_id':id});
+        if(!x){
+            res.send("consultancy agency not found");
+            return;
+        }
+        const deletedAgency = await agency.findByIdAndRemove(id)
+        const agencies = await agency.find();
+    res.json(agencies);
     }
-    x.reports.push(req.body.report);
-    res.send(constultancy_agencies);
+    catch(error){
+        console.log(error);
+    }
 });
 
-function checkAdult(obj) {
-    return (obj.consultancy_agency_id === 0 ||obj.consultancy_agency_id==null) && obj.consulty_needed==true;
-  };
+//add report in agency with id equal id
+router.put('/add_report/:id',async (req,res)=>{
+    try{
+    const id=req.params.id
+        var x= await agency.findOne({'_id':id});
+        if(!x){
+            res.send("consultancy agency not found");
+            return;
+        }
+   x.reports.push(req.body.report);
+  await agency.findOneAndUpdate({'_id':id},{"reports":x.reports});
+    const agencies = await agency.find();
+    res.json(agencies);
+    }
+    catch(error){
+        res.send(error);
+    }
+});
 
 //(partner_id  => partnerId, task_id=>taskId)
 router.get('/show_consulted_tasks/:partner_id/:task_id',(req,res)=>{

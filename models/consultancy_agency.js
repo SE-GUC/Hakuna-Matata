@@ -1,19 +1,13 @@
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+const consultancy_agency_schema = new Schema({
+    name:{type:String},
+    rate:{type:Number},
+    information:{type:String},
+    parteners:{type:[String]},
+    members:{type:[String]},
+    reports:{type:[String]}
+});
 
 
-
-
-
-class consultancy_agency{
-    constructor(id,name,rate,information,parteners,members,reports){
-        this.id=id;
-        this.name=name;
-        this.rate=rate;
-        this.information=information;
-        this.parteners=parteners;
-        this.members=members;
-        this.reports=reports;
-        //this.reports = new array();
-    }
-}
-
-module.exports=consultancy_agency;
+module.exports = router = mongoose.model('consulties', consultancy_agency_schema)
