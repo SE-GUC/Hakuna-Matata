@@ -1,33 +1,40 @@
+const mongoose= require('mongoose');
 const express = require('express');
 const router = express.Router();
 
 const Joi = require('joi');
 
 const agency = require('../models/consultancy_agency'); 
-const tasker=require('../models/task');
+const tasker=require('../models/consultance');
+const task=require('../models/task');
 const {Send_Task_Notification} = require("../arrays/Notifications.js");
 //const taskConsulted = require('../arrays/taskConsulted'); 
-const constultancy_agencies = require('../arrays/constultancy_agencys'); 
-const tasks=require('../arrays/tasks')
+//const constultancy_agencies = require('../arrays/constultancy_agencys'); 
+//const tasks=require('../arrays/tasks')
 
-router.get('/show_unconsultedtasks',(req,res)=>{
-    res.send(show_uncosultedtasks());
+//show all the tasks that need consultance 
+router.get('/show_unconsultedtasks',async (req,res)=>{
+    try{
+    const unconsulted=await task.find({ 
+        consulty_needed:true,
+        consultancy_agency_id:0
+     });
+    res.send(unconsulted);
+    }
+    catch(error){
+        console.log(error);
+    }
 });
-function show_uncosultedtasks(){
-    return tasks.filter(checkAdult) ;
-};
-function checkAdult(obj) {
-    return (obj.consultancy_agency_id === 0 ||obj.consultancy_agency_id==null) && obj.consulty_needed==true;
-  };
 
-
-router.post('/feedback/:agency_id/:id',(req,res)=>{
+//create a consultance to a task with id equal id by consultancy agency with id equal agency_id
+router.post('/feedback/:agency_id/:id', async (req,res)=>{
+    try{
     const schema={
         description:Joi.string().required(),
         deadline:Joi.string().required(),
 	    commit_level:Joi.number().integer().min(0).max(5).required(),
-	    experiance_level:Joi.number().integer().min(0).max(5).required(),
-        monetary_compensation:Joi.string().required(),
+	    experience_level:Joi.number().integer().min(0).max(5).required(),
+        monetary_compensation:Joi.number().required(),
         required_skills:Joi.array().required(),    
     };
     const result =Joi.validate(req.body,schema);
@@ -35,14 +42,43 @@ router.post('/feedback/:agency_id/:id',(req,res)=>{
         res.status(400).send(result.error.details[0].message);
         return;
     }
-    add_consultedtask(parseInt(req.params.id),parseInt(req.params.agency_id),req.body.description,req.body.required_skills,req.body.monetary_compensation,req.body.deadline,req.body.experience_level,req.body.commit_level);
-    res.send(tasks);
+    const tassk=await task.findOne({
+        '_id':req.params.id,
+        consulty_needed:true,
+        consultancy_agency_id:0
+    });
+    const consult=new tasker({
+        partner_id:tassk.partner_id,
+        consultancy_agency_id:req.params.agency_id,
+        member_id:tassk.member_id,
+        admin_id:tassk.admin_id,
+        applied_id:tassk.applied_id,
+        description:req.body.description,
+        required_skills:req.body.required_skills,
+        monetary_compensation:req.body.monetary_compensation,
+        deadline:req.body.deadline,
+        deadline_for_apply:tassk.deadline_for_apply,
+        upload_date:tassk.upload_date,
+        submission_date:tassk.submission_date,
+        experience_level:req.body.experience_level,
+        commit_level:req.body.commit_level,
+        work_cycle:tassk.work_cycle,
+        link_of_task:tassk.link_of_task,
+        user_rate:tassk.user_rate,
+        accepted:tassk.accepted,
+        rate:tassk.rate,
+        consulty_needed:tassk.consulty_needed,
+        cunsulties_done:[]
+    });
+    tassk.cunsulties_done.push(consult);
+    const query = await task.findOneAndUpdate({'_id':req.params.id},{cunsulties_done:tassk.cunsulties_done});
+    const taS = await task.find()
+    res.json(taS);
+}
+catch(error){
+    console.log(error);
+}
 });
-function add_consultedtask(taskid,consultancy_agency_id,description,required_skills,monetary_compensation,deadline,experience_level,commit_level){
-    var taask=tasks.find(m => m.id===taskid&&m.consultancy_agency_id===0);
-    var task_created=new tasker(taskid,taask.partner_id,consultancy_agency_id,taask.member_id,taask.admin_id,null,description,required_skills,monetary_compensation,deadline,taask.dealine_for_apply,taask.upload_date,null,experience_level,commit_level,taask.work_cycle,taask.link_of_task,taask.user_rate,taask.accepted,taask.rate,taask.consulty_needed,[]);
-    taask.cunsulties_done.push(task_created);
-};
 
 //show all agencies
 router.get('/show', async (req, res) =>{
@@ -181,17 +217,23 @@ router.put('/add_report/:id',async (req,res)=>{
     }
 });
 
+//show consultancies for a certain task
 //(partner_id  => partnerId, task_id=>taskId)
-router.get('/show_consulted_tasks/:partner_id/:task_id',(req,res)=>{
-    const task=tasks.find(m => m.id===parseInt(req.params.task_id)&&m.partner_id===parseInt(req.params.partner_id));
-    if(!task){
+router.get('/show_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
+    const tassk=await task.findOne({
+        '_id':req.params.task_id,
+        partner_id:req.params.partner_id
+    });
+    if(!tassk){
         res.send("not found");
     }
     else
-    res.send(task.cunsulties_done);
+    res.send(tassk.cunsulties_done);
 });
+
+
 //(id  => constultancyAgencysId, partner_id  => partnerId, task_id=>taskId,)
-router.put('/:id/accept_consulted_tasks/:partner_id/:task_id',(req,res)=>{
+router.put('/:id/accept_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
     /*tasks.forEach(element => {
         if(element.partner_id===parseInt(req.params.partner_id)&&element.id===parseInt(req.params.task_id)){
             tasks.cunsulties_done.forEach(elem=>{
@@ -204,46 +246,82 @@ router.put('/:id/accept_consulted_tasks/:partner_id/:task_id',(req,res)=>{
             });
         }
     }); */
-    const task=tasks.find(m => m.id===parseInt(req.params.task_id)&&m.partner_id===parseInt(req.params.partner_id));
-    if(task!=null){
-        const consultance=task.cunsulties_done.find(m => m.consultancy_agency_id===parseInt(req.params.id));
+    try{
+    const tassk=await task.findOne({
+        '_id':req.params.task_id,
+        partner_id:req.params.partner_id
+    });
+        if(tassk!=null){
+        const consultance=tassk.cunsulties_done.find(m => m.consultancy_agency_id==req.params.id);
         if(!consultance){
-            res.send("not found");
+            res.send("consultance not found");
             return;
         }
        /* task.cunsulties_done.forEach(element=>{
             consultance.cunsulties_done.push(element);
         });*/
-        const cons=new tasker(consultance.id,consultance.partner_id,consultance.consultancy_agency_id,consultance.member_id,consultance.admin_id,consultance.applied_id,consultance.description,consultance.required_skills,consultance.monetary_compensation,consultance.deadline,consultance.deadline_for_apply,consultance.upload_date,consultance.submission_date,consultance.experience_level,consultance.commit_level,consultance.work_cycle,consultance.link_of_task,consultance.user_rate,consultance.accepted,consultance.rate,consultance.consulty_needed,task.cunsulties_done);
-        tasks.push(cons);
+        const consult=new task({
+            partner_id:consultance.partner_id,
+            consultancy_agency_id:consultance.consultancy_agency_id,
+            member_id:consultance.member_id,
+            admin_id:consultance.admin_id,
+            applied_id:consultance.applied_id,
+            description:consultance.description,
+            required_skills:consultance.required_skills,
+            monetary_compensation:consultance.monetary_compensation,
+            deadline:consultance.deadline,
+            deadline_for_apply:consultance.deadline_for_apply,
+            upload_date:consultance.upload_date,
+            submission_date:consultance.submission_date,
+            experience_level:consultance.experience_level,
+            commit_level:consultance.commit_level,
+            work_cycle:consultance.work_cycle,
+            link_of_task:consultance.link_of_task,
+            user_rate:consultance.user_rate,
+            accepted:consultance.accepted,
+            rate:consultance.rate,
+            consulty_needed:consultance.consulty_needed,
+            cunsulties_done:tassk.cunsulties_done
+        });
+        /*tassk.cunsulties_done.forEach(element=>{
+            consultance.cunsulties_done.push(element);
+        });*/
+        task.insertMany(consult);
         var e=Send_Task_Notification(req.params.task_id,consultance.consultancy_agency_id,"Your consultancy has been accepted!");
-        const indx=tasks.indexOf(task);
-                    tasks.splice(indx,1);
+        await task.findByIdAndDelete(req.params.task_id);
+        //await task.findOneAndUpdate({'_id':req.params.task_id},consultance);
     }
     else{
-        res.send("not found");
+        res.send("task not found");
         return;
     }
     //res.send(taskConsulted);
-    res.send(tasks);
-    
+    const taS = await task.find()
+    res.send(taS);
+}
+catch(error){
+    console.log(error);
+}
     
 });
-/*function delete_consulted(task_id){
-    for (i = taskConsulted.length - 1; i >= 0; i -= 1) {
-        if (taskConsulted[i].id === task_id ) {
-            taskConsulted.splice(i, 1);
-        }
-    }
-};*/
 
 
 //update consultance to a certain task
 //(id=> consultancyAgencysId,task_id=>partenerId)
-router.put('/:id/update_consultance/:task_id',(req,res)=>{
-    const task=tasks.find(m => m.id===parseInt(req.params.task_id));
-    const consultance =task.cunsulties_done.find(m=>m.consultancy_agency_id===parseInt(req.params.id));
-
+router.put('/:id/update_consultance/:task_id',async (req,res)=>{
+    try{
+    const tassk=await task.findOne({
+        '_id':req.params.task_id,
+    });
+    if(!tassk){
+        res.send('task not found');
+        return;
+    }
+        const consultance =tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id);
+        if(!consultance){
+            res.send('consultance not found');
+            return
+        }
     const schema={
         description:Joi.string(),
         required_skills:Joi.string(),
@@ -282,19 +360,39 @@ router.put('/:id/update_consultance/:task_id',(req,res)=>{
     if(req.body.commit_level!=null){
         consultance.commit_level=req.body.commit_level;
         }
-        res.send(tasks);
+
+        await task.findOneAndUpdate({'_id':req.params.task_id},{cunsulties_done:tassk.cunsulties_done});
+        const taS = await task.find()
+    res.send(taS);
+    }
+    catch(error){
+        console.log(error);
+    }
 });
 
 //delete certain consultance of a task
-router.delete('/:id/delete_consultance/:taskid',(req,res)=>{
-    const task=tasks.find(m => m.id===parseInt(req.params.taskid));
-    const consultance=task.cunsulties_done.find(m=>m.consultancy_agency_id===parseInt(req.params.id));
-    if(!task.cunsulties_done.find(m=>m.consultancy_agency_id===parseInt(req.params.id))){
+router.delete('/:id/delete_consultance/:taskid',async (req,res)=>{
+    try{
+    const tassk=await task.findOne({
+        '_id':req.params.taskid,
+    });
+    if(!tassk){
+        res.send('task not found');
+        return;
+    }
+    const consultance=tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id);
+    if(!consultance){
         res.send('consultance not found');
         return;
     };
-    const indx=task.cunsulties_done.indexOf(consultance);
-    task.cunsulties_done.splice(indx,1);
-    res.send(tasks);
+    const indx=tassk.cunsulties_done.indexOf(tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id));
+    tassk.cunsulties_done.splice(indx,1);
+    await task.findOneAndUpdate({'_id':req.params.taskid},{cunsulties_done:tassk.cunsulties_done});
+    const taS = await task.find()
+    res.send(taS);
+}
+catch(error){
+    console.log(error);
+}
 });
   module.exports = router
