@@ -1,3 +1,4 @@
+const mongoose= require('mongoose');
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
@@ -11,67 +12,55 @@ const members= require('../arrays/members.js');
 const {Send_Task_Notification} = require("../arrays/Notifications.js");
 
 //create task
-router.post('/create/:id',(req,res)=>{
-    
+router.post('/create/:id',async (req,res)=>{
+    try{
     const schema={
         description:Joi.string().required(),
-        consult_needed:Joi.boolean(),
-        time:Joi.string(),
-	    level_of_commitment:Joi.number().integer().min(1).max(5),
-	    experiance_level:Joi.number().integer().min(1).max(5),
-        monetory_compensation:Joi.number(),
-        required_skills:Joi.array(),
-    };
-    const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    }
-    
-if (req.body.consult_needed===false){
-
-    const schema={
-        description:Joi.string().required(),
-        consult_needed:false,
-	    time:Joi.string().required(),
+        consult_needed:Joi.boolean().required(),
+        time:Joi.string().required(),
 	    level_of_commitment:Joi.number().integer().min(1).max(5).required(),
 	    experiance_level:Joi.number().integer().min(1).max(5).required(),
         monetory_compensation:Joi.number().required(),
         required_skills:Joi.array().required(),
-
     };
-
     const result =Joi.validate(req.body,schema);
     if(result.error){
         res.status(400).send(result.error.details[0].message);
         return;
     }
-
-    tasks.push(  
-        new task(tasks.length+1,parseInt(req.params.id),0,0,0,
-                 [{Memeber_id:null , date_of_apply:null}
-                    ],
-                req.body.description,req.body.required_skills,req.body.monetory_compensation,
-                req.body.time,null,null,null,req.body.experiance_level,req.body.level_of_commitment,
-                null,null,null,null,null,false,[]
-                )
-
-                );
-res.send({data : tasks});
-return;
+    const task1=new task({
+        partner_id:req.params.id,
+        consultancy_agency_id:0,
+        member_id:null,
+        admin_id:null,
+        applied_id:[],
+        description:req.body.description,
+        required_skills:req.body.required_skills,
+        monetary_compensation:req.body.monetory_compensation,
+        deadline:req.body.time,
+        deadline_for_apply:null,
+        upload_date:null,
+        submission_date:null,
+        experience_level:req.body.experiance_level,
+        commit_level:req.body.level_of_commitment,
+        work_cycle:null,
+        link_of_task:null,
+        user_rate:null,
+        accepted:null,
+        rate:null,
+        consulty_needed:req.body.consult_needed,
+        cunsulties_done:[]
+    });
+//const ta = await task.create(req.body)
+task.insertMany(task1);
+const taS = await task.find()
+res.json({data : taS});
 }
-tasks.push(  
-    new task(tasks.length+1,parseInt(req.params.id),0,0,0,
-             [{Memeber_id:null , date_of_apply:null}
-                ],
-            req.body.description,req.body.required_skills,req.body.monetory_compensation,
-            req.body.time,null,null,null,req.body.experiance_level,req.body.level_of_commitment,
-            null,null,null,null,null,false,[]
-            ));
-
-res.send(tasks);
+catch(error){
+    // we will handling the error later
+    console.log(error) 
 }
-);
+});
 
 // Update a tasks's state (taskID =>taskId , adminId=> admin who reject or accept the task)
 router.put('/:adminId/edit/:taskID', (req, res) => {
@@ -108,14 +97,20 @@ router.put('/:adminId/edit/:taskID', (req, res) => {
 })
 
 // get a specific task      (id =>taskId)
-router.get("/:id/admin" ,(req,res)=>{
-    const task =tasks.find(m=>m.id===parseInt(req.params.id));
-    res.send(task)
+router.get("/:id/admin" ,async(req,res)=>{
+    try{
+    const ta = await task.findOne({'_id':req.params.id});
+    res.json({data: ta})
+    }
+    catch(error){
+        console.log(error);
+    }
 });
 
 //show all tasks
-router.get("/",(req,res)=>{
-    res.send(tasks);
+router.get("/",async (req,res)=>{
+    const taS = await task.find()
+    res.json({data : taS});
 });
 
 
@@ -155,18 +150,22 @@ router.put('/:id/updateworkcycle',(request,response)=>{
 });
 
 // Delete Certine task from Array
-router.delete('/:id/deletetask', (req, res) => {
-    const taskId = req.params.id
-    //router.listen( () => console.log(memberId))
-    const task = tasks.find(task=>parseInt( task.id)=== parseInt(taskId))
-    if(task!==undefined){
-    tasks.splice(tasks.indexOf(task),1)
-    platform.splice(platform.indexOf(taskId),1)
-    res.send('Done')}
-    else{
-        res.send('this id is not on the System')
-    }
-})
+router.delete('/:id/deletetask', async (req, res) => {
+    try {
+        const id = req.params.id
+        const task1=await task.find({'_id':id})
+        if(!task1){
+            res.send("task not found");
+            return;
+        }
+        const deletedTask = await task.findByIdAndRemove(id)
+        res.json({msg:'Task was deleted successfully', data: deletedTask})
+       }
+       catch(error) {
+           // We will be handling the error later
+           console.log(error)
+   } 
+});
 
 // delete a certin task by his partner (id =>taskId , partner_id=> owner of the task)
 router.delete("/:id/delete/:partner_id",(req,res) =>{
@@ -212,51 +211,41 @@ res.send("YOU CANT RATE THIS TASK");
 
 
 // update a task (id =>taskId)
-router.put("/:id/update_task",(req,res) =>{
-    const schema={
-        description:Joi.string(),
-        required_skills:Joi.string(),
-        monetary_compensation:Joi.string(),
-        deadline:Joi.string(),
-        deadline_for_apply:Joi.string(),
-        experience_level:Joi.number().integer().min(1).max(5),
-        commit_level:Joi.number().integer().min(1).max(5)
+router.put("/:id/update_task",async (req,res) =>{
+    try{
+    const id = req.params.id
+    const ta = await task.findOne({"_id":req.params.id})
+    if(!ta) 
+    return res.status(404).send({error : 'task does not exist '})
+    if(ta.accepted == false||ta.accepted==null){
+        const schema={
+            description:Joi.string(),
+            required_skills:Joi.string(),
+            monetary_compensation:Joi.number(),
+            deadline:Joi.string(),
+            deadline_for_apply:Joi.string(),
+            experience_level:Joi.number().integer().min(1).max(5),
+            commit_level:Joi.number().integer().min(1).max(5)
+    
+        };
+    
+        const result =Joi.validate(req.body,schema);
+        if(result.error){
+            res.status(400).send(result.error.details[0].message);
+            return;
+        };
 
-    };
-
-    const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    };
-    var x= tasks.find(m => m.id===parseInt(req.params.id));
-    if(x.accepted===false){
-    if(req.body.description!=null){
-        x.description=req.body.description;
-        }
-    if(req.body.required_skills!=null){
-        x.required_skills=req.body.required_skills;
-        }
-    if(req.body.monetary_compensation!=null){
-    x.monetary_compensation=req.body.monetary_compensation;
-        }
-    if(req.body.deadline!=null){
-    x.deadline=req.body.deadline;
-        }
-    if(req.body.deadline_for_apply!=null){
-    x.deadline_for_apply=req.body.deadline_for_apply;
-        }
-    if(req.body.experience_level!=null){
-        x.experience_level=req.body.experience_level;
-        } 
-    if(req.body.commit_level!=null){
-        x.commit_level=req.body.commit_level;
-        } }
-        else{
-            res.send("YOU CAN NOT UPDATE!!!!!");
-        }    
-        
-        });
+        const ta = await task.findOneAndUpdate({'_id':req.params.id},req.body)
+        res.json({msg : 'task updated successfully'})
+    }
+    else {
+        return res.status(404).send({error : 'can not update '})
+    }
+}
+catch(error) {
+    console.log(error)
+}  
+});
 
 // get a specific task      (id =>taskId)
 router.get("/:id" ,(req,res)=>{
