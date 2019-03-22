@@ -1,19 +1,71 @@
+const mongoose = require('mongoose')
 
-class master_class{
-    constructor(id,name,description,payment,places,available_places,courses,course_duration,start_date,end_date,level_of_students,effort,available){
-        this.id=id;
-        this.name=name;
-        this.description=description;
-        this.payment=payment;
-        this.places=places;
-        this.available_places=available_places;
-        this.courses=courses;
-        this.course_duration=course_duration;
-        this.start_date=start_date;
-        this.end_date=end_date;
-        this.level_of_students=level_of_students;
-        this.effort=effort;
-        this.available=available
-    }
-}
-module.exports=master_class
+// DB Config
+const db = require('../config/keys').mongoURI
+
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+
+const Schema = mongoose.Schema
+
+// Create the schema
+const master_class_Schema = new Schema({
+    
+    name: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    payment: {
+        type: String,
+        required: true
+    },
+    places: {
+        type: Number,
+        required: true
+    },
+
+    available_places: {
+        type: Number,
+        required: true
+    },
+
+    courses: {
+        type: Array
+       
+    },
+    course_duration: {
+        type: String,
+        required: true
+    },
+    start_date: {
+        type: String,
+        required: true
+    },
+    end_date: {
+        type: String,
+        required: true
+    },
+    level_of_students: {
+        type: String,
+        required: true
+    },
+    effort: {
+        type: String,
+        required: true
+    },
+    available: {
+        type: Boolean,
+        required: true
+    },
+
+
+})
+
+module.exports = master_class = mongoose.model('master_class', master_class_Schema)
