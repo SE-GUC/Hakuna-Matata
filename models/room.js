@@ -12,7 +12,7 @@ reserved_date : {
     required: false
 },
 capacity : {
-    type: number,
+    type: Number,
     required: true
 },
 
@@ -22,7 +22,7 @@ end_of_reservation : {
 },
 
 reserved : {
-    type: boolean,
+    type: Boolean,
     required: false
 }
 })
