@@ -3,8 +3,13 @@ const router = express.Router();
 const Joi = require('joi');
 const {Member,getexplevel} = require('../models/member.js');
 const Project = require('../models/project.js');
+const notObject=require('../models/Notification.js');
+
+//Member CRUD
+
 //create member
-router.post('/create',(request,response)=>{
+//1
+router.post('/create', async (request,response)=>{
     const schema={
 
         fullname:Joi.string().required(),
@@ -32,7 +37,7 @@ router.post('/create',(request,response)=>{
         skills:skills
     });
     
-    member.save();
+    await member.save();
     response.sendStatus(200);
    
 }
@@ -40,21 +45,21 @@ router.post('/create',(request,response)=>{
 });
 
 //delete member 
-router.delete('/deleteMember/:id', function(req,res){
+//1
+router.delete('/deleteMember/:id',async (req,res)=>{
+   try {
+    const id = req.params.id
+    const deletedMember = await Member.findOneAndRemove({"_id":id})
+    if(deletedMember!==null)
+    res.json({msg:'Member was deleted successfully', data: deletedMember})
+    else
+    res.json({msg:'Member was deleted Already or Not Found'})
 
-    Member.findByIdAndRemove(
-        req.params.id,
-        function(err) {
-          if(!err){
-            res.sendStatus(200);
-
-          }
-          else{
-            res.status(404).send('Not found');
-
-          }
-        }
-    );
+   }
+   catch(error) {
+       // We will be handling the error later
+       console.log(error)
+   }
  
   });
 
@@ -62,8 +67,9 @@ router.delete('/deleteMember/:id', function(req,res){
 
 
 // Get all members
-router.get('/', (req, res) =>{
-    Member.find({}, function(err, members) {
+//1
+router.get('/', async (req, res) =>{
+  await  Member.find({}, function(err, members) {
           
         if(!err){
             res.send(members);
@@ -78,16 +84,21 @@ router.get('/', (req, res) =>{
 });
 
 //get member by id
-router.get('/:id',(req,res)=>{
+router.get('/:id',async (req,res)=>{
 
- Member.findById(req.params.id, function(err, members) {
+ await Member.findById(req.params.id, function(err, members) {
      if(!err){
+        if(members!==null)
         res.send(members);
+        else
+        res.send('Not found');
+
      }
      else {
         res.status(404).send('Not found');
      }  
       });
+     
 
 
 })
@@ -95,7 +106,7 @@ router.get('/:id',(req,res)=>{
 // update member name and skills
 //update a member
 
-router.put("/:id/update",(req,res)=>{
+router.put("/:id/update",async (req,res)=>{
   const schema={
     fullname:Joi.string().required(),
    
@@ -105,7 +116,7 @@ router.put("/:id/update",(req,res)=>{
       res.status(400).send(result.error.details[0].message);
       return;
   } 
-  Member.findById(req.params.id, function(err, members) {
+  await Member.findById(req.params.id, function(err, members) {
       if(!err){
           if(req.body.fullname!=null){
            members.fullname=req.body.fullname
@@ -121,7 +132,7 @@ router.put("/:id/update",(req,res)=>{
        });
 
 });
-
+//end marina part
 //create project
 router.post('/:id/create_project',(request,response)=>{
     const schema={
@@ -248,57 +259,50 @@ router.put("/:id/updateproject/:pid",(req,res)=>{
   
   });
 
-// We will be connecting using database 
-//const member = require('../models/member.js')
-//const members = require('../arrays/members')
-// temporary data created as if it was pulled out of the database ...
-/*
-const notObject = require("../arrays/Notifications.js");
-const courseRequestArray = require("../arrays/Courserequests.js");
-const Memberarray = require("../arrays/members.js");
-const tasks = require("../arrays/tasks.js");
 
-router.get('/tasks', (req, res) => {
-    res.send(tasks)
-   
-});
-
-
-
+//Badr Part
 //update rating (id =>memberId)
-router.put('/:id/ratemember',(request,response)=>{
+//1
+router.put('/:id/ratemember',async (request,response)=>{
     var id=request.params.id;
     const newrate = request.body.newrate;
     var nooftasks;
-const schema={
+    const schema={
 
     newrate: Joi.number().integer().max(5).required(),
   
 }
 const result=Joi.validate(request.body,schema);
 if (result.error) return response.status(400).send({ error: result.error.details[0].message });
- for(let object of Memberarray){
-     if(object.id==id){
+    var object =await Member.findById(id)
+     if(object !== undefined){
          nooftasks=object.allratedtasks;
-         object.allratedtasks=object.allratedtasks+1;
-         object.Rating=Math.floor(((object.Rating*nooftasks)+newrate)/object.allratedtasks);
-        
+
+         const x=object.allratedtasks+1;
+         var temprate;
+         if(Math.round(((object.Rating*nooftasks)+newrate)/x)>5)
+         temprate=5
+         else
+         temprate=Math.round(((object.Rating*nooftasks)+newrate)/x)
+        // object.save()
+         object =await Member.findOneAndUpdate({"_id":id},{"allratedtasks":x,"Rating":temprate})
+         response.sendStatus(200);
+
+
+     }else{
+        response.send("Not found");
 
      }
- }
- response.sendStatus(200);
+ 
 });
 
 
-
-
-//router.get('/', (req, res) => res.json({ data: members }))
-// Apply for a task
-router.put('/:id/applyForTask/:task_Id', (req, res) => {
+//2
+router.put('/:id/applyForTask', async(req, res) => {
     const memberId = req.params.id
-    const taskId = req.params.task_Id
-    const task = tasks.find(task => parseInt(task.id) === parseInt(taskId))
-    const member = Memberarray.find(member => parseInt(member.id) === parseInt(memberId))
+    const taskId = req.body.task_Id
+    const task = await Task.findById(taskId)
+    const member = await Member.findById(memberId)
     if(task.accepted){
         //onsole.log("we are Here")
        // const appliedtoit=task.applied
@@ -319,11 +323,13 @@ router.put('/:id/applyForTask/:task_Id', (req, res) => {
                 if(task.applied_id===null)
                     task.applied_id=[]
 
-                task.applied_id.push(member.id)
-            if(member.appliedtask===null)
-                member.appliedtask=[]
+                task.applied_id.push(member._id)
+                if(member.appliedtask===null)
+                     member.appliedtask=[]
 
-               member.appliedtask.push( task.id)
+               member.appliedtask.push( task._id)
+               member.save()
+               task.save()
                 res.send(member)
                 console.log("done")
                 //tempmembers.push(memberdata)
@@ -337,28 +343,13 @@ else{
 }
 
 });
-
-/*ask to edit profile marina*/
-//(id =>memberId)
-/*
+//2
 router.post('/:id/editrequest',(request,response)=>{
     var id=request.params.id;
     var e= notObject.SendToAdminRequestNotification("Member "+id+" wants to edit his profile");
     response.sendStatus(200);
 });
-router.get('/', (req, res) => {
-    res.send(Memberarray)
-})
+// End Badr Part
 
 
-// Get a certain member (id =>memberId)
-router.get('/:id', (req, res) => {
-    for (const object of Memberarray){
-        if(object.id==req.params.id){
-            res.send(object);
-      }
-      }
-     
-      });
-*/
  module.exports = router

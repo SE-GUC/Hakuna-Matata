@@ -782,6 +782,18 @@ router.post("/:id/create_certificates",async(req,res)=>{
 
 });
 
+router.get("/:id/getcertificate",async (request,response)=>{
+    await  certificates.findById(request.params.id, function(err, cer) {
+               
+             if(!err){       
+              response.send(cer);      
+             }    
+               else{
+                  response.status(404).send('Not found');    
+               }
+           });
+     })
+
 //(id  => educational_organizationId)
 router.get("/:id/show_certificates",async(req,res) =>{
     console.log("rgg")
