@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const Joi = require('joi');
-const Member = require('../models/member.js');
+const {Member,getexplevel} = require('../models/member.js');
+const Project = require('../models/project.js');
 //create member
 router.post('/create',(request,response)=>{
     const schema={
@@ -121,7 +122,131 @@ router.put("/:id/update",(req,res)=>{
 
 });
 
+//create project
+router.post('/:id/create_project',(request,response)=>{
+    const schema={
 
+        taskid:Joi.string().required(),
+        partnerid:Joi.string().required(),
+        link:Joi.string().required()
+
+     }
+     const result=Joi.validate(request.body,schema);
+    
+     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+  else {
+    const tID=request.body.taskid;
+    const pID=request.body.partnerid;
+    const LINK=request.body.link;
+    const mID=request.params.id;
+
+    const project = new Project ({
+        task_id:tID,
+    partner_id:pID,
+    member_id:mID,
+    link:LINK
+    });
+ 
+    project.save();
+  
+    response.sendStatus(200);
+   
+}
+   
+});
+
+
+
+//get project by member id
+
+router.get('/:id/projects',(req,res)=>{
+var temp=[];
+Project.find({}, function(err, members) {
+          
+    if(!err){
+        for (var i = 0; i < members.length; i++) {
+            if(members[i].member_id==req.params.id){
+                temp.push(members[i]);
+            }
+            
+        }
+        res.send(temp);
+
+      }
+      else{
+        res.status(404).send('Not found');
+
+      }
+  });
+   
+   })
+
+//delete project 
+router.delete('/:id/project/:pid', function(req,res){
+var isAllowedToDelete=false;
+Project.findById(req.params.pid, function(err, project) {
+    if(!err){
+        
+       if(project.member_id==req.params.id){
+        Project.findByIdAndRemove(
+            req.params.pid,
+            function(err) {
+              if(!err){
+                res.sendStatus(200);
+    
+              }
+              else{
+                res.status(404).send('Not found');
+    
+              }
+            }
+        );
+       }
+       else{
+        res.status(404).send('not allowed to delete this project');
+       }
+    }
+    else {
+       res.status(404).send('Error!');
+    }  
+     });
+
+
+
+    
+ 
+  });
+
+//update project 
+router.put("/:id/updateproject/:pid",(req,res)=>{
+    const schema={
+      link:Joi.string().required(),
+     
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    } 
+    Project.findById(req.params.pid, function(err, project) {
+        if(!err){  
+            console.log("here")
+           if(project.member_id==req.params.id){
+            project.link=req.body.link;
+            console.log("here")
+            project.save();
+            res.send(project);
+           }
+           else{
+            res.status(404).send('not allowed to delete this project');
+           }
+        }
+        else {
+           res.status(404).send('Error!');
+        }  
+         });
+  
+  });
 
 // We will be connecting using database 
 //const member = require('../models/member.js')

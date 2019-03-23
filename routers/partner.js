@@ -133,6 +133,31 @@ router.put("/:id/update",(req,res)=>{
          });
 
 });
+
+
+// get partner project
+router.get('/:id/projects',(req,res)=>{
+    var temp=[];
+    Project.find({}, function(err, members) {
+              
+        if(!err){
+            for (var i = 0; i < members.length; i++) {
+                if(members[i].partner_id==req.params.id){
+                    temp.push(members[i]);
+                }
+                
+            }
+            res.send(temp);
+    
+          }
+          else{
+            res.status(404).send('Not found');
+    
+          }
+      });
+       
+       })
+
 /*
 router.get('/:id/show_accpted_task_notify',(request,response)=>{
     const not = notificationSummaries.find({sent_to:request.params.id,title:"Your task has been accepted"});
