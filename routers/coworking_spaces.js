@@ -261,6 +261,13 @@ router.get('/:id/show_rooms',(req,res)=>{
       });
     
     });
+       // show all rooms of the collection 
+       router.get("/show_rooms/collection",async (req,res)=>{
+  
+        const cos = await room.find()
+        res.send(cos);
+        
+        });
 
 //(id  => coworking_spaces, room_id=>roomId) // show specific room
 router.get('/:id/show_room/:room_id',(req,res)=>{
