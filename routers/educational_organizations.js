@@ -355,6 +355,26 @@ router.get("/:id/show_educational_organization/:course_id/Show_Course",async(req
        
         
     });*/
+    router.get('/:id/sho/:course_id',(req,res)=>{
+    
+        educational_organization.findById  (req.params.id, function async (err, edu) {
+                  
+            if(!err){
+                
+               
+                const co = edu.courses.find(m=>m._id==req.params.course_id);
+                res.send(co);
+               
+            }
+            
+         
+              else{
+                res.status(404).send('Not found');
+        
+              }
+          });
+        
+        });
     // End of Course CRUDS
 
 
