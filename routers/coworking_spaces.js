@@ -211,13 +211,13 @@ router.post("/add_room",async(req,res)=>{
 
 //accept reservation for co-working 
 //reserve workshop for a course 
-router.put('/accept_reservation/:id/:room_id',(req,res)=>{
+router.put('/accept_reservation/:id/:room_id',async (req,res)=>{
  
     const schema={
         reserved:Joi.boolean(),
-        reserved_date:Joi.string(),
-        end_of_reservation:Joi.string(),
-        reserved_id: Joi.number().integer()
+        reserved_date:Joi.date(),
+        end_of_reservation:Joi.date(),
+        reserved_id: Joi.string()
     };
     const result =Joi.validate(req.body,schema);
     if(result.error){
@@ -225,15 +225,22 @@ router.put('/accept_reservation/:id/:room_id',(req,res)=>{
         return;
     }
    
-    const co = coworking_spaces.find(m=>m.id===parseInt(req.params.id));
+    const co =await  coworking_space.findById(req.params.id);
     const roooms = co.rooms;
-    const room = roooms.find(m=>m.id===parseInt(req.params.room_id));
-    if(room.reserved===false){
-      room.reserved_id = req.body.reserved_id;
-        room.reserved=req.body.reserved;
-        room.reserved_date=req.body.reserved_date;
-        room.end_of_reservation=req.body.end_of_reservation;
-        res.send(room);
+    const rooom = roooms.find(m=>m._id==req.params.room_id);
+    if(rooom.reserved===false){
+        rooom.reserved_id = req.body.reserved_id;
+        rooom.reserved=req.body.reserved;
+        rooom.reserved_date=req.body.reserved_date;
+        rooom.end_of_reservation=req.body.end_of_reservation;
+        await coworking_space.findOneAndUpdate({"_id":req.params.id},{"rooms":co.rooms});
+        await room.findOneAndUpdate({'_id':req.params.room_id},{
+            reserved_id:req.body.reserved_id,
+            reserved:req.body.reserved,
+            reserved_date:req.body.reserved_date,
+            end_of_reservation:req.body.end_of_reservation
+        })
+        res.send({data:co.rooms});
         return;
     };
 
@@ -261,7 +268,8 @@ router.get('/:id/show_rooms',(req,res)=>{
       });
     
     });
-       // show all rooms of the collection 
+
+// show all rooms of the collection 
        router.get("/show_rooms/collection",async (req,res)=>{
   
         const cos = await room.find()

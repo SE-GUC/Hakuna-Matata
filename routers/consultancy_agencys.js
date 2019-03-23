@@ -7,7 +7,7 @@ const Joi = require('joi');
 const agency = require('../models/consultancy_agency'); 
 const tasker=require('../models/consultance');
 const task=require('../models/task');
-const {Send_Task_Notification} = require('../models/Notification.js');
+//const {Send_Task_Notification} = require('../models/Notification.js');
 //const taskConsulted = require('../arrays/taskConsulted'); 
 //const constultancy_agencies = require('../arrays/constultancy_agencys'); 
 //const tasks=require('../arrays/tasks')
@@ -217,7 +217,7 @@ router.put('/add_report/:id',async (req,res)=>{
     }
 });
 
-//show consultancies for a certain task
+//show all consultancies for a certain task
 //(partner_id  => partnerId, task_id=>taskId)
 router.get('/show_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
     const tassk=await task.findOne({
@@ -231,6 +231,20 @@ router.get('/show_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
     res.send(tassk.cunsulties_done);
 });
 
+//show certain consultancies for a certain task
+//(partner_id  => partnerId, task_id=>taskId,consultance_id+>ConsultancyAgencyId)
+router.get('/show_consulted_task/:partner_id/:task_id/:consultance_id',async (req,res)=>{
+    const tassk=await task.findOne({
+        '_id':req.params.task_id,
+        partner_id:req.params.partner_id
+    });
+    if(!tassk){
+        res.send("not found");
+        return;
+    }
+    const consultance=tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.consultance_id);
+    res.send(consultance);
+});
 
 //(id  => constultancyAgencysId, partner_id  => partnerId, task_id=>taskId,)
 router.put('/:id/accept_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
@@ -287,7 +301,7 @@ router.put('/:id/accept_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
             consultance.cunsulties_done.push(element);
         });*/
         task.insertMany(consult);
-        var e=Send_Task_Notification(req.params.task_id,consultance.consultancy_agency_id,"Your consultancy has been accepted!");
+        //var e=Send_Task_Notification(req.params.task_id,consultance.consultancy_agency_id,"Your consultancy has been accepted!");
         await task.findByIdAndDelete(req.params.task_id);
         //await task.findOneAndUpdate({'_id':req.params.task_id},consultance);
     }
