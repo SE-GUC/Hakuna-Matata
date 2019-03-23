@@ -768,6 +768,26 @@ router.delete("/:id/delete_educator_profile/:educator_profile_id", async(req, re
     res.send({ data: educational_organizations });
 
 });
+router.get('/:id/show_educc/:edu_id', (req,res)=>{
+    
+    educational_organization.findById (req.params.id,  function  (err, edu) {
+              
+        if(!err){
+            
+           
+                const educ = edu.educators.find(m=>m._id==req.params.edu_id);
+            res.send(educ);
+           
+        }
+        
+     
+          else{
+            res.status(404).send('Not found');
+    
+          }
+      });
+    
+    });
 
 // End Educator CRUD
 
