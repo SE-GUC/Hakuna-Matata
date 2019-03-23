@@ -5,57 +5,38 @@ const {Notification,Not_summary}= require('../models/Notification.js');
 const {Member,getexplevel}= require('../models/member.js');
 
 
-
 //get all notifications   
-router.get('/',(request,response)=>{
-  Notification.find({},function(err,notifications){
-        if(!err){
-            response.send(notifications)
-            }
-            else {
-             response.status(404).send("not found") 
-            }
-    });
-    }) 
+//1
+router.get('/',async (request,response)=>{
+    const notifications = await Notification.find()
+    response.json({data: notifications})
+}) 
 //get notifications by id
-router.get('/:id/Notification',(request,response)=>{
-    Notification.findById(request.params.id,function(err,notifications){
-        if(!err){
-        response.send(notifications)
-        }
-        else {
-         response.status(404).send("not found") 
-        }
-    })
+//1
+router.get('/:id/Notification',async (request,response)=>{
+    const notification = await Notification.findById(request.params.id)
+    response.json({data: notification})
      })
 
 //get all notif sum
-router.get('/Not_summary',(request,response)=>{
-    Not_summary.find({},function(err,not_summaries){
-         if(!err){
-             response.send(not_summaries)
-             }
-             else {
-              response.status(404).send("not found") 
-             }
-     });
+//1
+router.get('/Not_summary',async (request,response)=>{
+    const not_summarys = await Not_summary.find()
+    response.json({data: not_summarys})
      }) 
 //get notif summ by id 
-router.get('/Not_summary/:id',(request,response)=>{
-    Not_summary.findById(request.params.id,function(err,not_summaries){
-        if(!err){
-        response.send(not_summaries)
-        }
-        else {
-         response.status(404).send("not found") 
-        }
-    })
+//1
+router.get('/Not_summary/:id',async (request,response)=>{
+    const not_summary = await Not_summary.findById(request.params.id)
+    response.json({data: not_summary})
+
      })
 
      //delete notification by id
-     router.delete('/delete/:id', function(req,res){
+     //1
+router.delete('/delete/:id', async function(req,res){
 
-        Notification.findByIdAndRemove(
+      await  Notification.findByIdAndRemove(
             req.params.id,
             function(err) {
               if(!err){
@@ -71,14 +52,15 @@ router.get('/Not_summary/:id',(request,response)=>{
             }
         );
      
-      });
+ });
     
     
 
-     //delete not summary by id
-     router.delete('/delete//Not_summary/:id', function(req,res){
+//delete not summary by id
+//1
+router.delete('/delete//Not_summary/:id',async function(req,res){
 
-       Not_summary.findByIdAndRemove(
+     await  Not_summary.findByIdAndRemove(
             req.params.id,
             function(err) {
               if(!err){
@@ -92,7 +74,7 @@ router.get('/Not_summary/:id',(request,response)=>{
             }
         );
      
-      });
+});
     
     
 
