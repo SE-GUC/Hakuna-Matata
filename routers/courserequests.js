@@ -6,124 +6,162 @@ const Joi = require('joi');
 
 
 // Models
-const coursemodel = require('../models/Courserequest.js');
+const Courserequest  = require('../models/Courserequest.js');
+const Recomendation = require('../models/recomendation.js');
+const Notification = require('../models/Notification.js');
 
-const notObject = require("../arrays/Notifications.js");
-const courserequests = require('../arrays/Courserequests.js');
-var members = require('../arrays/members.js');
-// Get all course
-router.get('/',(request,response)=>{
+ //create course request
 
- response.send(courserequests);
-});
-   
-   // Get courserequest by id
-//(id  => courserequestsId)
-router.get('/:id', (request,response)=>{
-    
-    for (const object of courserequests){
-      if(object.id==request.params.id){
-         response.send(object);
-    }
-    }
-    
+//1
+router.post("/newCourseRequest",async (request,response, next) => {
+
+    const Joi = require('joi');
+    const schema = Joi.object().keys({
+        description:Joi.string(),
+        categories:Joi.string(),
+        applyingmember_id:Joi.string()
     });
 
- 
+   const result= Joi.validate(request.body,schema); 
 
-// as an expert i can give a recomendation
-//(id  => courserequestsId)
-router.put('/:id/giverecomendation',(request,response)=>{
-    const request_id=request.params.id;
-    const expert_id= request.body.expert_id;
-    const course_id= request.body.course_id;
-    var recomendation_id ;
-    const schema={
-       
-        expert_id: Joi.number().required(),
-        course_id:Joi.number().required(),
-       
-     }
-     const result=Joi.validate(request.body,schema);
-     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
-
-
- for(let object of courserequests){
-     if(object.id==request_id){
-        
-
-         object.recomendations.push({recomendationid:object.recomendations.length+1,expert_id:expert_id,course_id:course_id,rating:0,numberofratings
-        :0});
-
-        var e=notObject.Send_CourseRecommendations_Notification(course_id,object.applyingmember_id,"%od elcourse dah yalaaa");
-
-     }
- }
-
-
- response.sendStatus(200);
-});
-   
-//rating a recomendations
-//(id  => courserequestsId,recId=> recomendationId)
-router.put('/:id/raterecomendation/:recId',(request,response)=>{
-    const request_id=request.params.id;
-    const recomendation_id= request.params.recId;
-    const Rating= request.body.Rating;
-    const schema={
-       
-        
-        Rating:Joi.number().valid(1,2,3,4,5).required(),
-       
-     }
-     const result=Joi.validate(request.body,schema);
-     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
-  
-    
-
- for(let object of courserequests){
-     if(object.id==request_id){
-       
-         for(let recomendation of object.recomendations){
+        if (result.error) {
+           return response.status(400).send({error:result.error.details[0].message})
+        } else {
+           const courserequest = new Courserequest({
+            description:request.body.description,
+            applyingmember_id:request.body.applyingmember_id,
+            categories:request.body.categories,
+            recomendations:[]
+           });
+           
+          await  courserequest.save(function(err,room) {
+              
+                Notification.Send_CourseRequest_Notification(room.id,"HELPPPP MEEEE GUYSSS");
+             });
+            response.sendStatus(200);
           
-             if(recomendation.recomendationid==recomendation_id){
+        }
+});
+
+// get all course requests 
+//1
+router.get('/',async (request,response)=>{
+    await Courserequest.find({},function(err,courserequests){
+    if(!err){
+        response.send(courserequests)
+        }
+        else {
+         response.status(404).send("not found") 
+        }
+});
+})
+// get course request by id 
+//1
+router.get('/:id',async (request,response)=>{
+    await Courserequest.findById(request.params.id,function(err,courserequests){
+       if(!err){
+       response.send(courserequests)
+       }
+       else {
+        response.status(404).send("not found") 
+       }
+   })
+    })
+    
+// delete a course request 
+//1
+router.delete('/delete/:id', async function(req,res){
+
+    await Courserequest.findByIdAndRemove(
+        req.params.id,
+        function(err) {
+          if(!err){
+            res.sendStatus(200);
+
+          }
+          else{
+            res.status(404).send('Not found');
+
+          }
+        }
+    );
+ 
+  });
+//give reco
+//1
+router.put('/:id/giverecomendation',async(req,res)=>{
+    try{
+       const id =req.params.id
+          const schema={
+        expert_id: Joi.number().required(),
+        course_id:Joi.number().required()
+     
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    } 
+        const cr= await Courserequest.findById(id);
+        if(cr._id!==undefined){
+            console.log(req.body)
+            const reco = await Recomendation.create(req.body)
                
-                 var memberid= recomendation.expert_id;
-                var oldnumberratig =recomendation.numberofratings;
-                recomendation.numberofratings=recomendation.numberofratings+1;
-                var oldrating = recomendation.rating;
-                 recomendation.rating=Math.floor(((oldrating*oldnumberratig)+Rating)/recomendation.numberofratings);
 
-                 
 
-             }
+               
+           cr.recomendations.push(reco);
+            const temp= await cr.save();
+            res.send(cr);    
+            Notification.Send_CourseRecommendations_Notification(req.body.course_id,cr.applyingmember_id,"%od elcourse dah yalaaa");
          }
-     }
- }
- for(let object2 of members){
-     if(object2.id==memberid){
-         object2.avreage_reco_rate=Math.floor(((object2.avreage_reco_rate*object2.all_rated_reco)+Rating)/(object2.all_rated_reco+1));
-         object2.all_rated_reco++;
-     }
+        else {
+            res.status(404).send("Not found")
+        }
+    }
+        catch(error) {
+            // We will be handling the error later
+            console.log(error)
+        } 
+        
+    });
+   
+//update courserequest 
+//1
+router.put("/:id/update",async (req,res)=>{
+    const schema={
+     description:Joi.string(),
+     categories:Joi.string(),
+     active:Joi.boolean()
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    } 
+ await   Courserequest.findById(req.params.id, function(err, courserequests) {
+        if(!err){
+            if(req.body.description!=null){
+             courserequests.description=req.body.description
+            }
+            if(req.body.categories!=null){
+                courserequests.categories=req.body.categories
+               }
+            if(req.body.active!=null){
+                courserequests.active=req.body.active
+               }
 
- }
- response.sendStatus(200);
-});
 
-router.post("/newCourseRequest",(request,response)=>{
-    id=courserequests.length+1;
-    description=request.body.description;
-    dateofsubmission=moment().format("MMMM Do YYYY, h:mm:ss a");
-    applyingmember_id=request.body.applyingmember_id;
-    categories=null;
-    recomendations=[];
-    active=true;
-    courserequests.push(new coursemodel(id, description, dateofsubmission, applyingmember_id, categories, recomendations, active));
-    var e=notObject.Send_CourseRequest_Notification(id,"HELPPPP MEEEE GUYSSS");
-    response.send(courserequests);
+         const result=courserequests.save()
+         res.send(courserequests); 
+  
+          }
+          else{
+            res.status(404).send('Not found');
+  
+          }  
+         });
+  
+  });
 
-});
-
-      
-
-     module.exports = router;
+module.exports = router;

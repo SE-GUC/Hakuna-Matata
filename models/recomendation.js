@@ -1,7 +1,6 @@
+//The Courserequest model
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema
-
-
 // DB Config
 const db = require('../config/keys').mongoURI
 
@@ -11,19 +10,7 @@ mongoose
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.log(err))
 
-// Create the schema
-const certificates_Schema = new Schema({
-    name: {
-        type: String,
-    },
-    type: {
-        type: String,
-    },
-    accreditation: {
-        type: String,
-    }
-
-
+const RecomendationsSchema = new Schema({
+    expert_id:String,course_id:String,rating:{type:Number,enum:[1,2,3,4,5]} ,numberofratings:Number
 })
-
-module.exports = certificates = mongoose.model('certificates', certificates_Schema)
+module.exports = Recomendation= mongoose.model('Recomendation', RecomendationsSchema)

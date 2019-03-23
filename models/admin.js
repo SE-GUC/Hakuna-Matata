@@ -1,12 +1,25 @@
-// The members Model
-class admin{
-    constructor(id,name,notification){
-          this.id=id;
-          this.name=name;
-          this.notification=notification;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+// DB Config
+const db = require('../config/keys').mongoURI
+
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+
+// Create the schema
+const AdminSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    id: {
+        type: Number,
+        required: true
     }
-}
-module.exports =admin
+})
 
 
-
+module.exports = Admin= mongoose.model('admins', AdminSchema)

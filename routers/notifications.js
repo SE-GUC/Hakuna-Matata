@@ -1,15 +1,89 @@
-const express = require('express');
+const express = require('express')
 const router = express.Router();
-
 const Joi = require('joi');
+const {Notification,Not_summary}= require('../models/Notification.js');
+const {Member,getexplevel}= require('../models/member.js');
 
 
-const members = require("../arrays/members.js");
-const {notifications,notificationSummaries,SendToUserRequestNotification} = require("../arrays/Notifications.js");
+//get all notifications   
+//1
+router.get('/',async (request,response)=>{
+    const notifications = await Notification.find()
+    response.json({data: notifications})
+}) 
+//get notifications by id
+//1
+router.get('/:id/Notification',async (request,response)=>{
+    const notification = await Notification.findById(request.params.id)
+    response.json({data: notification})
+     })
+
+//get all notif sum
+//1
+router.get('/Not_summary',async (request,response)=>{
+    const not_summarys = await Not_summary.find()
+    response.json({data: not_summarys})
+     }) 
+//get notif summ by id 
+//1
+router.get('/Not_summary/:id',async (request,response)=>{
+    const not_summary = await Not_summary.findById(request.params.id)
+    response.json({data: not_summary})
+
+     })
+
+     //delete notification by id
+     //1
+router.delete('/delete/:id', async function(req,res){
+
+      await  Notification.findByIdAndRemove(
+            req.params.id,
+            function(err) {
+              if(!err){
+                res.sendStatus(200);
+                Not_summary.remove({"not_parent_id":req.params.id}, function(err, result){
+ });
+    
+              }
+              else{
+                res.status(404).send('Not found');
+    
+              }
+            }
+        );
+     
+ });
+    
+    
+
+//delete not summary by id
+//1
+router.delete('/delete//Not_summary/:id',async function(req,res){
+
+     await  Not_summary.findByIdAndRemove(
+            req.params.id,
+            function(err) {
+              if(!err){
+                res.sendStatus(200);
+    
+              }
+              else{
+                res.status(404).send('Not found');
+    
+              }
+            }
+        );
+     
+});
+    
+    
+
+module.exports = router;
 
 
 
 
+/*
 //function to get level of experience of member
 function getexplevel(id) {
     for (const object of members){
@@ -19,9 +93,9 @@ function getexplevel(id) {
         }
   }}
 
-
+*/
 //show admin notifications for editing profile requests
-router.get('/admin', (request,response)=>{
+/*router.get('/admin', (request,response)=>{
     var newaray=[];
     for (const object of notificationSummaries){
         if(object.sent_to=="admin"){
@@ -44,9 +118,9 @@ for (const object of notifications){
 }
 
 });
+*/
 
-
-
+/*
 // get notification summary
 router.get('/:id/Not_summary',(request,response)=>{
 var newArray=[];
@@ -70,17 +144,11 @@ else{
         
         }
     }
-
-
-
-
-
-
 response.send(newArray)
 });
 
-
-
+*/
+/*
 // for admin to approve user by id he got in the title of the request
 router.post('/approveUser',(request,response)=>{
 var user_id=request.body.user_id;
@@ -102,5 +170,9 @@ response.sendStatus(200);
 
 
 });
+*/
 
-module.exports = router;
+
+
+
+//module.exports = router;

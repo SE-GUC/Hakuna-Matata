@@ -1,12 +1,37 @@
-class room{
-    constructor(reserved_id,id,reserved_date,capacity,end_of_reservation,reserved){
-        this.id=id;
-        this.reserved_id=reserved_id;
-        
-        this.capacity=capacity;
-        this.end_of_reservation=end_of_reservation;
-        this.reserved_date=reserved_date;
-        this.reserved=reserved;
-    }
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+// DB Config
+const db = require('../config/keys').mongoURI
+
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+
+// Create the schema
+const roomSchema = new Schema({
+ reserved_id : {
+        type: String,
+        required: false
+},
+reserved_date : {
+    type: Date,
+    required: false
+},
+capacity : {
+    type: Number,
+    required: true
+},
+
+end_of_reservation : {
+    type: Date,
+    required: false
+},
+
+reserved : {
+    type: Boolean,
+    required: false
 }
-module.exports=room
+})
+module.exports = Room = mongoose.model('rooms', roomSchema)

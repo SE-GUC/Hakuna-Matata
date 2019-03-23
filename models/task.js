@@ -1,50 +1,100 @@
-class task{
-    constructor(
-        id,
-        partner_id,
-        consultancy_agency_id,
-        member_id,
-        admin_id,
-        applied_id,
-        description,
-        required_skills,
-        monetary_compensation,
-        deadline,
-        deadline_for_apply,
-        upload_date,
-        submission_date,
-        experience_level,
-        commit_level,
-        work_cycle,
-        link_of_task,
-        user_rate,
-        accepted,
-        rate,
-        consulty_needed,
-        consulty_members)
-        {
-                this.id=id;
-                this.partner_id=partner_id;
-                this.consultancy_agency_id=consultancy_agency_id;
-                this.member_id=member_id;
-                this.admin_id=admin_id;
-                this.applied_id=applied_id;
-                this.description=description;
-                this.required_skills=required_skills;
-                this.monetary_compensation=monetary_compensation;
-                this.deadline=deadline;
-                this.deadline_for_apply=deadline_for_apply;
-                this.upload_date=upload_date;
-                this.submission_date=submission_date;
-                this.experience_level=experience_level;
-                this.commit_level=commit_level;
-                this.work_cycle=work_cycle;
-                this.link_of_task=link_of_task;
-                this.user_rate=user_rate;
-                this.accepted=accepted;
-                this.rate=rate;
-                this.consulty_needed=consulty_needed;
-                this.consulty_members=consulty_members;}
-        };
+const mongoose = require('mongoose')
 
-        module.exports = task
+// DB Config
+const db = require('../config/keys').mongoURI
+
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+const Schema = mongoose.Schema
+// Create the schema
+const taskSchema = new Schema({
+partner_id : {
+    type: String,
+    required: false
+},
+consultancy_agency_id : {
+    type: String,
+    required: false
+},
+member_id : {
+    type: String,
+    required: false
+},
+admin_id : {
+    type: String,
+    required: false
+},
+applied_id : {
+    type: [String],
+    required: false
+},
+description : {
+    type: String,
+    required: false
+},
+// why array ?
+required_skills : {
+    type: [String],
+    required: false
+},
+monetary_compensation : {
+    type: Number,
+    required: false
+},
+deadline : {
+    type: Date,
+    required: false
+},
+deadline_for_apply : {
+    type: Date,
+    required: false
+},
+upload_date : {
+    type: Date,
+    required: false
+},
+submission_date : {
+    type: Date,
+    required: false
+},
+experience_level : {
+    type: Number,
+    required: false
+},
+commit_level : {
+    type: Number,
+    required: false
+},
+work_cycle : {
+    type: String,
+    required: false
+},
+link_of_task : {
+    type: String,
+    required: false
+},
+user_rate : {
+    type: Number,
+    required: false
+},
+accepted : {
+    type: Boolean,
+    required: false
+},
+rate : {
+    type: Number,
+    required: false
+},
+consulty_needed : {
+    type: Boolean,
+    required: false
+},
+cunsulties_done : {
+    type: Array,
+    required: false
+}
+})
+module.exports = Task = mongoose.model('tasks', taskSchema)

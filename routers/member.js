@@ -1,58 +1,308 @@
 const express = require('express')
-const router = express.Router()
+const router = express.Router();
 const Joi = require('joi');
+const {Member,getexplevel} = require('../models/member.js');
+const Project = require('../models/project.js');
+const notObject=require('../models/Notification.js');
 
-// We will be connecting using database 
-//const member = require('../models/member.js')
-//const members = require('../arrays/members')
-// temporary data created as if it was pulled out of the database ...
+//Member CRUD
 
-const notObject = require("../arrays/Notifications.js");
-const courseRequestArray = require("../arrays/Courserequests.js");
-const Memberarray = require("../arrays/members.js");
-const tasks = require("../arrays/tasks.js");
+//create member
+//1
+router.post('/create', async (request,response)=>{
+    const schema={
 
-router.get('/tasks', (req, res) => {
-    res.send(tasks)
+        fullname:Joi.string().required(),
+        skills:Joi.array().items(Joi.string())
+
+     }
+     const result=Joi.validate(request.body,schema);
+    
+     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+  else {
+    const fullname=request.body.fullname;
+    var splitted=fullname.split(" ");
+    var webname=splitted[0];
+    const skills= request.body.skills;
+    const member = new Member ({
+        fullname:fullname,
+        webname:webname,
+        completed_task_id:[],
+        applied_task_id:[],
+        levelofexpreience:0,
+        Rating:0,
+        all_rated_reco:0,
+        avreage_reco_rate:0,
+        allratedtasks:0,
+        skills:skills
+    });
+    
+    await member.save();
+    response.sendStatus(200);
+   
+}
+   
+});
+
+//delete member 
+//1
+router.delete('/deleteMember/:id',async (req,res)=>{
+   try {
+    const id = req.params.id
+    const deletedMember = await Member.findOneAndRemove({"_id":id})
+    if(deletedMember!==null)
+    res.json({msg:'Member was deleted successfully', data: deletedMember})
+    else
+    res.json({msg:'Member was deleted Already or Not Found'})
+
+   }
+   catch(error) {
+       // We will be handling the error later
+       console.log(error)
+   }
+ 
+  });
+
+
+
+
+// Get all members
+//1
+router.get('/', async (req, res) =>{
+  await  Member.find({}, function(err, members) {
+          
+        if(!err){
+            res.send(members);
+
+          }
+          else{
+            res.status(404).send('Not found');
+
+          }
+      });
+
+});
+
+//get member by id
+router.get('/:id',async (req,res)=>{
+
+ await Member.findById(req.params.id, function(err, members) {
+     if(!err){
+        if(members!==null)
+        res.send(members);
+        else
+        res.send('Not found');
+
+     }
+     else {
+        res.status(404).send('Not found');
+     }  
+      });
+     
+
+
+})
+
+// update member name and skills
+//update a member
+
+router.put("/:id/update",async (req,res)=>{
+  const schema={
+    fullname:Joi.string().required(),
+   
+  };
+  const result =Joi.validate(req.body,schema);
+  if(result.error){
+      res.status(400).send(result.error.details[0].message);
+      return;
+  } 
+  await Member.findById(req.params.id, function(err, members) {
+      if(!err){
+          if(req.body.fullname!=null){
+           members.fullname=req.body.fullname
+          }
+       const result=members.save()
+       res.send(members); 
+
+        }
+        else{
+          res.status(404).send('Not found');
+
+        }  
+       });
+
+});
+//end marina part
+//create project
+router.post('/:id/create_project',(request,response)=>{
+    const schema={
+
+        taskid:Joi.string().required(),
+        partnerid:Joi.string().required(),
+        link:Joi.string().required()
+
+     }
+     const result=Joi.validate(request.body,schema);
+    
+     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+  else {
+    const tID=request.body.taskid;
+    const pID=request.body.partnerid;
+    const LINK=request.body.link;
+    const mID=request.params.id;
+
+    const project = new Project ({
+        task_id:tID,
+    partner_id:pID,
+    member_id:mID,
+    link:LINK
+    });
+ 
+    project.save();
+  
+    response.sendStatus(200);
+   
+}
    
 });
 
 
 
+//get project by member id
+
+router.get('/:id/projects',(req,res)=>{
+var temp=[];
+Project.find({}, function(err, members) {
+          
+    if(!err){
+        for (var i = 0; i < members.length; i++) {
+            if(members[i].member_id==req.params.id){
+                temp.push(members[i]);
+            }
+            
+        }
+        res.send(temp);
+
+      }
+      else{
+        res.status(404).send('Not found');
+
+      }
+  });
+   
+   })
+
+//delete project 
+router.delete('/:id/project/:pid', function(req,res){
+var isAllowedToDelete=false;
+Project.findById(req.params.pid, function(err, project) {
+    if(!err){
+        
+       if(project.member_id==req.params.id){
+        Project.findByIdAndRemove(
+            req.params.pid,
+            function(err) {
+              if(!err){
+                res.sendStatus(200);
+    
+              }
+              else{
+                res.status(404).send('Not found');
+    
+              }
+            }
+        );
+       }
+       else{
+        res.status(404).send('not allowed to delete this project');
+       }
+    }
+    else {
+       res.status(404).send('Error!');
+    }  
+     });
+
+
+
+    
+ 
+  });
+
+//update project 
+router.put("/:id/updateproject/:pid",(req,res)=>{
+    const schema={
+      link:Joi.string().required(),
+     
+    };
+    const result =Joi.validate(req.body,schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    } 
+    Project.findById(req.params.pid, function(err, project) {
+        if(!err){  
+            console.log("here")
+           if(project.member_id==req.params.id){
+            project.link=req.body.link;
+            console.log("here")
+            project.save();
+            res.send(project);
+           }
+           else{
+            res.status(404).send('not allowed to delete this project');
+           }
+        }
+        else {
+           res.status(404).send('Error!');
+        }  
+         });
+  
+  });
+
+
+//Badr Part
 //update rating (id =>memberId)
-router.put('/:id/ratemember',(request,response)=>{
+//1
+router.put('/:id/ratemember',async (request,response)=>{
     var id=request.params.id;
     const newrate = request.body.newrate;
     var nooftasks;
-const schema={
+    const schema={
 
     newrate: Joi.number().integer().max(5).required(),
   
 }
 const result=Joi.validate(request.body,schema);
 if (result.error) return response.status(400).send({ error: result.error.details[0].message });
- for(let object of Memberarray){
-     if(object.id==id){
+    var object =await Member.findById(id)
+     if(object !== undefined){
          nooftasks=object.allratedtasks;
-         object.allratedtasks=object.allratedtasks+1;
-         object.Rating=Math.floor(((object.Rating*nooftasks)+newrate)/object.allratedtasks);
-        
+
+         const x=object.allratedtasks+1;
+         var temprate;
+         if(Math.round(((object.Rating*nooftasks)+newrate)/x)>5)
+         temprate=5
+         else
+         temprate=Math.round(((object.Rating*nooftasks)+newrate)/x)
+        // object.save()
+         object =await Member.findOneAndUpdate({"_id":id},{"allratedtasks":x,"Rating":temprate})
+         response.sendStatus(200);
+
+
+     }else{
+        response.send("Not found");
 
      }
- }
- response.sendStatus(200);
+ 
 });
 
 
-
-
-//router.get('/', (req, res) => res.json({ data: members }))
-// Apply for a task
-router.put('/:id/applyForTask/:task_Id', (req, res) => {
+//2
+router.put('/:id/applyForTask', async(req, res) => {
     const memberId = req.params.id
-    const taskId = req.params.task_Id
-    const task = tasks.find(task => parseInt(task.id) === parseInt(taskId))
-    const member = Memberarray.find(member => parseInt(member.id) === parseInt(memberId))
+    const taskId = req.body.task_Id
+    const task = await Task.findById(taskId)
+    const member = await Member.findById(memberId)
     if(task.accepted){
         //onsole.log("we are Here")
        // const appliedtoit=task.applied
@@ -73,11 +323,13 @@ router.put('/:id/applyForTask/:task_Id', (req, res) => {
                 if(task.applied_id===null)
                     task.applied_id=[]
 
-                task.applied_id.push(member.id)
-            if(member.appliedtask===null)
-                member.appliedtask=[]
+                task.applied_id.push(member._id)
+                if(member.appliedtask===null)
+                     member.appliedtask=[]
 
-               member.appliedtask.push( task.id)
+               member.appliedtask.push( task._id)
+               member.save()
+               task.save()
                 res.send(member)
                 console.log("done")
                 //tempmembers.push(memberdata)
@@ -91,55 +343,13 @@ else{
 }
 
 });
-
-// Delete Certine Member from Array  (id =>memberId)
-router.delete('/:id/deleteMember', (req, res) => {
-    const memberId = req.params.id
-    //router.listen( () => console.log(memberId))
-    const member = Memberarray.find(member=> parseInt(member.id) === parseInt(memberId))
-    if(member!==undefined){
-        Memberarray.splice(Memberarray.indexOf(member),1)
-        res.send('Done')}
-    else{
-        res.send('this id is not on the System')
-    }
-})
-
-
-// Get a certain member (id =>memberId)
-router.get('/:id/admin', (req, res) => {
-    for (const object of Memberarray){
-        if(object.id==req.params.id){
-            res.send(object);
-      }
-      }
-     
-      });
-//get all members
-      router.get('/', (req, res) => {
-        res.send(Memberarray)
-    })
-/*ask to edit profile marina*/
-//(id =>memberId)
+//2
 router.post('/:id/editrequest',(request,response)=>{
     var id=request.params.id;
     var e= notObject.SendToAdminRequestNotification("Member "+id+" wants to edit his profile");
     response.sendStatus(200);
 });
-router.get('/', (req, res) => {
-    res.send(Memberarray)
-})
+// End Badr Part
 
 
-// Get a certain member (id =>memberId)
-router.get('/:id', (req, res) => {
-    for (const object of Memberarray){
-        if(object.id==req.params.id){
-            res.send(object);
-      }
-      }
-     
-      });
-
-	  
-	  module.exports = router
+ module.exports = router

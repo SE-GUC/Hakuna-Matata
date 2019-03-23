@@ -1,22 +1,49 @@
 
-class educational_organization{
-    //educational_oragnization can offer courses or series of courses 
-    //master class is series of courses 
-    constructor (id,partner_id,name,certificates,training_programs,courses,master_class,educators){
+const mongoose=require('mongoose')
+const Schema = mongoose.Schema
+// DB Config
+const db = require('../config/keys').mongoURI
+
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+
+const organizationschema=new Schema({
+   //update partner id to reference partner
+    partner_id:{
+      type:Number,
+      required:true
+    },
+    name:{
+        type:String,
+        required:true
+    },
+    certificates:{
+        type:Array,
+
+    },
+    training_programs:{
+        type:Array
+    },
+    courses:{
         
-        this.partner_id=partner_id;
-        this.id=id;
-        this.name=name;
-        this.certificates=certificates;
-        this.training_programs=training_programs;
-        this.courses=courses;
-        this.master_class=master_class;
-        this.educators=educators;   
+        type:Array
+       
+    },
+    master_class:{
+        type:Array
+    },
+    educators:{
+        type:Array
     }
-}
+})
 
 
 
 
+organization = mongoose.model('educational_organizations', organizationschema)
 
-module.exports=educational_organization
+
+module.exports=organization
