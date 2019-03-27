@@ -1,2 +1,2 @@
 Deployment Link 
-https://lirtenhub1.herokuapp.com/
+https://hakuna-mtata.herokuapp.com/
