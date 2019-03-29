@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const Joi = require('joi');
 const Partner = require('../models/partner')
+const Project = require('../models/project')
+const {SendToAdminRequestNotification,Not_summary}= require('../models/Notification.js');
 //create a partner
 //1
 router.post('/create',async (request,response)=>{
@@ -158,98 +160,37 @@ router.get('/:id/projects',async (req,res)=>{
       });
        
 })
-
-/*
-router.get('/:id/show_accpted_task_notify',(request,response)=>{
-    const not = notificationSummaries.find({sent_to:request.params.id,title:"Your task has been accepted"});
-    response.send(not);
+//badr
+//1
+router.get('/:id/show_accpted_task_notify',async (request,response)=>{
+    const not = await Not_summary.find({"sent_to":request.params.id,"title":"Your task has been accepted"});
+    response.send({data:not});
 });
-router.get('/:id/show_assigned_task_notify',(request,response)=>{
-    const not = notificationSummaries.find({sent_to : request.params.id,title:"You task has been assigned to a member!"});
-   
-    response.send(not);
+//1
+router.get('/:id/show_assigned_task_notify',async (request,response)=>{
+    const not =await Not_summary.find({"sent_to" : request.params.id,"title":"You task has been assigned to a member!"});
+    response.send({data:not});
 });
-*/
-
-/*const express = require('express')
-const router = express.Router()
-const Joi = require('joi');
-
-
-// We will be connecting using database 
-const partner = require('../models/partner')
-const notObject = require("../arrays/Notifications.js");
-const projects=require('../arrays/projects')
-// temporary data created as if it was pulled out of the database ...
-const  partners = require('../arrays/partners')
-
-const {notificationSummaries} = require("../arrays/Notifications.js");
-
-
-
-//show my project (id =>partnerId)
-router.get('/:id/show_projects',(req,res)=>{
-    projects.forEach(element => {
-        if(element.partner_id===parseInt(req.params.partner_id)){
-            res.write(JSON.stringify(element));
-        }
-    });
-    res.end();
-});
-
-// Get all partner
-router.get('/adminpartner', (req, res) => {
-    res.send(partners)
-})
-
-
-// Get a certain partner (id =>partnerId)
-router.get('/:id/adminpartner', (req, res) => {
-    const partnerId = req.params.id
-    const partner = partners.find(partner=> partner.id === partnerId)
-    if(partner!==undefined)
-        res.send(partner)
-})
-
-
-
-// Delete Certine partner from Array (id =>partnerId)
-router.delete('/:id/deletepartner/adminpartner', (req, res) => {
-    const partnerId = req.params.id
-    //router.listen( () => console.log(partnerId))
-    const partner = partners.find(partner=> partner.id === partnerId)
-    partners.splice(partners.indexOf(partner),1)
-})
-
-
-
-router.get('/:id/show_accpted_task_notify',(request,response)=>{
-    const not = notificationSummaries.find(not=> not.sent_to === parseInt(request.params.id)&&not.title==="Your task has been accepted");
-   
-    response.send(not);
-});
-router.get('/:id/show_assigned_task_notify',(request,response)=>{
-    const not = notificationSummaries.find(not=> not.sent_to === parseInt(request.params.id)&&not.title==="You task has been assigned to a member!");
-   
-    response.send(not);
-});
-
-*/
-
-/*marina show profile */
-// Get a certain partner (id =>partnerId)
-/*
-router.get('/:id', (req, res) => {
-    const partnerId = req.params.id
-    const partner = partners.find(partner=> partner.id === partnerId)
-    if(partner!==undefined)
-        res.send(partner)
-})
-
-
+//1
 router.post('/:id/editrequest',(request,response)=>{
     var id=request.params.id;
-    var e= notObject.SendToAdminRequestNotification("Partner "+id+" wants to edit his profile");
+    var e= SendToAdminRequestNotification("Partner "+id+" wants to edit his profile");
     response.sendStatus(200);
-});*/
+});
+
+//show my project (id =>partnerId)
+//1
+router.get('/:id/show_projects',async(req,res)=>{
+    const projects=await Project.find({"partner_id":req.params.id})
+    if(projects.length==0)
+    res.send("You don't have projects")
+    else
+    res.send({data:projects})
+});
+//end badr
+
+
+
+
+
 module.exports=router;
