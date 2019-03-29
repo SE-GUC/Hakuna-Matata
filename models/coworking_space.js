@@ -1,7 +1,7 @@
 const room = require('./room');
 
 const mongoose = require('mongoose')
-// DB Config
+/* // DB Config
 const db = require('../config/keys').mongoURI
 
 
@@ -9,7 +9,7 @@ const db = require('../config/keys').mongoURI
 mongoose.connect(db,{ useNewUrlParser: true })
 .then(()=>console.log('connected to mongo'))
 .catch(err => console.error('coudnt connect to mongo',err))
-
+ */
 const Schema = mongoose.Schema
 
 // Create the schema

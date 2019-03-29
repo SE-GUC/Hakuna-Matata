@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router();
 const Joi = require('joi');
 const {Notification,Not_summary}= require('../models/Notification.js');
-const {Member,getexplevel}= require('../models/member.js');
+const Member= require('../models/member.js');
+const {SendToUserRequestNotification}= require('../models/Notification.js');
 
 
 //get all notifications   
@@ -77,26 +78,12 @@ router.delete('/delete//Not_summary/:id',async function(req,res){
 });
     
     
-
-module.exports = router;
-
-
-
-
-/*
-//function to get level of experience of member
-function getexplevel(id) {
-    for (const object of members){
-        if(object.member_id==id){
-           
-            return object.levelofexpreience;
-        }
-  }}
-
-*/
+//badr 
 //show admin notifications for editing profile requests
-/*router.get('/admin', (request,response)=>{
+//1
+router.get('/admin',async (request,response)=>{
     var newaray=[];
+    const notificationSummaries=await Not_summary.find()
     for (const object of notificationSummaries){
         if(object.sent_to=="admin"){
           
@@ -107,33 +94,24 @@ function getexplevel(id) {
     
     });
 
-// show notifications for specific member
-router.get('/', (request,response)=>{
-const not_id=request.query.notification_id;
-for (const object of notifications){
-    if(object.notification_id==not_id){
-        response.send(object);
-        return;
-    }
-}
 
-});
-*/
 
-/*
 // get notification summary
-router.get('/:id/Not_summary',(request,response)=>{
+//1,2
+router.get('/:id/Not_summary',async(request,response)=>{
 var newArray=[];
+const notificationSummaries=await Not_summary.find()
 for (const object of notificationSummaries){
 if (!object.expert_requires){  
     if (object.sent_to==request.params.id){
-    newArray.push(object);
-}}
+        newArray.push(object);
+}
+}
 else{
     if (object.expert_requires){
-     
+     const members= await Member.find()
         for (const object2 of members){
-            if(object2.id==request.params.id){
+            if(object2._id==request.params.id){
               
                if(object2.levelofexpreience>=4){
                 newArray.push(object); 
@@ -147,9 +125,10 @@ else{
 response.send(newArray)
 });
 
-*/
-/*
+
+
 // for admin to approve user by id he got in the title of the request
+//1
 router.post('/approveUser',(request,response)=>{
 var user_id=request.body.user_id;
 var approved=request.body.approved;
@@ -170,9 +149,39 @@ response.sendStatus(200);
 
 
 });
+
+
+//end badr
+
+/*
+// show notifications for specific member
+router.get('/', (request,response)=>{
+const not_id=request.query.notification_id;
+for (const object of notifications){
+    if(object.notification_id==not_id){
+        response.send(object);
+        return;
+    }
+}
+
+});
 */
 
+/*
+//function to get level of experience of member
+function getexplevel(id) {
+    for (const object of members){
+        if(object.member_id==id){
+           
+            return object.levelofexpreience;
+        }
+  }}
+
+
+*/
+
+module.exports = router;
 
 
 
-//module.exports = router;
+

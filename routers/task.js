@@ -4,6 +4,7 @@ const router = express.Router();
 const Joi = require('joi');
 
 const task = require('../models/task.js'); 
+const Member = require('../models/member.js'); 
 
 //const taskConsulted = require('../arrays/taskConsulted.js'); 
 //const tasks= require('../arrays/tasks.js');
@@ -246,98 +247,126 @@ catch(error) {
     console.log(error)
 }  
 });
+//badr
+// Update a tasks's state (taskID =>taskId , adminId=> admin who reject or accept the task)
+//1
+router.put('/:adminId/edit/:taskID',async (req, res) => {
+    const admin_Id=req.params.adminId
+    const task_Id = req.params.taskID 
+    const acceptancy = req.body.state
+    try{
+    const vartask = await task.findOne({"_id":task_Id})
+        //console.log(vartask)
+        if(vartask!== undefined){
+            //   vartask.accepted = acceptancy
+               if(acceptancy===true){       
+                 const temptask=  await task.findOneAndUpdate({"_id":task_Id},{"admin_id":admin_Id,"accepted":acceptancy})
+                   //tasks.splice(tasks.indexOf(vartask),1)
+                   //platform.push(task1.id)
+                   //tasks.push(task1)
+                   
+                   var e=Send_Task_Notification(task_Id,vartask.partner_id,"Your task has been accepted");
+                   res.json({data:temptask})
+               }
+               else{
+                   var e=Send_Task_Notification(task_Id,vartask.partner_id,"Your task has been rejected");
+                   const temptask=  await task.findOneAndRemove({"_id":task_Id})
+                   res.json({data:temptask})
+       
+               }
+       
+           }
+           else{
+               res.send('there is not such task') 
+           }
+           
+}catch{
+    res.status(400).send("Error");
+}
 
-// get a specific task      (id =>taskId)
-router.get("/:id" ,(req,res)=>{
-    const task =tasks.find(m=>m.id===parseInt(req.params.id));
-    res.send(task)
+})
+//1
+router.put('/:id/updateworkcycle',async(request,response)=>{
+    
+    const taskid=request.params.id;
+    const newworkcycle = request.body.work_cycle;
+    var memberid =0;
+    const schema={
+      
+       work_cycle: Joi.number().valid(25,50,75,100).required(),
+      
+    }
+    const result=Joi.validate(request.body,schema);
+    if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+    const ttask=await task.findOneAndUpdate({"_id":taskid},{"work_cycle":newworkcycle})
+    if(ttask!==null){
+        
+        memberid= ttask.member_id
+        if(newworkcycle==100){
+            const member=await Member.findOneAndUpdate({"_id":memberid},{$push :{"completed_task_id":taskid}})
+        }
+        response.send(ttask);
+  
+    }
+    else{
+        response.send("There is no Such Task")
+    }
 });
 
 
 
+// rate a task by his partner (id =>taskId , partner_id=> owner of the task)
+//1
+router.put("/:id/give_rate/:partner_id",async (req,res)=>{
+    var ttask = await task.findById(req.params.id);
+    if(ttask.partner_id==req.params.partner_id){
+        const schema={
+	      rate:Joi.number().integer().min(1).max(5).required(),
+	  
+        };
+        const result =Joi.validate(req.body,schema);
+         if(result.error){
+            res.status(400).send(result.error.details[0].message);
+        
+        }
+        else{
+           ttask= await task.findOneAndUpdate({"_id":req.params.id},{"rate":req.body.rate}) 
+            res.send(ttask)
+        }
 
-//View task Cycle (id =>taskId )
-router.get('/:id/viewCycle', (req, res) => {
-    const task =tasks.find(task=>task.id===parseInt(req.params.id));
-    if(task !==undefined)
-    res.send(task.workcycle)
-    else{
-        res.send('This task not Found !')
     }
-
-})
-
-
-// Delete Certine task from Array
-router.delete('/:id/deletetask', (req, res) => {
-    const taskId = req.params.id
-    //router.listen( () => console.log(memberId))
-    const task = tasks.find(task=>parseInt( task.id)=== parseInt(taskId))
-    if(task!==undefined){
-    tasks.splice(tasks.indexOf(task),1)
-    platform.splice(platform.indexOf(taskId),1)
-    res.send('Done')}
-    else{
-        res.send('this id is not on the System')
-    }
-})
-
-// Get a All member of specific task
-router.get('/:id/membersTasks', (req, res) => {
-    const taskId = req.params.id
-    //router.listen( () => console.log(taskId))
-    const task = tasks.find(task=>parseInt( task.id)=== parseInt(taskId))
-    var routerliedmembers=[]
-   
-    if(task.applied_id!==null){
-    for(var member of task.applied_id){
-        //console.log(memberId)
-        const member1 = members.find(member1=> member1.id=== member)    
-        routerliedmembers.push(member1)
-    }
-    res.send(routerliedmembers)
-    }else{
-        res.send('No members applied yo this task')
-    }
-})
-
-//View task Cycle (id =>taskId )
-router.get('/:id/viewCycle/admin', (req, res) => {
-    const task =tasks.find(task=>task.id===parseInt(req.params.id));
-    if(task !==undefined)
-    res.send(task.workcycle)
-    else{
-        res.send('This task not Found !')
-    }
-
-})
+    else
+        res.send("YOU CANT RATE THIS TASK");
+});
 
 
 // Assignig a member to a certain task (id =>taskId , memberId=> member who will be assigned to a task)
-router.put('/:id/assTask/:memberId', (req, res) => {
+//1,2
+router.put('/:id/assTask/:memberId',async (req, res) => {
     const task_Id = req.params.id 
     const member_Id=req.params.memberId
-    const task = tasks.find(task => parseInt(task.id) ===parseInt( task_Id))
+    const ttask = await task.findById(task_Id)
   
-if (task.applied_id==null){
+if (ttask.applied_id==null){
     res.status(400);
 res.send('No members applied yet');
 }
 else{
 
-    if(task.accepted===true&&(task.member_id===null||task.member_id.length===0)){
-        const appliedtoit=task.applied_id
+    if(ttask.accepted===true&&(ttask.member_id===null||ttask.member_id.length===0)){
+        const appliedtoit=ttask.applied_id
       
-        const check=appliedtoit.find(check=>check===parseInt(member_Id))
+        const check=appliedtoit.find(check=>check==member_Id)
         if(check!==undefined){
-            const member = members.find(member => parseInt(member.id) ===parseInt( member_Id))
+            const member = await Member.findById( member_Id)
             if(member!== undefined){
-                task.work_cycle=0
-                member.appliedtask.push(task_Id)
-                task.member_id=member_Id
-                res.send(task)
+
+                await Member.findOneAndUpdate( {"_id":member_Id},{$push:{"applied_task_id":task_Id}})
+             const temptask=   await task.findOneAndUpdate({"_id": task_Id},{"work_cycle":0,"member_id":member_Id})
+
                 var e=Send_Task_Notification(task_Id,member_Id,"You have been assigned!");
                 var e=Send_Task_Notification(task_Id,task.partner_id,"You task has been assigned to a member!");
+                res.json({data:temptask})
 
             }
             else{
@@ -361,22 +390,81 @@ else{
 )
 
 // Assignig a member to a certain task (id =>taskId , memberId=> member who will be assigned to a task)
-router.put('/:id/forceAssTask/:memberId', (req, res) => {
+//2
+router.put('/:id/forceAssTask/:memberId',async (req, res) => {
     const task_Id = req.params.id 
     const member_Id=req.params.memberId
-    const task = tasks.find(task => task.id === task_Id)
+    const task = await tasks.findById( task_Id)
     if(task.accepted&&task.member_id.length==0){
-            const member = members.find(member => member.id === member_Id)
+            const member =await  Member.findById(member_Id)
             if(member!== undefined){
                 member.appliedtask.push(task_Id)
                 task.member_id=member_Id
                 res.send(task)
+                member.save()
+                
             }
             else{
                 res.send("This member is Deleted")
             }
     }
 })
+
+// Get a All member of specific task
+//1
+router.get('/:id/membersTasks',async (req, res) => {
+    const taskId = req.params.id
+    //router.listen( () => console.log(taskId))
+    const ttask =await task.findById(taskId);
+    var routerliedmembers=[]
+   
+    if(ttask.applied_id!==null){
+       const  members=await Member.find()
+    for(var member of ttask.applied_id){
+        //console.log(memberId)
+        const member1 = members.find(member1=> member1._id == member)    
+        routerliedmembers.push(member1)
+    }
+    res.send(routerliedmembers)
+    }else{
+        res.send('No members applied yo this task')
+    }
+})
+
+//View task Cycle (id =>taskId )
+//1
+router.get('/:id/viewCycle', async (req, res) => {
+    const ttask =await task.findById(req.params.id);
+    if(ttask !==undefined)
+    res.send(ttask.workcycle)
+    else{
+        res.send('This task not Found !')
+    }
+
+})
+
+
+//end badr
+/* 
+// delete a certin task by his partner (id =>taskId , partner_id=> owner of the task)
+router.delete("/:id/delete/:partner_id",(req,res) =>{
+    const task =tasks.find(m=>m.id===parseInt(req.params.id)&&m.partner_id===parseInt(req.params.partner_id));    
+    if(task!==undefined){
+        if(task.accepted===null ){
+            tasks.splice(task);
+            res.send('Task deleted');
+        } 
+        else {
+            
+            res.send('U CANT DELETE THIS TASK')
+        }
+
+    }else{
+    res.send('this task is not available ');   
+    }
+
+   
+}); */
 
 
 
