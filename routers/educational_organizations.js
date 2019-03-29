@@ -4,6 +4,9 @@
 //create training programs
 //create certificates
 //add info about educators and trainers
+
+
+//3wo
 const express = require('express');
 const router = express.Router();
 router.use(express.json());
@@ -1099,8 +1102,12 @@ router.delete("/:id/delete_training_programs/:training_program_id",async(req,res
 
 // End Training Program CRUD
 ////////////////////////////////
+/*  */
+
+//Badr
 //reserve workshop for course  
-router.put('/:id/accept_reservation/:room_id',(req,res)=>{
+//is Exist in Co-working Space 
+router.put('/:id/accept_reservation/:room_id',async (req,res)=>{
  
     const schema={
         reserved:Joi.boolean(),
@@ -1114,44 +1121,109 @@ router.put('/:id/accept_reservation/:room_id',(req,res)=>{
         return;
     }
    
-    const co = coworking_spaces.find(m=>m.id===parseInt(req.params.id));
-    const roooms = co.rooms;
-    const room = roooms.find(m=>m.id===parseInt(req.params.room_id));
+    const coWorkingSpace =await  coworking_space.findById(req.params.id);
+    //const roooms = coWorkingSpace.rooms;
+    const room = coWorkingSpace.rooms.find(m=>m._id===parseInt(req.params.room_id));
+    if(room !==undefined){
     if(room.reserved===false){
-      room.reserved_id = req.body.reserved_id;
+        coWorkingSpace.rooms.remove(room)
+        room.reserved_id = req.body.reserved_id;
         room.reserved=req.body.reserved;
         room.reserved_date=req.body.reserved_date;
         room.end_of_reservation=req.body.end_of_reservation;
-        res.send(room);
-        return;
-    };
+        coWorkingSpace.rooms.push(room)
+        await coworking_space.findOneAndUpdate({"_id":req.params.id},{"rooms":coWorkingSpace.rooms});
+        res.send({data:coWorkingSpace.rooms});
+        
+    }else{
 
     res.send("this room is not available");
+}
+}else{
+    res.send("There is no such room");
+}
 });
-
-
-
 
 
 
 //accept member for course
 //(id  => educational_organizationId  ,course_id => courseId,student_id=>studentId)
-router.post("/:id/accept_member_course/:course_id/:student_id",(req,res)=>{
-   const education = educational_organizations.find(m=>m.id===parseInt(req.params.id));
-   const course =education.courses.find(m=>m.id===parseInt(req.params.course_id));
-   if(course.available===true){
-       course.students_assigened.push(parseInt(req.params.student_id))
-   }
+router.put("/:id/accept_member_course/:course_id/:student_id",async (req,res)=>{
+   const EOrg =await educational_organization.findById(req.params.id);
+   const course =EOrg.courses.find(m=>m._id==req.params.course_id);
+   const courseModel =await courses.findById(req.params.id);
+   if(course!==undefined){
+    if(course.available===true){
+        var cousrses=EOrg.courses
+
+        if(course.acceptedmembers==null)
+        course.acceptedmembers=[]
+       
+        if(courseModel.acceptedmembers==null)
+        courseModel.acceptedmembers=[]
+
+        for( var i = 0; i < cousrses.length; i++){ 
+           if ( cousrses[i]._id == req.params.course_id) {
+            cousrses.splice(i, 1); 
+           }
+        }
+
+        course.acceptedmembers.push(req.params.student_id)
+        courseModel.acceptedmembers.push(req.params.student_id)
+        courseModel.save()
+        cousrses.push(course)
+        //  console.log(masterclasses)
+           EOrg.save()
+           const temp_EOrg =await educational_organization.findOneAndUpdate({"_id":req.params.id},{"courses":cousrses});
+
+        res.send(temp_EOrg.courses)
+    }else{
+     res.send("this Course is not available");
+    }
+}else{
+    res.send("There is no such Course Here");
+
+}
+
 
 });
 //accept member for master class 
 //(id  => educational_organizationId  ,master_class_id => masterClassId,student_id=>studentId)
-router.post("/:id/accept_member_master/:master_class_id/:student_id",(req,res)=>{
-    const education = educational_organizations.find(m=>m.id===parseInt(req.params.id));
-    const master_class =education.master_class.find(m=>m.id===parseInt(req.params.master_class_id));
-    if(master_class.available===true){
-        master_class.students_assigened.push(parseInt(req.params.student_id))
-    }
+router.put("/:id/accept_member_master/:master_class_id/:student_id",async(req,res)=>{
+
+    const EOrg =await educational_organization.findById(req.params.id);
+    const masterclass =EOrg.master_class.find(m=>m._id==req.params.master_class_id);
+    const master_classModel =await master_class.findById(req.params.master_class_id);
+    if(masterclass!==undefined){
+     if(masterclass.available===true){
+         var masterclasses=EOrg.master_class
+
+         if(masterclass.students_assigened==null)
+         masterclass.students_assigened=[]
+        
+         if(master_classModel.students_assigened==null)
+         master_classModel.students_assigened=[]
+
+         for( var i = 0; i < masterclasses.length; i++){ 
+            if ( masterclasses[i]._id == req.params.master_class_id) {
+                masterclasses.splice(i, 1); 
+            }
+         }
+        masterclass.students_assigened.push(req.params.student_id)
+        master_classModel.students_assigened.push(req.params.student_id)
+        master_classModel.save()
+        masterclasses.push(masterclass)
+      //  console.log(masterclasses)
+         EOrg.save()
+         const temp_EOrg =await educational_organization.findOneAndUpdate({"_id":req.params.id},{"master_class":masterclasses});
+         res.send(temp_EOrg.master_class)
+     }else{
+      res.send("this Master Class is not available");
+     }
+ }else{
+     res.send("There is no such Master Class Here");
+ 
+ }
  
  });
 
@@ -1159,6 +1231,7 @@ router.post("/:id/accept_member_master/:master_class_id/:student_id",(req,res)=>
 
 
 
+//End Badr
 
 
 
