@@ -1,3 +1,4 @@
+//1WT
 // Dependencies
 const express = require('express');
 const router = express.Router();
@@ -9,6 +10,8 @@ const Joi = require('joi');
 const Courserequest  = require('../models/Courserequest.js');
 const Recomendation = require('../models/recomendation.js');
 const Notification = require('../models/Notification.js');
+const Member = require('../models/member.js');
+
 
  //create course request
 
@@ -107,9 +110,6 @@ router.put('/:id/giverecomendation',async(req,res)=>{
             console.log(req.body)
             const reco = await Recomendation.create(req.body)
                
-
-
-               
            cr.recomendations.push(reco);
             const temp= await cr.save();
             res.send(cr);    
@@ -163,5 +163,92 @@ router.put("/:id/update",async (req,res)=>{
          });
   
   });
+
+
+
+
+  //badr
+//1
+//rating a recomendations
+//(id  => courserequestsId,recId=> recomendationId)
+router.put('/:id/raterecomendation/:recId',async(request,response)=>{
+    const courseId=request.params.id;
+    const recomendation_id= request.params.recId;
+    const Rating= request.body.Rating;
+    const schema={
+       
+        
+        Rating:Joi.number().valid(1,2,3,4,5).required(),
+       
+     }
+     const result=Joi.validate(request.body,schema);
+     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+  
+    
+  const course=  await Courserequest.findById(courseId);
+  if(course !== undefined){
+    const recomendations=course.recomendations;
+    for( var i = 0; i < recomendations.length; i++){ 
+        if ( recomendations[i]._id == recomendation_id) {
+            recomendations.splice(i, 1); 
+        }
+     }
+
+    const recomendation=await  Recomendation.findById(recomendation_id)
+
+    
+    
+    if(recomendation.numberofratings ===undefined){
+    recomendation.numberofratings=0
+}
+    const NoOfRating=recomendation.numberofratings
+    
+    const newNoOfRating=NoOfRating+1;
+    if(recomendation.rating==undefined)
+    recomendation.rating=0
+    var temprate;
+    if(Math.round(((recomendation.rating*NoOfRating)+Rating)/newNoOfRating)>5)
+    temprate=5
+    else
+    temprate=Math.round(((recomendation.rating*NoOfRating)+Rating)/newNoOfRating)
+    recomendation.numberofratings=newNoOfRating
+    recomendation.rating=temprate
+     await Recomendation.findOneAndUpdate({"_id":recomendation_id},recomendation)
+    recomendations.push(recomendation)
+try {    
+    course =await Courserequest.findOneAndUpdate({"_id":courseId},{"recomendations":recomendations})
+
+    
+} catch (error) {
+    
+}
+
+    const id=recomendation.expert_id
+
+    var object =await Member.findOne({"_id":id})
+     if(object !== undefined){
+         nooftasks=object.all_rated_reco;
+
+         const x=object.all_rated_reco+1;
+         var temprate;
+         if(Math.round(((object.avreage_reco_rate*nooftasks)+Rating)/x)>5)
+         temprate=5
+         else
+         temprate=Math.round(((object.avreage_reco_rate*nooftasks)+Rating)/x)
+         object =await Member.findOneAndUpdate({"_id":id},{"all_rated_reco":x,"avreage_reco_rate":temprate})
+     }else{
+        response.send("Not found");
+
+     }
+
+    response.sendStatus(200);
+
+
+}else{
+   response.send("Not found");
+
+}
+});
+//End badr
 
 module.exports = router;

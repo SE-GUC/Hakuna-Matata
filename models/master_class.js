@@ -64,7 +64,9 @@ const master_class_Schema = new Schema({
         type: Boolean,
         required: true
     },
-
+    students_assigened:{
+        type: []
+    }
 
 })
 
