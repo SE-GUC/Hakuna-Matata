@@ -18,7 +18,9 @@ const Joi = require('joi');
 const room = require('../models/room'); 
 const coworking_space = require('../models/coworking_space'); 
 const validator = require('../validations/CourseValidations.js')
+
 const ovalidator = require('../validations/OrganizationValidation.js')
+
 
 const educational_organization = require('../models/educational_organization.js');
 const master_class=require('../models/master_class.js');
@@ -93,7 +95,9 @@ router.get("/:id/show_educational_organization/Show_cousrses",async(req,res) =>{
         res.json({msg:'You get the organization',data :organizationfind.courses})
         }
         catch(error){
+
             res.status(404).send("Not found")
+
         }
        
         
@@ -344,9 +348,11 @@ catch(error)
     res.status(404).send("Not found")
   }
     
+
 });
 //get course of specific educational organization
  router.get('/:id/sho/:course_id',(req,res)=>{
+
     
         educational_organization.findById  (req.params.id, function async (err, edu) {
                   
@@ -360,7 +366,8 @@ catch(error)
             
          
               else{
-                res.send('Not found');
+
+                res.status(404).send('Not found');
         
               }
           });
@@ -811,6 +818,7 @@ router.post("/:id/create_certificates",async(req,res)=>{
     }
 
 
+
 });
 
 router.get("/:id/getcertificate",async (request,response)=>{
@@ -838,6 +846,7 @@ router.get("/:id/show_certificates",async(req,res) =>{
           }
       });    
 });
+
 //(id  => educational_organizationId  ,training_program_id => trainingProgramId)
 router.get("/:id/show_certificates/:certificate_id",async(req,res) =>{
     educational_organization.findById(req.params.id, function(err, co) {
@@ -930,6 +939,7 @@ router.delete("/:id/delete_certificate/:certificate_id",async(req,res) =>{
     
 });
 //End Certificant CRUD
+
 
 // Training Program CRUD
 //URL to add trainings programs  (id  => educational_organizationId)
@@ -1081,10 +1091,12 @@ router.delete("/:id/delete_training_programs/:training_program_id",async(req,res
         
           else{
             res.status(404).send('Not found');
+
     
           }
       
     
+
     });
 });
 
