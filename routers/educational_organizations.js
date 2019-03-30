@@ -1,3 +1,5 @@
+
+    
 //creation of educational organization
 //create master class
 //create courses
@@ -16,6 +18,8 @@ const Joi = require('joi');
 const room = require('../models/room'); 
 const coworking_space = require('../models/coworking_space'); 
 const validator = require('../validations/CourseValidations.js')
+
+const ovalidator = require('../validations/OrganizationValidation.js')
 
 
 const educational_organization = require('../models/educational_organization.js');
@@ -58,7 +62,7 @@ router.get("/",async(req,res)=>{
         res.json({msg:'You update educational_organization', data : educationalor})
     }
     catch(error){
-        console.log(error)
+        res.status(404).send("Not found")
     }
     
 });
@@ -73,8 +77,10 @@ router.get("/:id/show_educational_organization",async(req,res) =>{
         res.json({msg:'You get the organization',data :organizationfind})
         }
         catch(error){
-            console.log(error)
+            res.status(404).send("Not found")
         }
+
+        
        
         
     });
@@ -89,7 +95,9 @@ router.get("/:id/show_educational_organization/Show_cousrses",async(req,res) =>{
         res.json({msg:'You get the organization',data :organizationfind.courses})
         }
         catch(error){
-            console.log(error)
+
+            res.status(404).send("Not found")
+
         }
        
         
@@ -105,10 +113,11 @@ router.put("/:id/update_educational",async(req,res)=>{
         const isValidated = ovalidator.updateValidation(req.body)
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const updatedorganization = await educational_organization.findOneAndUpdate({"_id":id},req.body)
+       
         res.json({msg:'You update educational_organization',data : updatedorganization})
         }
         catch(error){
-            console.log(error)
+            res.sendStatus(404).send("Not found")
         }
 });
 
@@ -123,7 +132,7 @@ router.delete("/:id/delete_educational_organization",async(req,res) =>{
     }
     catch(error)
       {
-          console.log(error)
+        res.status(404).send("Educationalorganizations does not exist")
       }
         
     });  
@@ -144,7 +153,7 @@ router.post("/add_course",async(req,res)=>{
      res.send({msg: "Course is created ",data: course});  
     }   catch(error) {
         // We will be handling the error later
-        console.log(error)
+        res.status(404).send("Not found")
     }    
 
 });
@@ -163,7 +172,7 @@ router.post("/:id/add_course",async(req,res)=>{
        //course.save();
             add_eduOrg.courses.push(course);
             const temp= await add_eduOrg.save();
-            res.send(add_eduOrg);    
+            res.send(course);    
          }
         else {
             res.status(404).send("Not found")
@@ -171,7 +180,7 @@ router.post("/:id/add_course",async(req,res)=>{
     }
         catch(error) {
             // We will be handling the error later
-            console.log(error)
+            res.status(404).send("Not found")
         }  
 });
 
@@ -185,7 +194,7 @@ router.get("/show_courses",async(req,res) =>{
     res.json({msg:'You get the course',data :allCourses})
     }
     catch(error){
-        console.log(error)
+        res.status(404).send("Not found")
     }
 });
 
@@ -200,7 +209,7 @@ router.get("/:id/show_courses",async(req,res) =>{
     res.json({msg:'You get the course',data :coursefind})
     }
     catch(error){
-        console.log(error)
+        res.sendStatus(404)
     }
 });
 
@@ -227,7 +236,7 @@ router.put("/update_course/:course_id",async (req,res)=>{
     res.send({data: cousreAfterUpdate,msg: "Before",data:up_course });
     }catch(error) {
         // We will be handling the error later
-        console.log(error)
+        res.status(404).send("Not found")
     }  
 });
 
@@ -288,7 +297,7 @@ router.put("/:id/update_course/:course_id",async (req,res)=>{
             }
         }   catch(error) {
             // We will be handling the error later
-            console.log(error)
+            res.status(404).send("Not found")
         }     
 });
 
@@ -303,13 +312,14 @@ router.delete("/delete_courses/:course_id",async(req,res) =>{
     //console.log({data :allCourses})
 
     const deletedformCourses= await courses.findOneAndRemove({"_id": id})
+    if (!deletedformCourses) return  res    .send('Not found')
     var allCourses=await courses.find()
         //deletedformCourses.save()
     res.send({data :allCourses})
 }
 catch(error)
   {
-      console.log(error)
+    res.send('Not found')
   }
     
 });
@@ -335,31 +345,14 @@ router.delete("/:id/delete_courses/:course_id",async(req,res) =>{
 }
 catch(error)
   {
-      console.log(error)
+    res.status(404).send("Not found")
   }
     
-});/*
-router.get("/:id/show_educational_organization/:course_id/Show_Course",async(req,res) =>{
-    try{
-        const id =req.params.id
-        const CourseId=req.params.course_id
-        const organizationfind=await educational_organization.findById(id);
-        if(!organizationfind) return res.status(404).send({error: 'educational_organization does not exist'})
-        const coursee=organizationfind.courses.find(returnedMC=>returnedMC._id ==CourseId)
-        if(coursee!==undefined)
-        res.json({msg:'You get the Course', Course})
-        else
-        res.json({msg:'this Course not Found'})
 
+});
+//get course of specific educational organization
+ router.get('/:id/sho/:course_id',(req,res)=>{
 
-    }
-        catch(error){
-            console.log(error)
-        }
-       
-        
-    });*/
-    router.get('/:id/sho/:course_id',(req,res)=>{
     
         educational_organization.findById  (req.params.id, function async (err, edu) {
                   
@@ -373,6 +366,7 @@ router.get("/:id/show_educational_organization/:course_id/Show_Course",async(req
             
          
               else{
+
                 res.status(404).send('Not found');
         
               }
@@ -824,6 +818,7 @@ router.post("/:id/create_certificates",async(req,res)=>{
     }
 
 
+
 });
 
 router.get("/:id/getcertificate",async (request,response)=>{
@@ -851,6 +846,7 @@ router.get("/:id/show_certificates",async(req,res) =>{
           }
       });    
 });
+
 //(id  => educational_organizationId  ,training_program_id => trainingProgramId)
 router.get("/:id/show_certificates/:certificate_id",async(req,res) =>{
     educational_organization.findById(req.params.id, function(err, co) {
@@ -943,6 +939,7 @@ router.delete("/:id/delete_certificate/:certificate_id",async(req,res) =>{
     
 });
 //End Certificant CRUD
+
 
 // Training Program CRUD
 //URL to add trainings programs  (id  => educational_organizationId)
@@ -1094,10 +1091,12 @@ router.delete("/:id/delete_training_programs/:training_program_id",async(req,res
         
           else{
             res.status(404).send('Not found');
+
     
           }
       
     
+
     });
 });
 
@@ -1201,6 +1200,8 @@ router.put("/:id/accept_member_course/:course_id/:student_id",async (req,res)=>{
 
 
 module.exports = router
+
+
 
 
 
