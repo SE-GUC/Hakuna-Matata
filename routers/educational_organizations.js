@@ -1,9 +1,14 @@
+
+    
 //creation of educational organization
 //create master class
 //create courses
 //create training programs
 //create certificates
 //add info about educators and trainers
+
+
+//3wo
 const express = require('express');
 const router = express.Router();
 router.use(express.json());
@@ -12,7 +17,8 @@ const Joi = require('joi');
 
 const room = require('../models/room'); 
 const coworking_space = require('../models/coworking_space'); 
-
+const validator = require('../validations/CourseValidations.js')
+const ovalidator = require('../validations/OrganizationValidation.js')
 
 const educational_organization = require('../models/educational_organization.js');
 const master_class=require('../models/master_class.js');
@@ -21,8 +27,10 @@ const training_programs=require('../models/training_programs.js');
 const certificates=require('../models/certificates.js');
 const educators=require('../models/educators.js');
 
-const ovalidator=require('../validations/OrganizationValidation.js')
-const validator=require('../validations/CourseValidations.js')
+// router.get("/",(req,res)=>{
+//     res.send("afssa");
+// });
+
  // EOrg CRUDS
 //create educational organization using mongo
 //URl to create educational organization  (partner_id =>partnerId)
@@ -300,7 +308,7 @@ router.delete("/delete_courses/:course_id",async(req,res) =>{
     //console.log({data :allCourses})
 
     const deletedformCourses= await courses.findOneAndRemove({"_id": id})
-    if (!deletedformCourses) return  res.send('Not found')
+    if (!deletedformCourses) return  res    .send('Not found')
     var allCourses=await courses.find()
         //deletedformCourses.save()
     res.send({data :allCourses})
@@ -361,7 +369,26 @@ catch(error)
     // End of Course CRUDS
 
 
- // get one   Show_MasterClasses of One educational_organizationId
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // get one   Show_MasterClasses of One educational_organizationId
 //(id  => educational_organizationId ,masterClass_id => MasterClassID)
 //1
 router.get("/:id/show_educational_organization/:masterClass_id/Show_MasterClasses",async(req,res) =>{
@@ -1161,3 +1188,8 @@ router.put("/:id/accept_member_course/:course_id/:student_id",async (req,res)=>{
 
 
 module.exports = router
+
+
+
+
+
