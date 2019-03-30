@@ -1,9 +1,14 @@
 // The Member model 
 const mongoose = require ('mongoose');
-mongoose.connect('mongodb://localhost/newmongo',{ useNewUrlParser: true })
-.then(()=>console.log('connected to mongo'))
-.catch(err => console.error('coudnt connect to mongo',err))
+/* // DB Config
+const db = require('../config/keys').mongoURI
 
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+ */
 const memberSchema = new mongoose.Schema({
 
     fullname:{type:String ,required:true},

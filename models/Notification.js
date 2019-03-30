@@ -1,10 +1,13 @@
 const mongoose=require('mongoose');
-mongoose.connect('mongodb://localhost/lirtenhub',{ useNewUrlParser: true})
-.then(()=>console.log('Connected to mongodp'))
-.catch(err => console.log("theres an error",err) );
+/* // DB Config
+const db = require('../config/keys').mongoURI
 
-
-
+// Connect to mongo
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log(err))
+ */
 //schemas
 const NotificationSchema=new mongoose.Schema({
     notification_id: mongoose.Schema.Types.ObjectId,

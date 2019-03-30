@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const platform= require('../arrays/platform.js');
-const tasks= require('../arrays/tasks.js');
+//const platform= require('../arrays/platform.js');
 
 
 router.get('/', (req, res) => {

@@ -2,8 +2,11 @@ const express = require('express')
 const router = express.Router()
 const Joi = require('joi');
 const Partner = require('../models/partner')
+const Project = require('../models/project')
+const {SendToAdminRequestNotification,Not_summary}= require('../models/Notification.js');
 //create a partner
-router.post('/create',(request,response)=>{
+//1
+router.post('/create',async (request,response)=>{
     const name=request.body.name;
     const information= request.body.information;
     const partners= request.body.partners;
@@ -11,14 +14,12 @@ router.post('/create',(request,response)=>{
     const projects= request.body.projects;
     const feedback=request.body.feedback;
     const schema={
-
         name:Joi.string().required(),
         information:Joi.string().required(),
         partners:Joi.array().items(Joi.string()).required(),
         field_of_work:Joi.string().required(),
         projects:Joi.array().items(Joi.string()).required(),
         feedback:Joi.string().required()
-
      }
      const result=Joi.validate(request.body,schema);
      if (result.error) return response.status(400).send({ error: result.error.details[0].message });
@@ -32,32 +33,33 @@ router.post('/create',(request,response)=>{
             feedback:feedback
         });
         
-        partner.save();
+        await partner.save();
         response.sendStatus(200);
         
 }})
 //delete partner
-router.delete('/:id/deletepartner', function(req,res){
-
-    Partner.findByIdAndRemove(
-        req.params.id,
-        function(err) {
-          if(!err){
-            res.sendStatus(200);
-
-          }
-          else{
-            res.status(404).send('Not found');
-
-          }
-        }
-    );
+//1
+router.delete('/:id/deletepartner', async  function(req,res){
+    try {
+        const id = req.params.id
+        const deletedPartner = await Partner.findOneAndRemove({"_id":id})
+        if(deletedPartner!==null)
+        res.json({msg:'Partner was deleted successfully', data: deletedPartner})
+        else
+        res.json({msg:'Partner was deleted Already or Not Found'})
+    
+       }
+       catch(error) {
+           // We will be handling the error later
+           console.log(error)
+       }
  
   });
 
 //get all partners
-router.get('/', (req, res) =>{
-   Partner.find({}, function(err, partners) {
+//1
+router.get('/', async (req, res) =>{
+  await Partner.find({}, function(err, partners) {
           
         if(!err){
             res.send(partners);
@@ -71,9 +73,10 @@ router.get('/', (req, res) =>{
 
 });
 //get partner by id
-router.get('/:id',(req,res)=>{
+//1
+router.get('/:id',async (req,res)=>{
 
-    Partner.findById(req.params.id, function(err, partners) {
+    await Partner.findById(req.params.id, function(err, partners) {
         if(!err){
             res.send(partners);
 
@@ -87,7 +90,8 @@ router.get('/:id',(req,res)=>{
    
    })
 //update a partner
-router.put("/:id/update",(req,res)=>{
+//1
+router.put("/:id/update",async (req,res)=>{
     const schema={
         name:Joi.string(),
         information:Joi.string(),
@@ -103,7 +107,7 @@ router.put("/:id/update",(req,res)=>{
         res.status(400).send(result.error.details[0].message);
         return;
     } 
-    Partner.findById(req.params.id, function(err, partners) {
+   await Partner.findById(req.params.id, function(err, partners) {
         if(!err){
             if(req.body.name!=null){
              partners.name=req.body.name
@@ -122,7 +126,7 @@ router.put("/:id/update",(req,res)=>{
             partners.feedback_form=req.body.feedback_form
            
          }
-         const result=partners.save()
+         const result= partners.save()
          res.send(partners); 
 
           }
@@ -133,97 +137,60 @@ router.put("/:id/update",(req,res)=>{
          });
 
 });
-/*
-router.get('/:id/show_accpted_task_notify',(request,response)=>{
-    const not = notificationSummaries.find({sent_to:request.params.id,title:"Your task has been accepted"});
-    response.send(not);
-});
-router.get('/:id/show_assigned_task_notify',(request,response)=>{
-    const not = notificationSummaries.find({sent_to : request.params.id,title:"You task has been assigned to a member!"});
-   
-    response.send(not);
-});
-*/
-
-/*const express = require('express')
-const router = express.Router()
-const Joi = require('joi');
 
 
-// We will be connecting using database 
-const partner = require('../models/partner')
-const notObject = require("../arrays/Notifications.js");
-const projects=require('../arrays/projects')
-// temporary data created as if it was pulled out of the database ...
-const  partners = require('../arrays/partners')
-
-const {notificationSummaries} = require("../arrays/Notifications.js");
-
-
-
-//show my project (id =>partnerId)
-router.get('/:id/show_projects',(req,res)=>{
-    projects.forEach(element => {
-        if(element.partner_id===parseInt(req.params.partner_id)){
-            res.write(JSON.stringify(element));
-        }
-    });
-    res.end();
-});
-
-// Get all partner
-router.get('/adminpartner', (req, res) => {
-    res.send(partners)
+// get partner project
+//1
+router.get('/:id/projects',async (req,res)=>{
+  //  var temp=[];
+   await Partner.findOne({"_id":req.params.id}, function(err, tPartner) {
+              
+        if(!err){
+            //console.log
+            if(tPartner!==null)
+            res.send(tPartner.projects);
+            else
+            res.send("Not Found")
+    
+          }
+          else{
+            res.status(404).send('Not found');
+    
+          }
+      });
+       
 })
-
-
-// Get a certain partner (id =>partnerId)
-router.get('/:id/adminpartner', (req, res) => {
-    const partnerId = req.params.id
-    const partner = partners.find(partner=> partner.id === partnerId)
-    if(partner!==undefined)
-        res.send(partner)
-})
-
-
-
-// Delete Certine partner from Array (id =>partnerId)
-router.delete('/:id/deletepartner/adminpartner', (req, res) => {
-    const partnerId = req.params.id
-    //router.listen( () => console.log(partnerId))
-    const partner = partners.find(partner=> partner.id === partnerId)
-    partners.splice(partners.indexOf(partner),1)
-})
-
-
-
-router.get('/:id/show_accpted_task_notify',(request,response)=>{
-    const not = notificationSummaries.find(not=> not.sent_to === parseInt(request.params.id)&&not.title==="Your task has been accepted");
-   
-    response.send(not);
+//badr
+//1
+router.get('/:id/show_accpted_task_notify',async (request,response)=>{
+    const not = await Not_summary.find({"sent_to":request.params.id,"title":"Your task has been accepted"});
+    response.send({data:not});
 });
-router.get('/:id/show_assigned_task_notify',(request,response)=>{
-    const not = notificationSummaries.find(not=> not.sent_to === parseInt(request.params.id)&&not.title==="You task has been assigned to a member!");
-   
-    response.send(not);
+//1
+router.get('/:id/show_assigned_task_notify',async (request,response)=>{
+    const not =await Not_summary.find({"sent_to" : request.params.id,"title":"You task has been assigned to a member!"});
+    response.send({data:not});
 });
-
-*/
-
-/*marina show profile */
-// Get a certain partner (id =>partnerId)
-/*
-router.get('/:id', (req, res) => {
-    const partnerId = req.params.id
-    const partner = partners.find(partner=> partner.id === partnerId)
-    if(partner!==undefined)
-        res.send(partner)
-})
-
-
+//1
 router.post('/:id/editrequest',(request,response)=>{
     var id=request.params.id;
-    var e= notObject.SendToAdminRequestNotification("Partner "+id+" wants to edit his profile");
+    var e= SendToAdminRequestNotification("Partner "+id+" wants to edit his profile");
     response.sendStatus(200);
-});*/
+});
+
+//show my project (id =>partnerId)
+//1
+router.get('/:id/show_projects',async(req,res)=>{
+    const projects=await Project.find({"partner_id":req.params.id})
+    if(projects.length==0)
+    res.send("You don't have projects")
+    else
+    res.send({data:projects})
+});
+//end badr
+
+
+
+
+
 module.exports=router;
