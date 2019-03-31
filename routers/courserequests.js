@@ -73,23 +73,24 @@ router.get('/:id',async (request,response)=>{
     
 // delete a course request 
 //1
-router.delete('/delete/:id', async function(req,res){
+router.delete('/:id/delete', async function(req,res){
 
-    await Courserequest.findByIdAndRemove(
-        req.params.id,
-        function(err) {
-          if(!err){
-            res.sendStatus(200);
-
-          }
-          else{
-            res.status(404).send('Not found');
-
-          }
-        }
-    );
+    try {
+        const id = req.params.id
+        const deleted = await Courserequest.findOneAndRemove({"_id":id})
+        if(deleted!==null)
+        res.json({msg:'courserequest was deleted successfully', data: deleted})
+        else
+        res.json({msg:'courserequest was deleted Already or Not Found'})
+    
+       }
+       catch(error) {
+           // We will be handling the error later
+           console.log(error)
+       }
  
   });
+
 //give reco
 //1
 router.put('/:id/giverecomendation',async(req,res)=>{
