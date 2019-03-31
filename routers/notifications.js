@@ -15,9 +15,15 @@ router.get('/',async (request,response)=>{
 //get notifications by id
 //1
 router.get('/:id/Notification',async (request,response)=>{
-    const notification = await Notification.findById(request.params.id)
-    response.json({data: notification})
-     })
+    await Notification.findById(request.params.id,function(err,noti){
+       if(!err){
+       response.send(noti)
+       }
+       else {
+        response.status(404).send("not found") 
+       }
+   })
+    }) 
 
 //get all notif sum
 //1
