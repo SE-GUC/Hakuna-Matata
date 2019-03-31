@@ -12,14 +12,14 @@ router.post('/create',async (request,response)=>{
     const partners= request.body.partners;
     const field_of_work=request.body.field_of_work;
     const projects= request.body.projects;
-    const feedback=request.body.feedback;
+    const feedback_form=request.body.feedback_form;
     const schema={
         name:Joi.string().required(),
         information:Joi.string().required(),
         partners:Joi.array().items(Joi.string()).required(),
         field_of_work:Joi.string().required(),
         projects:Joi.array().items(Joi.string()).required(),
-        feedback:Joi.string().required()
+        feedback_form:Joi.string().required()
      }
      const result=Joi.validate(request.body,schema);
      if (result.error) return response.status(400).send({ error: result.error.details[0].message });
@@ -30,7 +30,7 @@ router.post('/create',async (request,response)=>{
             partners:partners,
             field_of_work:field_of_work,
             projects:projects,
-            feedback:feedback
+            feedback_form:feedback_form
         });
         
         await partner.save();
@@ -46,8 +46,8 @@ router.delete('/:id/deletepartner', async  function(req,res){
         if(deletedPartner!==null)
         res.json({msg:'Partner was deleted successfully', data: deletedPartner})
         else
-        res.json({msg:'Partner was deleted Already or Not Found'})
-    
+        //res.json({msg:'Partner was deleted Already or Not Found'})
+        res.status(404).send('Not found');
        }
        catch(error) {
            // We will be handling the error later
@@ -98,7 +98,7 @@ router.put("/:id/update",async (req,res)=>{
         partners:Joi.array().items(Joi.string()),
         field_of_work:Joi.string(),
         projects:Joi.array().items(Joi.string()),
-        feedback:Joi.string()
+        feedback_form:Joi.string()
    
 
     };
