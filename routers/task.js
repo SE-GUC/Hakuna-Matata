@@ -55,7 +55,7 @@ router.post('/create/:id',async (req,res)=>{
 //const ta = await task.create(req.body)
 task.insertMany(task1);
 const taS = await task.find()
-res.json({data : taS});
+res.json({data : task1});
 }
 catch(error){
     // we will handling the error later

@@ -7,24 +7,11 @@ const Joi = require('joi');
 const agency = require('../models/consultancy_agency'); 
 const tasker=require('../models/consultance');
 const task=require('../models/task');
-//const {Send_Task_Notification} = require('../models/Notification.js');
+const {Send_Task_Notification} = require('../models/Notification.js');
 //const taskConsulted = require('../arrays/taskConsulted'); 
 //const constultancy_agencies = require('../arrays/constultancy_agencys'); 
 //const tasks=require('../arrays/tasks')
 
-//show all the tasks that need consultance 
-router.get('/show_unconsultedtasks',async (req,res)=>{
-    try{
-    const unconsulted=await task.find({ 
-        consulty_needed:true,
-        consultancy_agency_id:0
-     });
-    res.send(unconsulted);
-    }
-    catch(error){
-        console.log(error);
-    }
-});
 
 //create a consultance to a task with id equal id by consultancy agency with id equal agency_id
 router.post('/feedback/:agency_id/:id', async (req,res)=>{
@@ -47,6 +34,10 @@ router.post('/feedback/:agency_id/:id', async (req,res)=>{
         consulty_needed:true,
         consultancy_agency_id:0
     });
+    if(!tassk){
+        res.status(404).json("task not found or don't need consultance");
+        return;
+    }
     const consult=new tasker({
         partner_id:tassk.partner_id,
         consultancy_agency_id:req.params.agency_id,
@@ -72,11 +63,11 @@ router.post('/feedback/:agency_id/:id', async (req,res)=>{
     });
     tassk.cunsulties_done.push(consult);
     const query = await task.findOneAndUpdate({'_id':req.params.id},{cunsulties_done:tassk.cunsulties_done});
-    const taS = await task.find()
+    const taS = await task.findOne({'_id':req.params.id})
     res.json(taS);
 }
 catch(error){
-    console.log(error);
+    res.status(404).json("task not found or don't need consultance");
 }
 });
 
@@ -88,12 +79,17 @@ router.get('/show', async (req, res) =>{
 //show agency with id equal agency_id
 router.get('/show/:agency_id', async (req, res) =>{
     const id=req.params.agency_id
-    var x= await agency.find({"_id" :id});
-     if(!x){
-        res.send("consultancy agency not found");
-        return;
-    }
+    try{
+    var x= await agency.findById({"_id" :id});
+      if(!x){
+         res.status(404).send("consultancy agency not found");
+         return;
+     }
      res.send(x);
+}
+ catch(error){
+ res.status(404).send("consultancy agency not found");
+ }
 });
 
 //create agency
@@ -126,13 +122,14 @@ router.post('/add_agency/:partner_id',async (req,res)=>{
     });
     await agency.insertMany(agent);
     //const newagency= await agency.create(req.body);
-    const agencies = await agency.find();
-    res.json(agencies);
+    res.json(agent);
     }
     catch(error){
-        console.log(error);
+        res.status(404).send(error)
     }
 });
+
+
 
 //update agency with id equal agency_id
 router.put('/update_agency/:agency_id',async (req,res)=>{
@@ -140,7 +137,7 @@ router.put('/update_agency/:agency_id',async (req,res)=>{
         const id=req.params.agency_id
         var x= await agency.find({"_id" :id});
     if(!x){
-        res.send("consultancy agency not found");
+        res.status(404).send("consultancy agency not found");
         return;
     }
     const schema={
@@ -163,19 +160,20 @@ router.put('/update_agency/:agency_id',async (req,res)=>{
     }
     if(req.body.parteners!=null){
         x.parteners=req.body.parteners;
-    }
+    
     if(req.body.members!=null){
         x.members=req.body.members;
     }
     if(req.body.reports!=null){
         x.reports=req.body.reports;
     }*/
-    const query = await agency.findOneAndUpdate({'_id':req.params.agency_id},req.body)
-    const agencies = await agency.find();
-    res.json(agencies);
+     await agency.findOneAndUpdate({'_id':req.params.agency_id},req.body)
+     const query =await agency.findOne({'_id':req.params.agency_id})
+    // const agencies = await agency.find();
+    res.json(query);
 }
 catch(error){
-    console.log(error);
+    res.status(404).send("consultancy agency not found");
 };
 });
 
@@ -186,15 +184,14 @@ router.delete('/delete_agency/:agency_id',async (req,res)=>{
         const id=req.params.agency_id
         var x= await agency.find({'_id':id});
         if(!x){
-            res.send("consultancy agency not found");
+            res.status(404).send("consultancy agency not found")
             return;
         }
         const deletedAgency = await agency.findByIdAndRemove(id)
-        const agencies = await agency.find();
-    res.json(agencies);
+    res.json(deletedAgency);
     }
     catch(error){
-        console.log(error);
+        res.status(404).send("consultancy agency not found")
     }
 });
 
@@ -204,46 +201,74 @@ router.put('/add_report/:id',async (req,res)=>{
     const id=req.params.id
         var x= await agency.findOne({'_id':id});
         if(!x){
-            res.send("consultancy agency not found");
+            res.status(404).send("consultancy agency not found");
             return;
         }
    x.reports.push(req.body.report);
   await agency.findOneAndUpdate({'_id':id},{"reports":x.reports});
-    const agencies = await agency.find();
-    res.json(agencies);
+  const agenc=await agency.findOne({'_id':id});
+    //const agencies = await agency.find();
+    res.json(agenc);
     }
     catch(error){
-        res.send(error);
+        res.status(404).send("consultancy agency not found");
     }
 });
 
+//show all the tasks that need consultance 
+router.get('/show_unconsultedtasks',async (req,res)=>{
+    try{
+    const unconsulted=await task.find({ 
+        consulty_needed:true,
+        consultancy_agency_id:0
+     });
+    res.send(unconsulted);
+    }
+    catch(error){
+        res.status(404).json('no task found');
+    }
+});
 //show all consultancies for a certain task
 //(partner_id  => partnerId, task_id=>taskId)
 router.get('/show_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
+    try{
     const tassk=await task.findOne({
         '_id':req.params.task_id,
         partner_id:req.params.partner_id
     });
     if(!tassk){
-        res.send("not found");
+        res.status(404).send("not found");
     }
     else
     res.send(tassk.cunsulties_done);
+}
+catch(error){
+    res.status(404).send("not found");
+}
 });
 
 //show certain consultancies for a certain task
 //(partner_id  => partnerId, task_id=>taskId,consultance_id+>ConsultancyAgencyId)
 router.get('/show_consulted_task/:partner_id/:task_id/:consultance_id',async (req,res)=>{
+    try{
     const tassk=await task.findOne({
         '_id':req.params.task_id,
         partner_id:req.params.partner_id
     });
     if(!tassk){
-        res.send("not found");
+        res.status(404).send("not found");
         return;
     }
     const consultance=tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.consultance_id);
+    if(!consultance){
+        res.status(404).send("not found");
+        return;
+    }
     res.send(consultance);
+}
+catch(error){
+    res.status(404).send("not found");
+}
 });
 
 //(id  => constultancyAgencysId, partner_id  => partnerId, task_id=>taskId,)
@@ -268,7 +293,7 @@ router.put('/:id/accept_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
         if(tassk!=null){
         const consultance=tassk.cunsulties_done.find(m => m.consultancy_agency_id==req.params.id);
         if(!consultance){
-            res.send("consultance not found");
+            res.status(404).send("consultance not found");
             return;
         }
        /* task.cunsulties_done.forEach(element=>{
@@ -301,20 +326,19 @@ router.put('/:id/accept_consulted_tasks/:partner_id/:task_id',async (req,res)=>{
             consultance.cunsulties_done.push(element);
         });*/
         task.insertMany(consult);
-        //var e=Send_Task_Notification(req.params.task_id,consultance.consultancy_agency_id,"Your consultancy has been accepted!");
+        var e=Send_Task_Notification(req.params.task_id,consultance.consultancy_agency_id,"Your consultancy has been accepted!");
         await task.findByIdAndDelete(req.params.task_id);
+        res.send(consult);
         //await task.findOneAndUpdate({'_id':req.params.task_id},consultance);
     }
     else{
-        res.send("task not found");
+        res.status(404).send("task not found");
         return;
     }
     //res.send(taskConsulted);
-    const taS = await task.find()
-    res.send(taS);
 }
 catch(error){
-    console.log(error);
+    res.status(404).send(error);
 }
     
 });
@@ -328,18 +352,18 @@ router.put('/:id/update_consultance/:task_id',async (req,res)=>{
         '_id':req.params.task_id,
     });
     if(!tassk){
-        res.send('task not found');
+        res.status(404).send('task not found');
         return;
     }
         const consultance =tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id);
         if(!consultance){
-            res.send('consultance not found');
+            res.status(404).send('consultance not found');
             return
         }
     const schema={
         description:Joi.string(),
         required_skills:Joi.string(),
-        monetary_compensation:Joi.string(),
+        monetary_compensation:Joi.number(),
         deadline:Joi.string(),
         deadline_for_apply:Joi.string(),
         experience_level:Joi.number().integer().min(1).max(5),
@@ -376,11 +400,11 @@ router.put('/:id/update_consultance/:task_id',async (req,res)=>{
         }
 
         await task.findOneAndUpdate({'_id':req.params.task_id},{cunsulties_done:tassk.cunsulties_done});
-        const taS = await task.find()
-    res.send(taS);
+        const taS = await task.findOne({'_id':req.params.task_id})
+        res.send(taS.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id));
     }
     catch(error){
-        console.log(error);
+        res.status(404).send("not found")
     }
 });
 
@@ -391,22 +415,21 @@ router.delete('/:id/delete_consultance/:taskid',async (req,res)=>{
         '_id':req.params.taskid,
     });
     if(!tassk){
-        res.send('task not found');
+        res.status(404).send('task not found');
         return;
     }
     const consultance=tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id);
     if(!consultance){
-        res.send('consultance not found');
+        res.status(404).send('consultance not found');
         return;
     };
     const indx=tassk.cunsulties_done.indexOf(tassk.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id));
     tassk.cunsulties_done.splice(indx,1);
-    await task.findOneAndUpdate({'_id':req.params.taskid},{cunsulties_done:tassk.cunsulties_done});
-    const taS = await task.find()
-    res.send(taS);
+    const taS=await task.findOneAndUpdate({'_id':req.params.taskid},{cunsulties_done:tassk.cunsulties_done});
+    res.send(taS.cunsulties_done.find(m=>m.consultancy_agency_id==req.params.id));
 }
 catch(error){
-    console.log(error);
+    res.status(404).send('not found');
 }
 });
   module.exports = router
