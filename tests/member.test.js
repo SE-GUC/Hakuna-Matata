@@ -33,6 +33,48 @@ test('create project',async() => {
 
      
     });
+    test('delete member',async()=>{
+        expect.assertions(1);
+        try{
+           
+           
+            const members =  await functions.getMembers()
+            const len1 = members.data.length
+            const id = members.data[len1-1]._id;
+            const name = members.data[len1-1].name;
+            const member =  await functions.deletemember(id)
+           const member2 =  await functions.getMembers()
+            const len2 = member2.data.length;
+            expect(len2).toEqual(len1-1)
+            expect(member.data.data.name).toEqual(name)
+        
+        }
+        catch(error){
+          expect(error.response.status).toBeGreaterThanOrEqual(400)
+          console.log('Not found')
+        }
+    })
+    test('update member',async()=>{
+        expect.assertions(1);
+      
+            try{
+             const members =  await functions.getMembers()
+             const len1 =members.data.length
+             const id = members.data[len1-1]._id;
+             const dataToUpdate = {
+                 fullname:"laila",
+              }
+             const member =  await functions.updatemember(id,dataToUpdate.fullname)
+             expect(member.data.fullname).toEqual(dataToUpdate.fullname)
+            }
+            catch(error){
+                
+                expect(error.response.status).toBeGreaterThanOrEqual(400)
+                console.log('Not found')
+              }
+         
+         
+       });
 // cannot create a project as there is a wrong data type
     test(' cannot create project',async() => {
         expect.assertions(1);

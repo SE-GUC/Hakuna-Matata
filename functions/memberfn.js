@@ -12,6 +12,13 @@ const functions = {
         const members=await axios.get('http://localhost:3000/member/')
         return members
         },
+        updatemember:async(id,fullname1)=>{
+            a='http://localhost:3000/member/'+id+'/update'
+         const members=await axios.put(a,{
+             fullname:fullname1
+         })
+         return members
+        },
    
         
     createproject:async(tID,pID,LINK,id)=>{
