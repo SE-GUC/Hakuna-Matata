@@ -151,6 +151,9 @@ router.post('/:id/create_project',(request,response)=>{
     const LINK=request.body.link;
     const mID=request.params.id;
 
+
+
+
     const project = new Project ({
         task_id:tID,
     partner_id:pID,
@@ -182,6 +185,7 @@ Project.find({}, function(err, members) {
             
         }
         res.send(temp);
+        //res.send(200);
 
       }
       else{
@@ -194,7 +198,6 @@ Project.find({}, function(err, members) {
 
 //delete project 
 router.delete('/:id/project/:pid', function(req,res){
-var isAllowedToDelete=false;
 Project.findById(req.params.pid, function(err, project) {
     if(!err){
         
@@ -302,7 +305,9 @@ router.put('/:id/applyForTask', async(req, res) => {
     const memberId = req.params.id
     const taskId = req.body.task_Id
     const task = await Task.findById(taskId)
+    if(task!==null){
     const member = await Member.findById(memberId)
+   if(member!==null){
     if(task.accepted){
         //onsole.log("we are Here")
        // const appliedtoit=task.applied
@@ -334,7 +339,14 @@ router.put('/:id/applyForTask', async(req, res) => {
                 console.log("done")
                 //tempmembers.push(memberdata)
             }else{
+                res.status(400);
                 res.send("Sorry u can not Apply , u Dont have the required Specifications")
+            }}else{
+              res.status(400).send("member id is not available");
+            
+            }}else{
+              res.status(400).send("task id is not available");
+            
             }
 } 
 else{

@@ -1,9 +1,14 @@
+
+    
 //creation of educational organization
 //create master class
 //create courses
 //create training programs
 //create certificates
 //add info about educators and trainers
+
+
+//3wo
 const express = require('express');
 const router = express.Router();
 router.use(express.json());
@@ -12,6 +17,9 @@ const Joi = require('joi');
 
 const room = require('../models/room'); 
 const coworking_space = require('../models/coworking_space'); 
+const validator = require('../validations/CourseValidations.js')
+
+const ovalidator = require('../validations/OrganizationValidation.js')
 
 
 const educational_organization = require('../models/educational_organization.js');
@@ -21,9 +29,9 @@ const training_programs=require('../models/training_programs.js');
 const certificates=require('../models/certificates.js');
 const educators=require('../models/educators.js');
 
-router.get("/",(req,res)=>{
-    res.send("afssa");
-});
+// router.get("/",(req,res)=>{
+//     res.send("afssa");
+// });
 
  // EOrg CRUDS
 //create educational organization using mongo
@@ -54,7 +62,7 @@ router.get("/",async(req,res)=>{
         res.json({msg:'You update educational_organization', data : educationalor})
     }
     catch(error){
-        console.log(error)
+        res.status(404).send("Not found")
     }
     
 });
@@ -69,8 +77,10 @@ router.get("/:id/show_educational_organization",async(req,res) =>{
         res.json({msg:'You get the organization',data :organizationfind})
         }
         catch(error){
-            console.log(error)
+            res.status(404).send("Not found")
         }
+
+        
        
         
     });
@@ -85,7 +95,9 @@ router.get("/:id/show_educational_organization/Show_cousrses",async(req,res) =>{
         res.json({msg:'You get the organization',data :organizationfind.courses})
         }
         catch(error){
-            console.log(error)
+
+            res.status(404).send("Not found")
+
         }
        
         
@@ -101,10 +113,11 @@ router.put("/:id/update_educational",async(req,res)=>{
         const isValidated = ovalidator.updateValidation(req.body)
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const updatedorganization = await educational_organization.findOneAndUpdate({"_id":id},req.body)
+       
         res.json({msg:'You update educational_organization',data : updatedorganization})
         }
         catch(error){
-            console.log(error)
+            res.sendStatus(404).send("Not found")
         }
 });
 
@@ -119,7 +132,7 @@ router.delete("/:id/delete_educational_organization",async(req,res) =>{
     }
     catch(error)
       {
-          console.log(error)
+        res.status(404).send("Educationalorganizations does not exist")
       }
         
     });  
@@ -140,7 +153,7 @@ router.post("/add_course",async(req,res)=>{
      res.send({msg: "Course is created ",data: course});  
     }   catch(error) {
         // We will be handling the error later
-        console.log(error)
+        res.status(404).send("Not found")
     }    
 
 });
@@ -159,7 +172,7 @@ router.post("/:id/add_course",async(req,res)=>{
        //course.save();
             add_eduOrg.courses.push(course);
             const temp= await add_eduOrg.save();
-            res.send(add_eduOrg);    
+            res.send(course);    
          }
         else {
             res.status(404).send("Not found")
@@ -167,7 +180,7 @@ router.post("/:id/add_course",async(req,res)=>{
     }
         catch(error) {
             // We will be handling the error later
-            console.log(error)
+            res.status(404).send("Not found")
         }  
 });
 
@@ -181,7 +194,7 @@ router.get("/show_courses",async(req,res) =>{
     res.json({msg:'You get the course',data :allCourses})
     }
     catch(error){
-        console.log(error)
+        res.status(404).send("Not found")
     }
 });
 
@@ -196,7 +209,7 @@ router.get("/:id/show_courses",async(req,res) =>{
     res.json({msg:'You get the course',data :coursefind})
     }
     catch(error){
-        console.log(error)
+        res.sendStatus(404)
     }
 });
 
@@ -223,7 +236,7 @@ router.put("/update_course/:course_id",async (req,res)=>{
     res.send({data: cousreAfterUpdate,msg: "Before",data:up_course });
     }catch(error) {
         // We will be handling the error later
-        console.log(error)
+        res.status(404).send("Not found")
     }  
 });
 
@@ -284,7 +297,7 @@ router.put("/:id/update_course/:course_id",async (req,res)=>{
             }
         }   catch(error) {
             // We will be handling the error later
-            console.log(error)
+            res.status(404).send("Not found")
         }     
 });
 
@@ -299,13 +312,14 @@ router.delete("/delete_courses/:course_id",async(req,res) =>{
     //console.log({data :allCourses})
 
     const deletedformCourses= await courses.findOneAndRemove({"_id": id})
+    if (!deletedformCourses) return  res    .send('Not found')
     var allCourses=await courses.find()
         //deletedformCourses.save()
     res.send({data :allCourses})
 }
 catch(error)
   {
-      console.log(error)
+    res.send('Not found')
   }
     
 });
@@ -331,31 +345,14 @@ router.delete("/:id/delete_courses/:course_id",async(req,res) =>{
 }
 catch(error)
   {
-      console.log(error)
+    res.status(404).send("Not found")
   }
     
-});/*
-router.get("/:id/show_educational_organization/:course_id/Show_Course",async(req,res) =>{
-    try{
-        const id =req.params.id
-        const CourseId=req.params.course_id
-        const organizationfind=await educational_organization.findById(id);
-        if(!organizationfind) return res.status(404).send({error: 'educational_organization does not exist'})
-        const coursee=organizationfind.courses.find(returnedMC=>returnedMC._id ==CourseId)
-        if(coursee!==undefined)
-        res.json({msg:'You get the Course', Course})
-        else
-        res.json({msg:'this Course not Found'})
 
+});
+//get course of specific educational organization
+ router.get('/:id/sho/:course_id',(req,res)=>{
 
-    }
-        catch(error){
-            console.log(error)
-        }
-       
-        
-    });*/
-    router.get('/:id/sho/:course_id',(req,res)=>{
     
         educational_organization.findById  (req.params.id, function async (err, edu) {
                   
@@ -369,6 +366,7 @@ router.get("/:id/show_educational_organization/:course_id/Show_Course",async(req
             
          
               else{
+
                 res.status(404).send('Not found');
         
               }
@@ -791,380 +789,449 @@ router.get('/:id/show_educc/:edu_id', (req,res)=>{
 
 // End Educator CRUD
 
+// End Educator CRUD
+/////////////////////////////////////////
+//Elbekoo Area
+/////////////////////
+// Certificant CRUD
+
 // Certificant CRUD
 
 //URL to create certificates  (id  => educational_organizationId)
 router.post("/:id/create_certificates",async(req,res)=>{
-    const schema={
-               
-        name:Joi.string().min(3).max(500).required(),
-        type:Joi.string().min(3).max(500).required(),
-        accreditation:Joi.string().min(3).max(500).required()
-    };
-    const result = Joi.validate(req.body, schema);
-    if (result.error) {
-        res.status(400).send(result.error.details[0].message);
-        return;
-    }
-
-
-    const temp_EOrg= await educational_organization.findById(req.params.id)
-    if(temp_EOrg!==undefined){
-        const cer= await  certificates.create(req.body);
-        temp_EOrg.certificates.push(cer);
-        temp_EOrg.save();
-        res.send(cer);
-        
-    }else{
-        res.status(404).send('Not found');
-    }
-
-
-});
-
-router.get("/:id/getcertificate",async (request,response)=>{
-    await  certificates.findById(request.params.id, function(err, cer) {
-               
-             if(!err){       
-              response.send(cer);      
-             }    
-               else{
-                  response.status(404).send('Not found');    
-               }
-           });
-     })
-
-//(id  => educational_organizationId)
-router.get("/:id/show_certificates",async(req,res) =>{
-    console.log("rgg")
-    educational_organization.findById(req.params.id, function(err, co) {
+    /*  try{
           
-        if(!err){       
-            res.send(co.certificates);      
-        }    
-          else{
-            res.status(404).send('Not found');    
-          }
-      });    
-});
-//(id  => educational_organizationId  ,training_program_id => trainingProgramId)
-router.get("/:id/show_certificates/:certificate_id",async(req,res) =>{
-    educational_organization.findById(req.params.id, function(err, co) {
-        if(!err){
-            const cer = co.certificates.find(m=>m._id==req.params.certificate_id);
-            res.send(cer);      
-        }
-          else{
-            res.status(404).send('Not found');   
-          }
-    });
-      });
-//(id  => educational_organizationId  ,certificate_id => certificateId)
-router.put("/:id/update_certificate/:certificate_id",async(req,res)=>{
-    const schema={
-        name:Joi.string(),
-        type:Joi.string(),
-        accreditation:Joi.string()
-     };
-     const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    };
-    educational_organization.findById(req.params.id, function(err, co) {
-                  
-        if(!err){
-            
-           
-     //const certifacatee = co.certificates.find(m=>m._id==req.params.certificate_id);
-     var certifacatee///here 
-               for( const end of co.certificates){
-               if(end !==null){
-                console.log(end._id)
-                console.log(req.params.certificate_id)
-                if(end._id==req.params.certificate_id){
-                    certifacatee=end
-                    //console.log(end)
-                }
-               }
-            }
-     if(certifacatee!==undefined){
-        co.certificates.remove(certifacatee)
-    if(req.body.name!=null){
-        certifacatee.name=req.body.name;
-    }
-    if(req.body.type!=null){
-        certifacatee.type=req.body.type;
-    }
-    if(req.body.available!=null){
-        certifacatee.accreditation=req.body.accreditation;
-    }
+          const isValidated = ovalidator.createValidation1(req.body);
+          if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
   
-     }
-     console.log(certifacatee);
-   co.certificates.push(certifacatee)
-    //educatorr.save();
- 
-    
-const x = educational_organization.findOneAndUpdate({"_id":req.params.id},co)
-co.save();
-const returnedvaule= educational_organization.findOne({"_id":req.params.id})
-res.send("Done");
-
-}
-    
-      else{
-        res.status(404).send('Not found');
-
+          const educationalor=await educational_organization.findById(req.params.id);
+          const cer = await certificates.create(req.body) 
+          educationalor.certificates.push(cer)
+  
+          educationalor.save();
+  
+          res.json({msg:'certificate was created successfully', data : cer})
       }
-    });
-
-
-  });    
-//(id  => educational_organizationId  ,certificate_id => certificateId)
-router.delete("/:id/delete_certificate/:certificate_id",async(req,res) =>{
-    educational_organization.findById(req.params.id, function(err, co) {                
-        if(!err){     
-            const cer = co.certificates.find(m=>m._id==req.params.certificate_id);
-           co.certificates.remove(cer);     
-            co.save();
-            res.send("done");
-
-        } 
-          else{
-            res.status(404).send('Not found');
-          }
-    });
-    
-    
-});
-//End Certificant CRUD
-
-// Training Program CRUD
-//URL to add trainings programs  (id  => educational_organizationId)
-router.post("/:id/add_programs",async(req,res)=>{
-
-    const schema={
-       name:Joi.string().min(3).max(500).required(),
-       trainer_id:Joi.number().integer().min(3).max(500),
-       trainer_name:Joi.string().min(3).max(500),
-       description:Joi.string().min(3).max(500),
-       type:Joi.string().min(3).max(500).required(),
-       duration:Joi.string().min(3).max(500),
-       apply_due_date:Joi.string().min(3).max(500),
-       start_date:Joi.string().min(3).max(500),
-       required_skills:Joi.string().min(3).max(500)
-    };
-    const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    }
-    const temp_EOrg= await educational_organization.findById(req.params.id)
-    if(temp_EOrg!==undefined){
-        const prog= await  training_programs.create(req.body);
-        temp_EOrg.training_programs.push(prog);
-        temp_EOrg.save();
-        res.send(prog);
-        
-    }else{
-        res.status(404).send('Not found');
-    }
-    });
-//(id  => educational_organizationId)
-router.get("/:id/show_training_programs",async(req,res) =>{
-    educational_organization.findById(req.params.id, function(err, co) {         
-        if(!err){         
-            res.send(co.training_programs);      
-        }
-          else{
-            res.status(404).send('Not found');   
-          }
-      });
-});
-//(id  => educational_organizationId  ,training_program_id => trainingProgramId)
-router.get("/:id/show_training_programs/:training_program_id",async(req,res) =>{
-    educational_organization.findById(req.params.id, function(err, co) {
-        if(!err){
-            const prog = co.training_programs.find(m=>m._id==req.params.training_program_id);
-            res.send(prog);      
-        }
-          else{
-            res.status(404).send('Not found');   
-          }
-    });
-      });
-//(id  => educational_organizationId  ,programs_id => programsId)
-router.put("/:id/update_programs/:programs_id",async(req,res)=>{
-    const schema={
-        name:Joi.string(),
-        trainer_id:Joi.number().integer(),
-        trainer_name:Joi.string(),
-        description:Joi.string(),
-        type:Joi.string(),
-        duration:Joi.string(),
-        apply_due_date:Joi.string(),
-        start_date:Joi.string(),
-        required_skills:Joi.string(),
-     };
-     const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    };
-
-    educational_organization.findById(req.params.id, function(err, co) {
-                  
-        if(!err){
-            
-            var program///here 
-            for( const end of co.training_programs){
-            if(end !==null){
-             console.log(end._id)
-             console.log(req.params.programs_id)
-             if(end._id==req.params.programs_id){
-                program=end
-                 //console.log(end)
-             }
-            }
-         }
-    //const program = co.training_programs.find(m=>m._id==req.params.programs_id);
-
-
-
-    if(program!==undefined){
-       co.training_programs.remove(program)
-
-        if(req.body.name!=null){
-            program.name=req.body.name;
-        }
-        if(req.body.trainer_id!=null){
-            program.trainer_id=req.body.trainer_id;
-        }
-        if(req.body.trainer_name!=null){
-            program.trainer_name=req.body.trainer_name;
-        }
-        if(req.body.description!=null){
-            program.description=req.body.description;
-        }
-        if(req.body.type!=null){
-            program.type=req.body.type;
-        }
-        if(req.body.duration!=null){
-            program.duration=req.body.duration;
-        }
-        if(req.body.apply_due_date!=null){
-            program.apply_due_date=req.body.apply_due_date;
-        }
-        if(req.body.start_date!=null){
-            program.start_date=req.body.start_date;
-        }
-        if(req.body.required_skills!=null){
-            program.required_skills=req.body.required_skills;
-        }
-        co.training_programs.push(program)
-        //educatorr.save();
-     
-        
-    const x = educational_organization.findOneAndUpdate({"_id":req.params.id},co)
-    res.send({data: co})        
-    }else{
-     res.send("this training Program is not Found")   
-    }
-}
-    else{
-        res.status(404).send('Not found');
-
-      }
-    });
-});
-//(id  => educational_organizationId  ,training_program_id => trainingProgramId)
-router.delete("/:id/delete_training_programs/:training_program_id",async(req,res) =>{
-    educational_organization.findById(req.params.id, function(err, co) {            
-        if(!err){   
-          const prog = co.training_programs.find(m=>m._id==req.params.training_program_id);   
-           co.training_programs.remove(prog); 
-            co.save();
-            res.send("done");
-        }
-        
-          else{
-            res.status(404).send('Not found');
-    
-          }
+      catch(error){
+          console.log(error)
+      }*/
       
+      const schema={
+                 
+          name:Joi.string().min(3).max(500).required(),
+          type:Joi.string().min(3).max(500).required(),
+          accreditation:Joi.string().min(3).max(500).required()
+      };
+      const result = Joi.validate(req.body, schema);
+      if (result.error) {
+          res.status(400).send(result.error.details[0].message);
+          return;
+      }
+  
+  
+      const temp_EOrg= await educational_organization.findById(req.params.id)
+      if(temp_EOrg!==undefined){
+          const cer= await  certificates.create(req.body);
+          temp_EOrg.certificates.push(cer);
+          temp_EOrg.save();
+          res.send(cer);
+          
+      }else{
+          res.status(404).send('Not found');
+      }
+  
+  
+  });
+  
+  
+  
+  //(id  => educational_organizationId)
+  router.get("/:id/show_certificates",async(req,res) =>{
+    /*  try{
+          const educationalor=await educational_organization.findById(req.params.id);
+          if(!educationalor) return res.status(404).send({error: 'organization does not exist'})
+          res.json({msg:'You update educational_organization', data : educationalor.certificates})
+      }
+      catch(error){
+          console.log(error)
+      }*/
+      
+      educational_organization.findById(req.params.id, function(err, co) {
+            
+          if(!err){
+              if(co!==null){
+
+                  
+              res.send(co.certificates);      
+               } else{
+                res.status(404).send('Not found');    
+            
+          }}    
+            else{
+              res.status(404).send('Not found');    
+            }
+        });  
+  });
+  //(id  => educational_organizationId  ,training_program_id => trainingProgramId)
+  router.get("/:id/show_certificates/:certificate_id",async(req,res) =>{
+      educational_organization.findById(req.params.id, function(err, co) {
+          if(!err){
+              const cer = co.certificates.find(m=>m._id==req.params.certificate_id);
+              res.send(cer);      
+          }
+            else{
+              res.status(404).send('Not found');   
+            }
+      });
+        });
+  //(id  => educational_organizationId  ,certificate_id => certificateId)
+  router.put("/:id/update_certificate/:certificate_id",async(req,res)=>{
+      const schema={
+          name:Joi.string(),
+          type:Joi.string(),
+          accreditation:Joi.string()
+       };
+       const result =Joi.validate(req.body,schema);
+      if(result.error){
+          res.status(400).send(result.error.details[0].message);
+          return;
+      };
+      educational_organization.findById(req.params.id, function(err, co) {
+                    
+          if(!err){
+              
+             
+       //const certifacatee = co.certificates.find(m=>m._id==req.params.certificate_id);
+       var certifacatee///here 
+                 for( const end of co.certificates){
+                 if(end !==null){
+                 if(end._id==req.params.certificate_id){
+                      certifacatee=end
+                      //console.log(end)
+                  }
+                 }
+              }
+       if(certifacatee!==undefined){
+          co.certificates.remove(certifacatee)
+         
+      if(req.body.name!=null){
+          certifacatee.name=req.body.name;
+      }
+      if(req.body.type!=null){
+          certifacatee.type=req.body.type;
+      }
+      if(req.body.accreditation!=null){
+          certifacatee.accreditation=req.body.accreditation;
+      }
     
-    });
-});
+      
+     // const x = educational_organization.findOneAndUpdate({"_id":req.params.id},co)
+      co.certificates.push(certifacatee)
+      co.save();
+     // const returnedvaule= educational_organization.findOne({"_id":req.params.id})
+      res.send(certifacatee);
+      
+       }
+       else{
+          res.send("this  certificate is not Found")   
+       }
+  
+  }
+      
+        else{
+          res.status(404).send('Not found');
+  
+        }
+  
+      });
+  
+  
+    });    
+  //(id  => educational_organizationId  ,certificate_id => certificateId)
+  router.delete("/:id/delete_certificate/:certificate_id",async(req,res) =>{
+      educational_organization.findById(req.params.id, function(err, co) {                
+          if(!err){     
+              const cer = co.certificates.find(m=>m._id==req.params.certificate_id);
+              res.send(cer);
+              co.certificates.remove(cer);     
+              co.save();
+              
+  
+          } 
+            else{
+              res.status(404).send('Not found');
+            }
+      });
+      
+      
+  });
+  //End Certificant CRUD
+  
+  // Training Program CRUD
+  //URL to add trainings programs  (id  => educational_organizationId)
+  router.post("/:id/add_programs",async(req,res)=>{
+  
+      const schema={
+         name:Joi.string().min(3).max(500).required(),
+         trainer_id:Joi.number().integer().min(3).max(500),
+         trainer_name:Joi.string().min(3).max(500),
+         description:Joi.string().min(3).max(500),
+         type:Joi.string().min(3).max(500).required(),
+         duration:Joi.string().min(3).max(500),
+         apply_due_date:Joi.string().min(3).max(500),
+         start_date:Joi.string().min(3).max(500),
+         required_skills:Joi.string().min(3).max(500)
+      };
+      const result =Joi.validate(req.body,schema);
+      if(result.error){
+          res.status(400).send(result.error.details[0].message);
+          return;
+      }
+      const temp_EOrg= await educational_organization.findById(req.params.id)
+      if(temp_EOrg!==undefined){
+          const prog= await  training_programs.create(req.body);
+          temp_EOrg.training_programs.push(prog);
+          temp_EOrg.save();
+          res.send(prog);
+          
+      }else{
+          res.status(404).send('Not found');
+      }
+      });
+  //(id  => educational_organizationId)
+  router.get("/:id/show_training_programs",async(req,res) =>{
+      educational_organization.findById(req.params.id, function(err, co) {         
+          if(!err){         
+              res.send(co.training_programs);      
+          }
+            else{
+              res.status(404).send('Not found');   
+            }
+        });
+  });
+  //(id  => educational_organizationId  ,training_program_id => trainingProgramId)
+  router.get("/:id/show_training_programs/:training_program_id",async(req,res) =>{
+      educational_organization.findById(req.params.id, function(err, co) {
+          if(!err){
+              const prog = co.training_programs.find(m=>m._id==req.params.training_program_id);
+              res.send(prog);      
+          }
+            else{
+              res.status(404).send('Not found');   
+            }
+      });
+        });
+  //(id  => educational_organizationId  ,programs_id => programsId)
+  router.put("/:id/update_programs/:programs_id",async(req,res)=>{
+      const schema={
+          name:Joi.string(),
+          trainer_id:Joi.number().integer(),
+          trainer_name:Joi.string(),
+          description:Joi.string(),
+          type:Joi.string(),
+          duration:Joi.string(),
+          apply_due_date:Joi.string(),
+          start_date:Joi.string(),
+          required_skills:Joi.string(),
+       };
+       const result =Joi.validate(req.body,schema);
+      if(result.error){
+          res.status(400).send(result.error.details[0].message);
+          return;
+      };
+  
+      educational_organization.findById(req.params.id, function(err, co) {
+                    
+          if(!err){
+              
+              var program///here 
+              for( const end of co.training_programs){
+              if(end !==null){
+               console.log(end._id)
+               console.log(req.params.programs_id)
+               if(end._id==req.params.programs_id){
+                  program=end
+                   //console.log(end)
+               }
+              }
+           }
+      //const program = co.training_programs.find(m=>m._id==req.params.programs_id);
+  
+  
+  
+      if(program!==undefined){
+         co.training_programs.remove(program)
+  
+          if(req.body.name!=null){
+              program.name=req.body.name;
+          }
+          if(req.body.trainer_id!=null){
+              program.trainer_id=req.body.trainer_id;
+          }
+          if(req.body.trainer_name!=null){
+              program.trainer_name=req.body.trainer_name;
+          }
+          if(req.body.description!=null){
+              program.description=req.body.description;
+          }
+          if(req.body.type!=null){
+              program.type=req.body.type;
+          }
+          if(req.body.duration!=null){
+              program.duration=req.body.duration;
+          }
+          if(req.body.apply_due_date!=null){
+              program.apply_due_date=req.body.apply_due_date;
+          }
+          if(req.body.start_date!=null){
+              program.start_date=req.body.start_date;
+          }
+          if(req.body.required_skills!=null){
+              program.required_skills=req.body.required_skills;
+          }
+          co.training_programs.push(program)
+          //educatorr.save();
+       
+          
+      const x = educational_organization.findOneAndUpdate({"_id":req.params.id},co)
+      res.send(program)        
+      }else{
+       res.send("this training Program is not Found")   
+      }
+  }
+      else{
+          res.status(404).send('Not found');
+  
+        }
+      });
+  });
+  //(id  => educational_organizationId  ,training_program_id => trainingProgramId)
+  router.delete("/:id/delete_training_programs/:training_program_id",async(req,res) =>{
+      educational_organization.findById(req.params.id, function(err, co) {            
+          if(!err){   
+            const prog = co.training_programs.find(m=>m._id==req.params.training_program_id);   
+            res.send(prog);
+            co.training_programs.remove(prog); 
+            co.save();
+              
+          }
+          
+            else{
+              res.status(404).send('Not found');
+      
+            }
+        
+      
+      });
+  });
+  
+  // End Training Program CRUD
 
 // End Training Program CRUD
+////////////////////////////////////////////
+//Ending of Elbekoo Area
+/////////////////////////////
 ////////////////////////////////
-//reserve workshop for course  
-router.put('/:id/accept_reservation/:room_id',(req,res)=>{
- 
-    const schema={
-        reserved:Joi.boolean(),
-        reserved_date:Joi.string(),
-        end_of_reservation:Joi.string(),
-        reserved_id: Joi.number().integer()
-    };
-    const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    }
-   
-    const co = coworking_spaces.find(m=>m.id===parseInt(req.params.id));
-    const roooms = co.rooms;
-    const room = roooms.find(m=>m.id===parseInt(req.params.room_id));
-    if(room.reserved===false){
-      room.reserved_id = req.body.reserved_id;
-        room.reserved=req.body.reserved;
-        room.reserved_date=req.body.reserved_date;
-        room.end_of_reservation=req.body.end_of_reservation;
-        res.send(room);
-        return;
-    };
+/*  */
 
-    res.send("this room is not available");
-});
+//Badr
 
 
 
-
-
-
+//1
 //accept member for course
 //(id  => educational_organizationId  ,course_id => courseId,student_id=>studentId)
-router.post("/:id/accept_member_course/:course_id/:student_id",(req,res)=>{
-   const education = educational_organizations.find(m=>m.id===parseInt(req.params.id));
-   const course =education.courses.find(m=>m.id===parseInt(req.params.course_id));
-   if(course.available===true){
-       course.students_assigened.push(parseInt(req.params.student_id))
-   }
-
-});
-//accept member for master class 
-//(id  => educational_organizationId  ,master_class_id => masterClassId,student_id=>studentId)
-router.post("/:id/accept_member_master/:master_class_id/:student_id",(req,res)=>{
-    const education = educational_organizations.find(m=>m.id===parseInt(req.params.id));
-    const master_class =education.master_class.find(m=>m.id===parseInt(req.params.master_class_id));
-    if(master_class.available===true){
-        master_class.students_assigened.push(parseInt(req.params.student_id))
-    }
+router.put("/:id/accept_member_course/:course_id/:student_id",async (req,res)=>{
+    const EOrg =await educational_organization.findById(req.params.id);
+    const course =EOrg.courses.find(m=>m._id==req.params.course_id);
+    const courseModel =await courses.findById(req.params.course_id);
+    if(course!==undefined&&courseModel!==null){
+     if(course.available===true){
+         var cousrses=EOrg.courses
+ 
+         if(course.acceptedmembers==null)
+         course.acceptedmembers=[]
+        
+         if(courseModel.acceptedmembers==null)
+         courseModel.acceptedmembers=[]
+ 
+         for( var i = 0; i < cousrses.length; i++){ 
+            if ( cousrses[i]._id == req.params.course_id) {
+             cousrses.splice(i, 1); 
+            }
+         }
+ 
+         course.acceptedmembers.push(req.params.student_id)
+         courseModel.acceptedmembers.push(req.params.student_id)
+         courseModel.save()
+         cousrses.push(course)
+         //  console.log(masterclasses)
+            EOrg.save()
+            const temp_EOrg =await educational_organization.findOneAndUpdate({"_id":req.params.id},{"courses":cousrses});
+ 
+         res.send(temp_EOrg.courses)
+     }else{
+      res.send("this Course is not available");
+     }
+ }else{
+     res.send("There is no such Course Here");
+ 
+ }
+ 
  
  });
+ //1
+ //accept member for master class 
+ //(id  => educational_organizationId  ,master_class_id => masterClassId,student_id=>studentId)
+ router.put("/:id/accept_member_master/:master_class_id/:student_id",async(req,res)=>{
+ 
+     const EOrg =await educational_organization.findById(req.params.id);
+     const masterclass =EOrg.master_class.find(m=>m._id==req.params.master_class_id);
+     const master_classModel =await master_class.findById(req.params.master_class_id);
+     if(masterclass!==undefined){
+      if(masterclass.available===true){
+          var masterclasses=EOrg.master_class
+ 
+          if(masterclass.students_assigened==null)
+          masterclass.students_assigened=[]
+         
+          if(master_classModel.students_assigened==null)
+          master_classModel.students_assigened=[]
+ 
+          for( var i = 0; i < masterclasses.length; i++){ 
+             if ( masterclasses[i]._id == req.params.master_class_id) {
+                 masterclasses.splice(i, 1); 
+             }
+          }
+         masterclass.students_assigened.push(req.params.student_id)
+         master_classModel.students_assigened.push(req.params.student_id)
+         master_classModel.save()
+         masterclasses.push(masterclass)
+       //  console.log(masterclasses)
+          EOrg.save()
+          const temp_EOrg =await educational_organization.findOneAndUpdate({"_id":req.params.id},{"master_class":masterclasses});
+          res.send(temp_EOrg.master_class)
+      }else{
+       res.send("this Master Class is not available");
+      }
+  }else{
+      res.send("There is no such Master Class Here");
+  
+  }
+  
+  });
+ 
 
-
-
-
-
+ 
+ //End Badr
 
 
 
 
 
 module.exports = router
+
+
 
 
 

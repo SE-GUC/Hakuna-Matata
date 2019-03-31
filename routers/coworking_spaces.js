@@ -41,13 +41,13 @@ router.post("/create/:partner_id",async (req,res)=>{
         });
         
         co.save();
-        res.send(coworking_space);
+        res.send(co);
         
         
     }
        catch(error) {
            // We will be handling the error later
-           console.log(error)
+           res.status(404).send('Cannot create')
        } 
    
 });
@@ -62,18 +62,33 @@ router.delete("/:id/delete",async (req,res)=>{
         const id = req.params.id
         const co = await coworking_space.findByIdAndRemove(id)
         
-        res.json({msg:'CoworkingSpace was deleted successfully', data: co})
-       }
+      res.send(co) }
        catch(error) {
            // We will be handling the error later
-           console.log(error)
+           res.status(404).send('Cannot find it ')
        }  
 });
 //(id  => coworking_spaces)
 router.get("/:id",async (req,res)=>{
-    const co = await coworking_space.findById(req.params.id)
-    res.send(co);
-
+    coworking_space.findById(req.params.id, function(err, co) {
+              
+        if(!err){
+            
+           if(co!==null){
+            res.send(co);
+           }else{
+            res.status(404).send('Not found');
+    
+           }
+        }
+        
+     
+          else{
+            res.status(404).send('Not found');
+    
+          }
+        })
+    
 });
 
 router.get("/",async (req,res)=>{
@@ -170,7 +185,7 @@ coworking_space.findById(req.params.id, function(err, co) {
         });
         room.create(rooom);
         co.rooms.push(rooom);
-            res.send(co);
+            res.send(rooom);
             co.save();
         return;
         }
@@ -199,11 +214,11 @@ router.post("/add_room",async(req,res)=>{
             return;
         }
     const ro = await room.create(req.body) 
-     res.send({msg: "Room is created ",data: ro});  
+     res.send(ro);  
     }   catch(error) {
         // We will be handling the error later
-        console.log(error)
-    }    
+        res.status(404).send('Cannot add it ')
+    }   
 
 });
 
@@ -214,38 +229,66 @@ router.post("/add_room",async(req,res)=>{
 router.put('/accept_reservation/:id/:room_id',async (req,res)=>{
  
     const schema={
-        reserved:Joi.boolean(),
-        reserved_date:Joi.date(),
-        end_of_reservation:Joi.date(),
-        reserved_id: Joi.string()
+    reserved_date:Joi.date().required(),
+        end_of_reservation:Joi.date().required(),
+        reserved_id: Joi.string().required()
     };
     const result =Joi.validate(req.body,schema);
     if(result.error){
         res.status(400).send(result.error.details[0].message);
         return;
     }
-   
-    const co =await  coworking_space.findById(req.params.id);
-    const roooms = co.rooms;
-    const rooom = roooms.find(m=>m._id==req.params.room_id);
+   coworking_space.findById(req.params.id, async function(err, co) {
+                  
+            if(!err){
+                
+               
+    
+    if(co!==null){
+        const roooms = co.rooms;
+        const rooom = roooms.find(m=>m._id==req.params.room_id);
+           if(rooom!=null){
     if(rooom.reserved===false){
         rooom.reserved_id = req.body.reserved_id;
-        rooom.reserved=req.body.reserved;
+        rooom.reserved=true;
         rooom.reserved_date=req.body.reserved_date;
         rooom.end_of_reservation=req.body.end_of_reservation;
         await coworking_space.findOneAndUpdate({"_id":req.params.id},{"rooms":co.rooms});
-        await room.findOneAndUpdate({'_id':req.params.room_id},{
+
+       const w =  await room.findOneAndUpdate({'_id':req.params.room_id},{
             reserved_id:req.body.reserved_id,
-            reserved:req.body.reserved,
+            reserved:true,
             reserved_date:req.body.reserved_date,
             end_of_reservation:req.body.end_of_reservation
         })
-        res.send({data:co.rooms});
+        res.send(rooom);
         return;
     };
 
-    res.send("this room is not available");
-})
+    res.status(404).send("this room is not available");
+    
+    }else{
+        res.status(404).send('Not found room');
+        
+    }
+}
+        else{
+            res.status(404).send('Not found cowrking space');
+            
+        }
+               
+            }
+            
+         
+              else{
+                res.status(404).send('Not found cowrking space');
+        
+              }
+          });
+        
+
+    
+   })
 
 
 //(id  => coworking_spaces) // show all rooms
@@ -255,9 +298,12 @@ router.get('/:id/show_rooms',(req,res)=>{
               
         if(!err){
             
-           
+           if(co!==null){
             res.send(co.rooms);
-        
+           }else{
+            res.status(404).send('Not found');
+    
+           }
         }
         
      
@@ -284,9 +330,13 @@ router.get('/:id/show_room/:room_id',(req,res)=>{
               
         if(!err){
             
-           
+           if(co!==null){
             const ro = co.rooms.find(m=>m._id==req.params.room_id);
-            res.send(ro);
+            res.send(ro);}
+            else{
+                res.status(404).send('Not found');
+                
+            }
            
         }
         
@@ -330,7 +380,7 @@ router.delete('/:id/delete_room/:room_id',(req,res)=>{
             const ro = co.rooms.find(m=>m._id==req.params.room_id);
             co.rooms.remove(ro)
             co.save();
-            res.send(co);
+            res.send(ro);
            
         }
         
@@ -351,16 +401,16 @@ router.delete("/delete_room/:id",async(req,res) =>{
     //console.log({data :allCourses})
 
     const ro= await room.findOneAndRemove({"_id": id})
-    var roo=await room.find()
-        //deletedformCourses.save()
-    res.send({data :roo})
+      //deletedformCourses.save()
+    res.send(ro)
 }
 catch(error)
   {
-      console.log(error)
+    res.status(404).send('Cannot find it ')
+}
   }
     
-});
+);
 
 //(id  => coworking_spaces, room_id=>roomId) // update room
 router.put('/:id/update_room/:room_id',async (req,res)=>{
@@ -395,7 +445,7 @@ router.put('/:id/update_room/:room_id',async (req,res)=>{
                     ro.reserved_id=req.body.reserved_id;}
             await room.findOneAndUpdate({'_id':req.params.room_id},{"capacity":ro.capacity,"reserved":ro.reserved,"reserved_date":ro.reserved_date,"end_of_reservation":ro.end_of_reservation,"reserved_id":ro.reserved_id})
            await coworking_space.findOneAndUpdate({'_id':req.params.id},{"rooms":co.rooms});
-            res.send(co);
+            res.send(ro);
 
         }
         
@@ -429,14 +479,14 @@ router.put("/update_room/:id",async (req,res)=>{
               if(rooo!==undefined){
                   co.rooms.remove(rooo)
                   co.rooms.push(roo)
-                  console.log(co.rooms)
                   co.save()
               }
           }
-      res.send({data: roo,msg: "Before",data:ro });
+      res.send(roo);
       }catch(error) {
           // We will be handling the error later
-          console.log(error)
-      }  
+          res.status(404).send('Cannot find it ')
+        }
+       
   });
 module.exports = router
