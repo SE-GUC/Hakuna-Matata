@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router();
 const Joi = require('joi');
-const Member = require('../models/member.js');
+const {Member,getexplevel} = require('../models/member.js');
 const Project = require('../models/project.js');
 const notObject=require('../models/Notification.js');
 
