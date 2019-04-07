@@ -13,6 +13,9 @@ import GetSpecRoom from './components/pages/getSpecRoom'
 import GetAllAgencies from "./components/pages/GetAllAgencies";
 import GetSpecificAgency from "./components/pages/GetSpecificAgency";
 import GetAllTasks from "./components/pages/GetAllTasks";
+
+import GetAllEdu from './components/pages/GetAllEdu'
+import GetSpecificEdu from './components/pages/GetSpecificEdu'
 class App extends Component {
   // creatTable() {
   //   let buttons = []
@@ -58,13 +61,13 @@ class App extends Component {
               <React.Fragment>
                 <div >
 
-                /*THIS WILL NOT WORK RIGHT AWAY 
+             {   /*THIS WILL NOT WORK RIGHT AWAY 
                   PLEASE GO TO Hakuna-Matata\client\node_modules\react-cardstack\dist
                   and rename "CardStack.js" with capital "S" to "Cardstack.js" with small
                   "s", and it will work sorry for inconvinience
 
                   PS id you cant find path please run: npm install --save react-cardstack ok thx bye
-                  */
+                  */}
 
               <PartnerComp />
 
@@ -89,6 +92,8 @@ class App extends Component {
                 </div>
               </React.Fragment>
             )} />
+            <Route exact path ="/educationalOrganizations/" component ={GetAllEdu}></Route>
+      <Route exact path ="/educationalOrganizations/:id" component ={GetSpecificEdu}></Route>
             <Footer></Footer>
 
           </div>
