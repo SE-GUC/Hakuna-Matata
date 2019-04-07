@@ -1,10 +1,11 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
 
 const Task = require('../models/Task.js')
 const taskValidator = require('../validations/taskValidations.js')
-const { Member } = require('../models/Member.js');
+const {Member} = require('../models/Member.js');
 const { sendTaskNotification } = require('../models/Notification.js');
 
 // CRUD
@@ -71,7 +72,7 @@ router.put("/:id", async (req, res) => {
     try {
         const id = req.params.id
         const oldTask = await Task.findById(id)
-        if (!oldTask) return res.status(404).send({ error: 'task does not exist ' })
+        if (!oldTask)return res.status(404).send({ error: 'task does not exist ' })
         if (oldTask.accepted == false || oldTask.accepted == null) {
             const isValidated = taskValidator.updateValidation(req.body);
             if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
@@ -107,20 +108,20 @@ router.delete('/:id', async (req, res) => {
 router.put('/edit/:id/:adminId', async (req, res) => {
     const adminId = req.params.adminId
     const taskId = req.params.id
-    const acceptancy = req.body.accepted
+    const acceptancy = req.body.accepted    
     try {
-        const vartask = await Task.findOne({ "_id": taskId })
-
-
+        const vartask = await Task.findOne({"_id": taskId })
+        
+      
         if (vartask !== undefined) {
-
+            
             //   vartask.accepted = acceptancy
             if (acceptancy === true) {
                 console.log("46546")
                 const temptask = await Task.findOneAndUpdate({ "_id": taskId }, { "adminId": adminId, "accepted": acceptancy })
                 console.log(temptask)
-                const vartask2 = await Task.findOne({ "_id": taskId })
-
+                const vartask2 = await Task.findOne({"_id": taskId })
+        
                 var e = sendTaskNotification(taskId, vartask.partnerId, "Your task has been accepted");
 
                 res.json({ data: vartask2 })
@@ -147,7 +148,7 @@ router.put('/updateWorkCycle/:id', async (request, response) => {
 
     const taskId = request.params.id;
     const newWorkCycle = request.body.workCycle;
-
+    
     const schema = {
         workCycle: Joi.number().valid(25, 50, 75, 100).required(),
     }
@@ -155,7 +156,7 @@ router.put('/updateWorkCycle/:id', async (request, response) => {
     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
 
     const updatedTask0 = await Task.findOneAndUpdate({ "_id": taskId }, { "workCycle": newWorkCycle })
-
+    
     if (updatedTask0 !== null) {
 
         const memberId = updatedTask0.memberId
@@ -163,7 +164,7 @@ router.put('/updateWorkCycle/:id', async (request, response) => {
             const member = await Member.findOneAndUpdate({ "_id": memberId }, { $push: { "completedTaskId": taskId } })
         }
         const updatedTask = await Task.findOne({ "_id": taskId })
-
+  
         response.send(updatedTask);
 
     }
@@ -189,7 +190,7 @@ router.put("/giveRate/:id/:partnerId", async (req, res) => {
         else {
             const updatedTask = await Task.findOneAndUpdate({ "_id": req.params.id }, { "rate": req.body.rate })
             const updatedTask0 = await Task.findOne({ "_id": req.params.id })
-
+          
             res.send(updatedTask0)
         }
 
@@ -218,12 +219,12 @@ router.put('/assTask/:id/:memberId', async (req, res) => {
             const check = appliedtoit.find(check => check == memberId)
             if (check !== undefined) {
 
-                const member = await Member.findOne({ '_id': memberId })
+                const member = await Member.findOne({'_id':memberId})
                 if (member !== undefined) {
 
                     await Member.findOneAndUpdate({ "_id": memberId }, { $push: { "appliedTaskId": taskId } })
                     const temptask = await Task.findOneAndUpdate({ "_id": taskId }, { "workCycle": 0, "memberId": memberId })
-                    const taskk = await Task.findOne({ '_id': taskId })
+const taskk = await Task.findOne({'_id':taskId})
                     var e = sendTaskNotification(taskId, memberId, "You have been assigned!");
                     var e = sendTaskNotification(taskId, task.partnerId, "You task has been assigned to a member!");
                     res.json({ data: taskk })
@@ -294,17 +295,18 @@ router.get('/membersTask/:id', async (req, res) => {
 //1
 router.get('/viewCycle/:id', async (req, res) => {
     const task = await Task.findById(req.params.id);
-    if (task !== undefined) {
-        if (task.workCycle === null) {
-            res.send(null)
-        } else {
-            res.send(task.workCycle)
-        }
-    } else {
+    if (task !== undefined)
+    if(task.workCycle===null)
+    res.send(null)
+    else
+        res.send(task.workCycle)
+    else {
         res.send('This task not Found !')
     }
 
 })
+
+
 //end badr
 
 module.exports = router

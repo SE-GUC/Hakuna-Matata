@@ -1,43 +1,61 @@
 // The Member model 
-const mongoose = require ('mongoose');
-/* // DB Config
-const db = require('../config/keys').mongoURI
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema
 
-// Connect to mongo
-mongoose
-    .connect(db, { useNewUrlParser: true })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.log(err))
- */
-const memberSchema = new mongoose.Schema({
+const MemberSchema = new Schema({
+    fullName: {
+        type: String,
+        required: true
+    },
+    webName: {
+        type: String,
+        required: true
+    },
+    dateJoined: {
+        type: Date,
+        default: Date.now
+    },
+    deactivated: {
+        type: Boolean,
+        default: false
+    },
+    completedTaskId: [mongoose.Schema.Types.ObjectId],
+    appliedTaskId: [mongoose.Schema.Types.ObjectId],
+    levelOfExperience: {
+        type: Number,
+        enum: [1, 2, 3, 4, 5]
+    },
+    rating: {
+        type: Number,
+        enum: [1, 2, 3, 4, 5]
+    },
+    allRatedReco: Number,
+    averageRecoRate: {
+        type: Number,
+        enum: [1, 2, 3, 4, 5]
+    },
+    allRatedTasks: Number,
+    skills: [{
+        type: String
+    }]
 
-    fullname:{type:String ,required:true},
-    webname:{type:String ,required:true},
-    datejoined:{type:Date ,default:Date.now},
-    deactivated:{type:Boolean,default:false},
-    completed_task_id:[mongoose.Schema.Types.ObjectId],
-    applied_task_id:[mongoose.Schema.Types.ObjectId],
-    levelofexpreience:{type:Number,enum:[1,2,3,4,5]},
-    Rating:{type:Number,enum:[1,2,3,4,5]},
-    all_rated_reco:Number,
-    avreage_reco_rate:{type:Number,enum:[1,2,3,4,5]},
-    allratedtasks:Number,
-    skills:[{type:String}]
 })
-const Member=mongoose.model('Member',memberSchema);
-module.exports.Member=Member;
+// changed export
+const  Member = mongoose.model('members', MemberSchema);
+module.exports.Member=Member
 
-function getexplevel(id) {
+function getExpLevel(id) {
     return Member
-        .findOne({_id: id})
-        .then(function(member) {
-            return member.levelofexpreience;
+        .findOne({ _id: id })
+        .then(function (member) {
+            return member.levelOfExperience;
         })
-        .catch(function(err) {
+        .catch(function (err) {
+            if (err) throw err
             console.log(err);
         });
 }
-module.exports.getexplevel=getexplevel;
+module.exports.getExpLevel = getExpLevel;
 
 
 

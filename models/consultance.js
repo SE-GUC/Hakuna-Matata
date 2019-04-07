@@ -1,75 +1,75 @@
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-
- const Schema = mongoose.Schema
-        const ConsultanceTask = new Schema({
-            partner_id: {
-                type: String,
-                required: false
-            },
-            consultancy_agency_id: {
-                type: String,
-                required: false
-            },
-            member_id: {
-                type: String,
-                required: false
-            },
-            admin_id: {
-                type: String, 
-                required: false
-            },
-            applied_id: {
-                type: [String]
-            },
-            description: {
-                type: String
-            },
-            required_skills: {
-                type: [String]
-            },
-            monetary_compensation: {
-                type: Number
-            },
-            deadline: {
-                type: Date
-            },
-            deadline_for_apply: {
-                type: Date
-            },
-            upload_date: {
-                type: Date
-            },
-            submission_date: {
-                type: Date
-            },
-            experience_level: {
-                type: Number
-            },
-            commit_level: {
-                type: Number
-            },
-            work_cycle: {
-                type: String
-            },
-            link_of_task: {
-                type: String
-            },
-            user_rate: {
-                type: Number
-            },
-            accepted: {
-                type: Boolean
-            },
-            rate: {
-                type: Number
-            },
-            consulty_needed: {
-                type: Boolean
-            },
-            cunsulties_done: {
-                type: Array
-            }
-        })
-        
-        module.exports = task = mongoose.model('task', ConsultanceTask)
+// Create the schema
+const ConsultanceTaskSchema = new Schema({
+    partnerId: {
+        type: String,
+        required: false
+    },
+    consultancyAgencyId: {
+        type: String,
+        equired: false
+    },
+    memberId: {
+        type: String,
+        required: false
+    },
+    adminId: {
+        type: String, 
+        required: false
+    },
+    appliedId: {
+        type: [String]
+    },
+    description: {
+        type: String
+    },
+    requiredSkills: {
+        type: [String]
+    },
+    monetaryCompensation: {
+        type: Number
+    },
+    deadline: {
+        type: Date
+    },
+    deadlineForApply: {
+        type: Date
+    },
+    uploadDate: {
+        type: Date
+    },
+    submissionDate: {
+        type: Date
+    },
+    experienceLevel: {
+        type: Number
+    },
+    commitLevel: {
+        type: Number
+    },
+    workCycle: {
+        type: String
+    },
+    linkOfTask: {
+        type: String
+    },
+    userRate: {
+        type: Number
+    },
+    accepted: {
+        type: Boolean
+    },
+    rate: {
+        type: Number
+    },
+    consultyNeeded: {
+        type: Boolean
+    },
+    consultanciesDone: {
+        type: Array
+    }
+})
+// which router will be use in
+module.exports = ConsultanceTask = mongoose.model('consultanceTasks', ConsultanceTaskSchema)

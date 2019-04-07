@@ -236,10 +236,10 @@ router.put('/applyForTask/:id', async (req, res) => {
             }
           }
         }
-        // console.log(matches)
-        // console.log(task.requiredSkills.length)
-        // console.log( member.levelOfExperience)
-        // console.log(task.experienceLevel)
+        console.log(matches)
+        console.log(task.requiredSkills.length)
+        console.log( member.levelOfExperience)
+        console.log(task.experienceLevel)
         if (matches >= task.requiredSkills.length & member.levelOfExperience >= task.experienceLevel) {
           if (task.appliedId === null) {
             task.appliedId = []

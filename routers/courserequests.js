@@ -1,83 +1,109 @@
 //1WT
 // Dependencies
-const express = require('express');
-const router = express.Router();
-var moment = require('moment');
-const Joi = require('joi');
+const express = require('express')
+const router = express.Router()
+var moment = require('moment')
+const Joi = require('joi')
 
 
 // Models
-const Courserequest  = require('../models/Courserequest.js');
-const Recomendation = require('../models/recomendation.js');
-const Notification = require('../models/Notification.js');
-const Member = require('../models/member.js');
+const CourseRequest  = require('../models/CourseRequest.js')
+const courseRequestValidator = require('../validations/courseRequestValidations')
+
+const Recomendation = require('../models/Recomendation.js')
+const Notification = require('../models/Notification.js')
+const {Member} = require('../models/Member.js')
 
 
  //create course request
 
 //1
-router.post("/newCourseRequest",async (request,response, next) => {
-
-    const Joi = require('joi');
-    const schema = Joi.object().keys({
-        description:Joi.string(),
-        categories:Joi.string(),
-        applyingmember_id:Joi.string()
-    });
-
-   const result= Joi.validate(request.body,schema); 
-
-        if (result.error) {
-           return response.status(400).send({error:result.error.details[0].message})
-        } else {
-           const courserequest = new Courserequest({
+router.post("/",async (request,response) => {
+    try{
+    const isValidated = courseRequestValidator.createValidation(request.body)
+    if (isValidated.error) return response.status(400).send({ error: isValidated.error.details[0].message })    
+    else {
+           const courseRequest = new CourseRequest({
             description:request.body.description,
-            applyingmember_id:request.body.applyingmember_id,
+            applyingMemberId:request.body.applyingMemberId,
             categories:request.body.categories,
             recomendations:[]
-           });
+           })
            
-          await  courserequest.save(function(err,room) {
+          await  courseRequest.save(function(err,room) {
               
-                Notification.Send_CourseRequest_Notification(room.id,"HELPPPP MEEEE GUYSSS");
-             });
-            response.sendStatus(200);
+                Notification.sendCourseRequestNotification(room.id,"HELPPPP MEEEE GUYSSS")
+             })
+            response.sendStatus(200)
           
         }
-});
+    }catch(err){
+        console.log(err)
+    }
+})
 
 // get all course requests 
 //1
 router.get('/',async (request,response)=>{
-    await Courserequest.find({},function(err,courserequests){
+    await CourseRequest.find({},function(err,courseRequests){
     if(!err){
-        response.send(courserequests)
+        response.send(courseRequests)
         }
         else {
          response.status(404).send("not found") 
         }
-});
+})
 })
 // get course request by id 
 //1
 router.get('/:id',async (request,response)=>{
-    await Courserequest.findById(request.params.id,function(err,courserequests){
+    await CourseRequest.findById(request.params.id,function(err,courseRequest){
        if(!err){
-       response.send(courserequests)
+       response.send(courseRequest)
        }
        else {
         response.status(404).send("not found") 
        }
    })
-    })
+})
     
-// delete a course request 
+//update courserequest 
 //1
-router.delete('/:id/delete', async function(req,res){
+router.put("/:id",async (req,res)=>{
+    const isValidated = courseRequestValidator.updateValidation(req.body)
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })    
+    else 
+ await   CourseRequest.findById(req.params.id, function(err, courseRequests) {
+        if(!err){
+            if(req.body.description!=null){
+             courseRequests.description=req.body.description
+            }
+            if(req.body.categories!=null){
+                courseRequests.categories=req.body.categories
+               }
+            if(req.body.active!=null){
+                courseRequests.active=req.body.active
+               }
+
+
+         const result=courseRequests.save()
+         res.send(courseRequests) 
+  
+          }
+          else{
+            res.status(404).send('Not found')
+  
+          }  
+         })
+  
+  })
+
+// delete a course request 
+router.delete('/:id', async function(req,res){
 
     try {
         const id = req.params.id
-        const deleted = await Courserequest.findOneAndRemove({"_id":id})
+        const deleted = await CourseRequest.findOneAndRemove({"_id":id})
         if(deleted!==null)
         res.json({msg:'courserequest was deleted successfully', data: deleted})
         else
@@ -86,35 +112,34 @@ router.delete('/:id/delete', async function(req,res){
        }
        catch(error) {
            // We will be handling the error later
-           console.log(error)
+           res.status(404).send('Not found')
        }
  
-  });
+  })
 
 //give reco
 //1
-router.put('/:id/giverecomendation',async(req,res)=>{
+router.put('/giveRecomendation/:id',async(req,res)=>{
     try{
        const id =req.params.id
           const schema={
-        expert_id: Joi.number().required(),
-        course_id:Joi.number().required()
+        expertId: Joi.number().required(),
+        courseId:Joi.number().required()
      
-    };
-    const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    } 
-        const cr= await Courserequest.findById(id);
+    }
+    const result =Joi.validate(req.body,schema)
+    if(result.error) return  res.status(400).send(result.error.details[0].message)
+        
+    
+        const cr= await CourseRequest.findById(id)
         if(cr._id!==undefined){
             console.log(req.body)
             const reco = await Recomendation.create(req.body)
                
-           cr.recomendations.push(reco);
-            const temp= await cr.save();
-            res.send(cr);    
-            Notification.Send_CourseRecommendations_Notification(req.body.course_id,cr.applyingmember_id,"%od elcourse dah yalaaa");
+           cr.recomendations.push(reco)
+            const temp= await cr.save()
+            res.send(cr)    
+            Notification.sendCourseRecommendationsNotification(req.body.courseId,cr.applyingMemberId,"%od elcourse dah yalaaa")
          }
         else {
             res.status(404).send("Not found")
@@ -122,134 +147,92 @@ router.put('/:id/giverecomendation',async(req,res)=>{
     }
         catch(error) {
             // We will be handling the error later
-            console.log(error)
+            res.status(404).send('Not found')
         } 
         
-    });
+    })
    
-//update courserequest 
-//1
-router.put("/:id/update",async (req,res)=>{
-    const schema={
-     description:Joi.string(),
-     categories:Joi.string(),
-     active:Joi.boolean()
-    };
-    const result =Joi.validate(req.body,schema);
-    if(result.error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    } 
- await   Courserequest.findById(req.params.id, function(err, courserequests) {
-        if(!err){
-            if(req.body.description!=null){
-             courserequests.description=req.body.description
-            }
-            if(req.body.categories!=null){
-                courserequests.categories=req.body.categories
-               }
-            if(req.body.active!=null){
-                courserequests.active=req.body.active
-               }
 
-
-         const result=courserequests.save()
-         res.send(courserequests); 
-  
-          }
-          else{
-            res.status(404).send('Not found');
-  
-          }  
-         });
-  
-  });
-
-
-
-
-  //badr
-//1
-//rating a recomendations
-//(id  => courserequestsId,recId=> recomendationId)
-router.put('/:id/raterecomendation/:recId',async(request,response)=>{
-    const courseId=request.params.id;
-    const recomendation_id= request.params.recId;
-    const Rating= request.body.Rating;
+// rating a recomendations
+// (id  => courserequestsId,recId=> recomendationId)
+router.put('/raterecomendation/:id/:recId',async(request,response)=>{
+    const courseId=request.params.id
+    const recomendationId= request.params.recId
+    const rating= request.body.rating
     const schema={
        
         
-        Rating:Joi.number().valid(1,2,3,4,5).required(),
+        rating:Joi.number().valid(1,2,3,4,5).required(),
        
      }
-     const result=Joi.validate(request.body,schema);
-     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+     const result=Joi.validate(request.body,schema)
+     if (result.error) return response.status(400).send({ error: result.error.details[0].message })
   
     
-  const course=  await Courserequest.findById(courseId);
+  const course=  await CourseRequest.findById(courseId)
   if(course !== undefined){
-    const recomendations=course.recomendations;
-    for( var i = 0; i < recomendations.length; i++){ 
-        if ( recomendations[i]._id == recomendation_id) {
-            recomendations.splice(i, 1); 
+    const recomendations=course.recomendations
+    for( var i = 0 ;i < recomendations.length; i++){ 
+        if ( recomendations[i]._id == recomendationId) {
+            recomendations.splice(i, 1) 
         }
      }
 
-    const recomendation=await  Recomendation.findById(recomendation_id)
+    const recomendation=await  Recomendation.findById(recomendationId)
 
     
     
-    if(recomendation.numberofratings ===undefined){
-    recomendation.numberofratings=0
+    if(recomendation.numberOfRatings ===undefined){
+    recomendation.numberOfRatings=0
 }
-    const NoOfRating=recomendation.numberofratings
+    const NoOfRating=recomendation.numberOfRatings
     
-    const newNoOfRating=NoOfRating+1;
+    const newNoOfRating=NoOfRating+1
     if(recomendation.rating==undefined)
     recomendation.rating=0
-    var temprate;
-    if(Math.round(((recomendation.rating*NoOfRating)+Rating)/newNoOfRating)>5)
+    var temprate
+    if(Math.round(((recomendation.rating*NoOfRating)+rating)/newNoOfRating)>5)
     temprate=5
     else
-    temprate=Math.round(((recomendation.rating*NoOfRating)+Rating)/newNoOfRating)
-    recomendation.numberofratings=newNoOfRating
+    temprate=Math.round(((recomendation.rating*NoOfRating)+rating)/newNoOfRating)
+    recomendation.numberOfRatings=newNoOfRating
     recomendation.rating=temprate
-     await Recomendation.findOneAndUpdate({"_id":recomendation_id},recomendation)
+     await Recomendation.findOneAndUpdate({"_id":recomendationId},recomendation)
     recomendations.push(recomendation)
 try {    
-    course =await Courserequest.findOneAndUpdate({"_id":courseId},{"recomendations":recomendations})
+    course =await CourseRequest.findOneAndUpdate({"_id":courseId},{"recomendations":recomendations})
 
     
 } catch (error) {
     
 }
 
-    const id=recomendation.expert_id
+    const id=recomendation.expertId
 
     var object =await Member.findOne({"_id":id})
      if(object !== undefined){
-         nooftasks=object.all_rated_reco;
+         nooftasks=object.allRatedReco
 
-         const x=object.all_rated_reco+1;
-         var temprate;
-         if(Math.round(((object.avreage_reco_rate*nooftasks)+Rating)/x)>5)
+         const x=object.allRatedReco+1
+         var temprate
+         if(Math.round(((object.averageRecoRate*nooftasks)+Rating)/x)>5)
          temprate=5
          else
-         temprate=Math.round(((object.avreage_reco_rate*nooftasks)+Rating)/x)
-         object =await Member.findOneAndUpdate({"_id":id},{"all_rated_reco":x,"avreage_reco_rate":temprate})
+         temprate=Math.round(((object.averageRecoRate*nooftasks)+Rating)/x)
+         object =await Member.findOneAndUpdate({"_id":id},{"allRatedReco":x,"averageRecoRate":temprate})
      }else{
-        response.send("Not found");
+        response.send("Not found")
 
      }
 
-    response.sendStatus(200);
+    response.sendStatus(200)
 
 
 }else{
-   response.send("Not found");
+   response.send("Not found")
 
 }
-});
-//End badr
+})
 
-module.exports = router;
+
+module.exports = router

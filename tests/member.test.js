@@ -1,211 +1,187 @@
 const functions = require('../functions/memberfn.js');
-
+const functionTask = require('../functions/taskfn');
 jest.setTimeout(180000);
 
-test('create member with name judy',async() => {
+test('create member with name judy', async () => {
     expect.assertions(1);
-    const member=  await functions.createmember("judy ayman",["piano"])
-     expect(member.status).toEqual(200)
-     
-    });
-//get all members
-
-test('should get all members ',async() => {
-    expect.assertions(2)
-    try{
-    const member=  await functions.getMembers()
-    expect(member).toBeDefined()
+    const member = await functions.createMember("judy ayman", ["piano"])
     expect(member.status).toEqual(200)
+
+});
+// get all members
+
+test('should get all members ', async () => {
+    expect.assertions(2)
+    try {
+        const member = await functions.getMembers()
+        expect(member).toBeDefined()
+        expect(member.status).toEqual(200)
     }
-    catch(error){
-        expect(error.response.status).toEqual(400)
+    catch (error) {
+        expect(error.response.status).totoBeGreaterThanOrEqual(400)
     }
 })
 
-//create a project
-test('create project',async() => {
+// create a project
+test('create project', async () => {
     expect.assertions(1);
-    const person=await functions.getMembers();
-    const len=person.data.length
-    const id=person.data[len-1]._id;
-    const project =  await functions.createproject("5c8234616fc41471fa42f1c","5c935226fc41471fa42f1ced","www.project.com",id)
+    const person = await functions.getMembers();
+    const len = person.data.length
+    const id = person.data[len - 1]._id;
+    const project = await functions.createProject("5c8234616fc41471fa42f1c", "5c935226fc41471fa42f1ced", "www.project.com", id)
     expect(project.status).toEqual(200)
+});
 
-     
-    });
-    test('delete member',async()=>{
-        expect.assertions(1);
-        try{
-           
-           
-            const members =  await functions.getMembers()
-            const len1 = members.data.length
-            const id = members.data[len1-1]._id;
-            const name = members.data[len1-1].name;
-            const member =  await functions.deletemember(id)
-           const member2 =  await functions.getMembers()
-            const len2 = member2.data.length;
-            expect(len2).toEqual(len1-1)
-            expect(member.data.data.name).toEqual(name)
-        
-        }
-        catch(error){
-          expect(error.response.status).toBeGreaterThanOrEqual(400)
-          console.log('Not found')
-        }
-    })
-    test('update member',async()=>{
-        expect.assertions(1);
-      
-            try{
-             const members =  await functions.getMembers()
-             const len1 =members.data.length
-             const id = members.data[len1-1]._id;
-             const dataToUpdate = {
-                 fullname:"laila",
-              }
-             const member =  await functions.updatemember(id,dataToUpdate.fullname)
-             expect(member.data.fullname).toEqual(dataToUpdate.fullname)
-            }
-            catch(error){
-                
-                expect(error.response.status).toBeGreaterThanOrEqual(400)
-                console.log('Not found')
-              }
-         
-         
-       });
-// cannot create a project as there is a wrong data type
-    test(' cannot create project',async() => {
-        expect.assertions(1);
-        const person=await functions.getMembers();
-        const id=person.data._id; 
-        try{
-        const project =  await functions.createproject("5c8234616fc41471fa42f1c","5c935226fc41471fa42f1ced",1,id)
-        }
-        catch(error){
-        expect(error.response.status).toEqual(400)
-        }
-        });
-      
-     test(' get project by member id',async() => {
-      expect.assertions(1);
-      try{
-      const member =  await functions.getMembers()
-      const len1 = member.data.length
-      const id = member.data[len1-1]._id;
-     const project =  await functions. getProjectbymemberid(id)
-     const len=project.data.length
-     expect(project.data[len-1].member_id).toEqual(id)}
-     catch(error){
-        expect(error.response.status).toBeGreaterThanOrEqual(400)
-     }
-      
-   
-    });
-    test(' update project by member id',async() => {
-        expect.assertions(1);
-        try{
-        const member =  await functions.getMembers()
-        const len1 = member.data.length
-        const id = member.data[len1-1]._id;
-       const project =  await functions.getProjectbymemberid(id)
-       const len=project.data.length
-       const dataToUpdate = {
-        link: 'www.project1.com'
-     }
-       const updatedproject=await functions.updateProjectbymemberid(id,project.data[len-1]._id,dataToUpdate)
-       expect(updatedproject.data.link).toEqual(dataToUpdate.link)}
-       catch(error){
-        expect(error.response.status).toBeGreaterThanOrEqual(400)
-       }
-    });
-    test(' delete project by member id',async() => {
-        expect.assertions(1);
-        try{
-        const member =  await functions.getMembers()
-        const len1 = member.data.length
-        const id = member.data[len1-1]._id;
-       const project =  await functions.getProjectbymemberid(id)
-       const len=project.data.length
-       const deletedproject=await functions.deleteProjectbymemberid(id,project.data[len-1]._id)
-       expect(deletedproject.status).toEqual(200)}
-       catch(error){
-        expect(error.response.status).toBeGreaterThanOrEqual(400)
-       }
-});
-test('updaterating',async() => {
+test('update member', async () => {
     expect.assertions(1);
-   
-    const member =  await functions.getMembers()
-    const len=member.data.length
-    const id = member.data[len-1]._id;
+    const members = await functions.getMembers()
+    const len1 = members.data.length
+    const id = members.data[len1 - 1]._id;
     const dataToUpdate = {
-        newrate:2
+        fullName: "laila",
     }
-   const updateRating=await functions.updateRating(id,dataToUpdate.newrate)
-   expect(updateRating.status).toEqual(200)
-  
+    const member = await functions.updateMember(id, dataToUpdate.fullName)
+    expect(member.data.fullName).toEqual(dataToUpdate.fullName)
 });
+
+// cannot create a project as there is a wrong data type
+test(' cannot create project', async () => {
+    expect.assertions(1);
+    const person = await functions.getMembers();
+    const id = person.data._id;
+    try {
+        const project = await functions.createProject("5c8234616fc41471fa42f1c", "5c935226fc41471fa42f1ced", 1, id)
+    }
+    catch (error) {
+        expect(error.response.status).toBeGreaterThanOrEqual(400)
+    }
+});
+
+test(' get project by member id', async () => {
+    expect.assertions(1);
+    try {
+        const member = await functions.getMembers()
+        const len1 = member.data.length
+        const id = member.data[len1 - 1]._id;
+        const project = await functions.getProjectByMemberId(id)
+        const len = project.data.length
+        expect(project.data[len - 1].memberId).toEqual(id)
+    }
+    catch (error) {
+        expect(error.response.status).toBeGreaterThanOrEqual(400)
+    }
+
+
+});
+
+test(' update project by member id', async () => {
+    expect.assertions(1);
+    try {
+        const member = await functions.getMembers()
+        const len1 = member.data.length
+        const id = member.data[len1 - 1]._id;
+        const project = await functions.getProjectByMemberId(id)
+        const len = project.data.length
+        const dataToUpdate = {
+            link: 'www.project1.com'
+        }
+        const updatedProject = await functions.updateProjectByMemberId(id, project.data[len - 1]._id, dataToUpdate)
+        expect(updatedProject.data.link).toEqual(dataToUpdate.link)
+    }
+    catch (error) {
+        expect(error.response.status).toBeGreaterThanOrEqual(400)
+    }
+});
+
+test(' delete project by member id', async () => {
+    expect.assertions(1);
+    try {
+        const member = await functions.getMembers()
+        const len1 = member.data.length
+        const id = member.data[len1 - 1]._id;
+        const project = await functions.getProjectByMemberId(id)
+        const len = project.data.length
+        const deletedProject = await functions.deleteProjectByMemberId(id, project.data[len - 1]._id)
+        expect(deletedProject.status).toEqual(200)
+    }
+    catch (error) {
+        expect(error.response.status).toBeGreaterThanOrEqual(400)
+    }
+});
+
+test('updaterating', async () => {
+    expect.assertions(1);
+
+    const member = await functions.getMembers()
+    const len = member.data.length
+    const id = member.data[len - 1]._id;
+    const dataToUpdate = {
+        newRate: 2
+    }
+    const updateRating = await functions.updateRating(id, dataToUpdate.newRate)
+    expect(updateRating.status).toEqual(200)
+
+}) 
 test('applyforatask',async() => {
     expect.assertions(1);
    try{
     const member =  await functions.getMembers()
     const len=member.data.length
     const id = member.data[len-1]._id;
+    const data = {
+        description:'hi',
+        consultyNeeded:'hello',
+        deadline:'here',
+        commitLevel:1,
+        experienceLevel:5,
+        monetaryCompensation:3,
+        requiredSkills:['piano']
+        }
+    const partnerID = "5"
+    
+    const task = await functionTask.createTask(partnerID,data)
+    const tasks = await functionTask.getAllTasks()
+    const taskID = tasks.data.data[tasks.data.data.length-1]._id
     const dataToUpdate = {
-        taskId:"5c67892333abc"
+        taskId:taskID
     }
-   const applyfortask=await functions.applyfortask(id,dataToUpdate.taskId)
-   expect(applyfortask.status).toEqual(200)
+   const applyForTask=await functions.applyForTask(id,dataToUpdate.taskId)
+   expect(applyForTask.status).toEqual(200)
 }
 catch(error){
     expect(error.response.status).toBeGreaterThanOrEqual(400)
 }
   
 });
-
-test('editingrequest',async() => {
+test('editingrequest', async () => {
     expect.assertions(1);
-   
-    const member =  await functions.getMembers()
-    const len=member.data.length
-    const id = member.data[len-1]._id;
-   const editingrequest=await functions.editingrequest(id)
-   expect(editingrequest.status).toEqual(200)
-  
+    try {
+        const member = await functions.getMembers()
+        const len = member.data.length
+        const id = member.data[len - 1]._id;
+        const editingRequest = await functions.editingRequest(id)
+        expect(editingRequest.status).toEqual(200)
+    }
+    catch (error) {
+        expect(error.response.status).toBeGreaterThanOrEqual(400)
+    }
+
 });
-
-
-
-/*
-//deleting found member
-test('delete found member',async()=>{
+test('delete member', async () => {
     expect.assertions(2);
-  
-      
-      
-       const members =  await functions.getMembers()
-       const len1 = members.data.length
-       const id = members.data[len1-1]._id;
-       const fullname = members.data[len1-1].fullname;
-       const member=  await functions.deletemember(id)
-       const len2 = member.data.length;
-       expect(len2).toEqual(len1-1)
-       expect(member.data.data.fullname).toEqual(fullname)
-   
-   
- });
-           /*
-     test(' cannot get project by member id',async() => {
-                
-                try{
-                const project =  await functions.getProjects1()}
-                catch(error){
-                 expect.assertions(1);
-                expect(error.response.status).toEqual(404)
-                }
-                }
-            
-                );
-  */ 
+
+    const members = await functions.getMembers()
+    const len1 = members.data.length
+    const id = members.data[len1 - 1]._id;
+    const name = members.data[len1 - 1].fullName;
+    const member = await functions.deleteMember(id)
+    const member2 = await functions.getMembers()
+    const len2 = member2.data.length;
+    expect(len2).toEqual(len1 - 1)
+    expect(member.data.data.fullName).toEqual(name)
+
+})
+
+
+
+

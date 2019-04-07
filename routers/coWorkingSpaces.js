@@ -9,7 +9,6 @@ const coWorkingSpaceValidator = require('../validations/coWorkingSpaceValidation
 
 // CRUD
 // Partner Creates CoWorking Space
-// it will be chnaged ro be user id since its a user in the site
 router.post("/:partnerId", async (req, res) => {
 
     try {
@@ -161,10 +160,12 @@ router.put("/addRoom/:id", async(req, res) => {
 //accept reservation for co-working 
 //reserve workshop for a course 
 router.put('/acceptReservation/:id/:roomId', async (req, res) => {
+
     try {
         const isValidated = roomValidator.reserveValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         CoWorkingSpace.findById(req.params.id, async function (err, co) {
+
             if (!err) {
                 if (co !== null) {
                     const roooms = co.rooms;
@@ -176,6 +177,7 @@ router.put('/acceptReservation/:id/:roomId', async (req, res) => {
                             rooom.reservedDate = req.body.reservedDate;
                             rooom.endOfReservation = req.body.endOfReservation;
                             await CoWorkingSpace.findOneAndUpdate({ "_id": req.params.id }, { "rooms": co.rooms });
+
                             const w = await Room.findOneAndUpdate({ '_id': req.params.roomId }, {
                                 reservedId: req.body.reservedId,
                                 reserved: true,
@@ -185,17 +187,25 @@ router.put('/acceptReservation/:id/:roomId', async (req, res) => {
                             res.send(rooom);
                             return;
                         };
+
                         res.status(404).send("this room is not available");
+
                     } else {
                         res.status(404).send('Not found room');
+
                     }
                 }
                 else {
                     res.status(404).send('Not found cowrking space');
+
                 }
+
             }
+
+
             else {
                 res.status(404).send('Not found cowrking space');
+
             }
         })
     } catch (err) {
@@ -215,6 +225,7 @@ router.get('/showRoom/:id/:roomId',async (req, res) => {
             }
             else {
                 res.status(404).send('Not found');
+
             }
         }
         else {
@@ -226,6 +237,7 @@ router.get('/showRoom/:id/:roomId',async (req, res) => {
 //(id  => coworking_spaces, room_id=>roomId) // delete room
 router.delete('/deleteRoom/:id/:roomId',async (req, res) => {
     CoWorkingSpace.findById(req.params.id, function (err, co) {
+
         if (!err) {
             const ro = co.rooms.find(m => m._id == req.params.roomId);
             co.rooms.remove(ro)
@@ -245,6 +257,7 @@ router.put('/updateRoom/:id/:roomId', async (req, res) => {
         const isValidated = roomValidator.updateValidation(req.body)
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         CoWorkingSpace.findById(req.params.id, async function (err, co) {
+
             if (!err) {
                 const ro = co.rooms.find(m => m._id == req.params.roomId)
                 if (req.body.capacity != null) ro.capacity = req.body.capacity
