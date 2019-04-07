@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import CardList from './components/CardList';
+
+import PartnerComp from './components/partnercompnents/partner';
 import Footer from './components/Layout/Footer';
 import Header from './components/Layout/Header';
 import MemberProfile from './components/Profiles/MemberProfile';
@@ -54,7 +56,15 @@ class App extends Component {
               <React.Fragment>
                 <div >
 
-               {/* here will be the partner part */}
+                /*THIS WILL NOT WORK RIGHT AWAY 
+                  PLEASE GO TO Hakuna-Matata\client\node_modules\react-cardstack\dist
+                  and rename "CardStack.js" with capital "S" to "Cardstack.js" with small
+                  "s", and it will work sorry for inconvinience
+
+                  PS id you cant find path please run: npm install --save react-cardstack ok thx bye
+                  */
+
+              <PartnerComp />
 
                 </div>
               </React.Fragment>
