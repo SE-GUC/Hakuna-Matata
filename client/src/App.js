@@ -5,7 +5,9 @@ import CardList from './components/CardList';
 import Footer from './components/Layout/Footer';
 import Header from './components/Layout/Header';
 import MemberProfile from './components/Profiles/MemberProfile';
-
+import GetAll from './components/pages/getAll'
+import GetSpec from './components/pages/getSpec'
+import GetSpecRoom from './components/pages/getSpecRoom'
 
 class App extends Component {
   // creatTable() {
@@ -27,7 +29,7 @@ class App extends Component {
       <Router>
         <div className="App">
           <Header></Header>
-          <div className="App-header">
+          <div className="App-header" >
             {/*this Route will be the main route of the App (Home Page of All)*/}
             <Route exact path="/" render={props => (
               <React.Fragment>
@@ -57,16 +59,10 @@ class App extends Component {
                 </div>
               </React.Fragment>
             )} />
-            <Route exact path="/coWorkingSpace" render={props => (
-              <React.Fragment>
-                <div >
-
-       {/* here will be the coWorkingSpace part */}
-
-
-                </div>
-              </React.Fragment>
-            )} />
+            <Route exact path="/coWorkingSpaces" component={GetAll}/>
+            <Route exact path='/coWorkingSpaces/:id' component={GetSpec}/>
+            <Route exact path='/coWorkingSpaces/:id/showRooms/:roomId' component={GetSpecRoom}/>
+     
             <Route exact path="/consultancyAgency" render={props => (
               <React.Fragment>
                 <div className="App-list">
