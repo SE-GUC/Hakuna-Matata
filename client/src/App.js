@@ -8,7 +8,9 @@ import MemberProfile from './components/Profiles/MemberProfile';
 import GetAll from './components/pages/getAll'
 import GetSpec from './components/pages/getSpec'
 import GetSpecRoom from './components/pages/getSpecRoom'
-
+import GetAllAgencies from "./components/pages/GetAllAgencies";
+import GetSpecificAgency from "./components/pages/GetSpecificAgency";
+import GetAllTasks from "./components/pages/GetAllTasks";
 class App extends Component {
   // creatTable() {
   //   let buttons = []
@@ -62,6 +64,10 @@ class App extends Component {
             <Route exact path="/coWorkingSpaces" component={GetAll}/>
             <Route exact path='/coWorkingSpaces/:id' component={GetSpec}/>
             <Route exact path='/coWorkingSpaces/:id/showRooms/:roomId' component={GetSpecRoom}/>
+
+            <Route exact path="/consultancyAgencies/" component={GetAllAgencies} />
+            <Route path="/consultancyAgencies/:id" component={GetSpecificAgency} />
+            <Route exact path="/tasks/" component={GetAllTasks} />
      
             <Route exact path="/consultancyAgency" render={props => (
               <React.Fragment>
