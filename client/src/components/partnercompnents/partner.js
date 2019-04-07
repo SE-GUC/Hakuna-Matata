@@ -1,5 +1,7 @@
 import React from 'react';
-import { CardStack, Card } from 'react-cardstack';
+import  Card  from '../../../../node_modules/react-cardstack/dist/Card.js';
+import  CardStack  from '../../../../node_modules/react-cardstack/dist/CardStack.js';
+
 const axios = require('axios')
 
 
@@ -43,7 +45,7 @@ class PartnerComp extends React.Component {
           .catch(error => console.log(error));
       }
       getColorCode(i){
-          if(i%2==0){
+          if(i%2===0){
               return "#D50000"
           }
           else{
