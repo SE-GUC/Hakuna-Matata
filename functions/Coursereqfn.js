@@ -1,20 +1,20 @@
 const axios = require('axios');
 const functions = {
     //create course req
-    createCourseRequest : async(description1,categories1,applyingmember_id1)=>{
-        const CourseRequest =await axios.post('http://localhost:3000/courserequests/newCourseRequest',{
+    createCourseRequest : async(description1,categories1,applyingMemberId1)=>{
+        const courseRequest =await axios.post('http://localhost:3000/courserequests/',{
            
                 description:description1,
                 categories: categories1,
-                applyingmember_id:applyingmember_id1
+                applyingMemberId:applyingMemberId1
         })
         
-         return CourseRequest 
+         return courseRequest 
         },
         //get all course requests 
         getCourseRequests: async() => {
-            const CourseRequests=await axios.get('http://localhost:3000/courserequests/')
-            return CourseRequests
+            const courseRequests=await axios.get('http://localhost:3000/courserequests/')
+            return courseRequests
             },
 
     //get CR by id  
@@ -26,7 +26,7 @@ const functions = {
 
 //delete Course request by id 
 deleteCourseRequest :async(id) => {
-    const a='http://localhost:3000/courserequests/'+id+'/delete'
+    const a='http://localhost:3000/courserequests/'+id
     const result =await axios.delete(a);
     return result 
     },
@@ -35,7 +35,7 @@ deleteCourseRequest :async(id) => {
     //update Course request by id 
    
 updateCourseRequest :async(id,description1,categories1,active1) => {
-    const a='http://localhost:3000/courserequests/'+id+'/update'
+    const a='http://localhost:3000/courserequests/'+id
     const result =await axios.put(a,{
         description:description1,
         categories:categories1,

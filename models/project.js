@@ -1,14 +1,25 @@
-
 // The Project model 
-const mongoose = require ('mongoose');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema
 
 
-const projectSchema = new mongoose.Schema({
+const projectSchema = new Schema({
 
-    task_id:{type:String,required:true},
-    partner_id:{type:String,required:true},
-    member_id:{type:String,required:true},
-    link:{type:String,required:true}
+    taskId: {
+        type: String,
+        required: true
+    },
+    partnerId: {
+        type: String,
+        required: true
+    },
+    memberId: {
+        type: String,
+        required: true
+    },
+    link: {
+        type: String,
+        required: true
+    }
 })
-const ProjectModel=mongoose.model('project',projectSchema);
-module.exports=ProjectModel;
+module.exports = Project = mongoose.model('projects', projectSchema)

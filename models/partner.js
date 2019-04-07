@@ -1,23 +1,24 @@
-const mongoose = require ('mongoose');
-/* // DB Config
-const db = require('../config/keys').mongoURI
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-// Connect to mongo
-mongoose
-    .connect(db, { useNewUrlParser: true })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.log(err)) */
+const PartnerSchema = new Schema({
 
-const partnerSchema = new mongoose.Schema({
-
-    name:{type:String ,required:true},
-    information:{type:String },
-    partners:[{type:String}],
-    field_of_work:String,
-    projects:[{type:String}],
-    feedback_form:String
+    name: {
+        type: String,
+        required: true
+    },
+    information: {
+        type: String
+    },
+    partners: [{
+        type: String
+    }],
+    fieldOfWork: String,
+    projects: [{
+        type: String
+    }],
+    feedbackForm: String
 
 })
-const Partner=mongoose.model('Partner',partnerSchema);
+module.exports = Partner = mongoose.model('partners', PartnerSchema);
 
-module.exports=Partner;

@@ -1,221 +1,206 @@
-const mongoose=require('mongoose');
-/* // DB Config
-const db = require('../config/keys').mongoURI
+const mongoose = require('mongoose')
 
-// Connect to mongo
-mongoose
-    .connect(db, { useNewUrlParser: true })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.log(err))
- */
-//schemas
-const NotificationSchema=new mongoose.Schema({
-    notification_id: mongoose.Schema.Types.ObjectId,
-	type: String,
-	task_id: String,
-	course_recommendation_id: String,
-	course_request_id: String,
-	sent_at:{ type: Date, default: Date.now}
-});
+// schemas
+const NotificationSchema = new mongoose.Schema({
 
-const Not_summarySchema=new mongoose.Schema({
-    not_parent_id: String,
-		title: String,
-		expert_requires: Boolean,
-		sent_to: String
-});
+	notificationId: {
+		type: mongoose.Schema.Types.ObjectId
+	},
+	type: {
+		type: String
+	},
+	taskId: {
+		type: String
+	},
+	courseRecommendationId: {
+		type: String
+	},
+	courseRequestId: {
+		type: String
+	},
+	sentAt: {
+		type: Date,
+		default: Date.now
+	}
+})
 
+const NotSummarySchema = new mongoose.Schema({
 
-const Notification=mongoose.model('notifications',NotificationSchema)
-const Not_summary=mongoose.model('not_summaries',Not_summarySchema)
+	notParentId: {
+		type: String
+	},
+	title: {
+		type: String
+	},
+	expertRequires: {
+		type: Boolean
+	},
+	sentTo: {
+		type: String
+	}
+})
 
-module.exports.Notification= Notification
-module.exports.Not_summary = Not_summary
+const Notification = mongoose.model('notifications', NotificationSchema)
+const NotSummary = mongoose.model('notSummaries', NotSummarySchema)
 
-//functions
-//send course request notification 
-async function Send_CourseRequest_Notification(course_request_id, title){
-	
-	const notification=new Notification({
-		type:'courserequest',
-		task_id: null,
-		course_recommendation_id: null,
-		course_request_id: course_request_id
-		
-	
-	});
-try{
-	var lastSavedId;
-	const result = await notification.save(function(err,room) {
-	 });
-	 console.log(notification._id)
-	 //lastSavedId=notification._id
+module.exports.Notification = Notification
+module.exports.NotSummary = NotSummary
 
-	 const notsummary=	new Not_summary({
-		not_parent_id: notification._id,
-		title: title,
-		expert_requires: true,
-		sent_to: null
+// functions
+// send course request notification 
+async function sendCourseRequestNotification(courseRequestId, title) {
+	const notification = new Notification({
+
+		type: 'courserequest',
+		taskId: null,
+		courseRecommendationId: null,
+		courseRequestId: courseRequestId
 	})
+	try {
+		var lastSavedId
+		const result = await notification.save(function (err, room) {
+			if (err) throw err
+		})
+		console.log(notification._id)
+		const notSummary = new NotSummary({
 
-	 await notsummary.save();
-
-
-}	
-catch(err){
-	console.log(err);
+			notParentId: notification._id,
+			title: title,
+			expertRequires: true,
+			sentTo: null
+		})
+		await notSummary.save()
+	}
+	catch (err) {
+		console.log(err)
+	}
 }
-}
 
+// send task notification
+async function sendTaskNotification(taskId, senttoID, title) {
+	const notification = new Notification({
 
-
-///send task notification
-async function Send_Task_Notification(taskId,senttoID,title){
-	
-	const notification=new Notification({
-		type:'task',
-		task_id: null,
-		course_recommendation_id: null,
-		course_request_id: null
-		
-	
-	});
-try{
-	var lastSavedId;
-	const result = await notification.save(function(err,room) {
-	 });
-	 console.log(notification._id)
-	 //lastSavedId=notification._id
-
-	 const notsummary=	new Not_summary({
-		not_parent_id: notification._id,
-		title: title,
-		expert_requires: false,
-		sent_to: senttoID
+		type: 'task',
+		taskId: taskId,
+		courseRecommendationId: null,
+		courseRequestId: null
 	})
+	try {
+		var lastSavedId
+		const result = await notification.save(function (err, room) {
+			if (err) throw err
+		})
 
-	 await notsummary.save();
-
-
-}	
-catch(err){
-	console.log(err);
+		const notsummary = new NotSummary({
+			notParentId: notification._id,
+			title: title,
+			expertRequires: false,
+			sentTo: senttoID
+		})
+		await notsummary.save()
+	}
+	catch (err) {
+		console.log(err)
+	}
 }
-}
 
 
-//functions
+// functions
 // request to admin to edit profile 
-async function  SendToAdminRequestNotification(title){
-	
-	const notification=new Notification({
-		type:'edit_profile',
-		task_id: null,
-		course_recommendation_id: null,
-		course_request_id: null
-		
-	
-	});
-try{
-	var lastSavedId;
-	const result = await notification.save(function(err,room) {
-	 });
-	 console.log(notification._id)
-	 //lastSavedId=notification._id
+async function sendToAdminRequestNotification(title) {
 
-	 const notsummary=	new Not_summary({
-		not_parent_id: notification._id,
-		title: title,
-		expert_requires: true,
-		sent_to: "admin"
+	const notification = new Notification({
+		type: 'edit_profile',
+		taskId: null,
+		courseRecommendationId: null,
+		courseRequestId: null
 	})
+	try {
+		var lastSavedId
+		const result = await notification.save(function (err, room) {
+			if (err) throw err
+		})
 
-	 await notsummary.save();
+		const notsummary = new NotSummary({
+			notParentId: notification._id,
+			title: title,
+			expertRequires: true,
+			sentTo: 'admin'
+		})
 
+		await notsummary.save()
 
-}	
-catch(err){
-	console.log(err);
+	}
+	catch (err) {
+		console.log(err)
+	}
 }
-}
-
 
 //notification to user edit prof 
-async function SendToUserRequestNotification(title,sentToID){
-	
-	const notification=new Notification({
-		type:"edit_profile",
-		task_id: null,
-		course_recommendation_id: null,
-		course_request_id: null
-		
-	
-	});
-try{
-	var lastSavedId;
-	const result = await notification.save(function(err,room) {
-	 });
-	 console.log(notification._id)
-	 //lastSavedId=notification._id
+async function sendToUserRequestNotification(title, sentToID) {
 
-	 const notsummary=	new Not_summary({
-		not_parent_id: notification._id,
-		title: title,
-		expert_requires: true,
-		sent_to: sentToID
+	const notification = new Notification({
+		type: "edit profile",
+		taskId: null,
+		courseRecommendationId: null,
+		courseRequestId: null
+
+
 	})
+	try {
+		var lastSavedId
+		const result = await notification.save(function (err, room) {
+			if (err) throw err
+		})
 
-	 await notsummary.save();
-
-
-}	
-catch(err){
-	console.log(err);
-}
+		const notsummary = new NotSummary({
+			notParentId: notification._id,
+			title: title,
+			expertRequires: true,
+			sentTo: sentToID
+		})
+		await notsummary.save()
+	}
+	catch (err) {
+		console.log(err)
+	}
 }
 // course reco notifi
-async function Send_CourseRecommendations_Notification(courseID, senttoID, title){
-	
-	const notification=new Notification({
-		type:"recommendation",
-		task_id: null,
-		course_recommendation_id: courseID,
-		course_request_id: null
-		
-	
-	});
-try{
-	var lastSavedId;
-	const result = await notification.save(function(err,room) {
-	 });
-	 console.log(notification._id)
-	 //lastSavedId=notification._id
+async function sendCourseRecommendationsNotification(courseID, senttoID, title) {
 
-	 const notsummary=	new Not_summary({
-		not_parent_id: notification._id,
-		title: title,
-		expert_requires: false,
-		sent_to: senttoID
+	const notification = new Notification({
+		type: "recommendation",
+		taskId: null,
+		courseRecommendationId: courseID,
+		courseRequestId: null
+
 	})
+	try {
+		var lastSavedId
+		const result = await notification.save(function (err, room) {
+			if (err) throw err
+		})
 
-	 await notsummary.save();
+		const notsummary = new NotSummary({
+			notParentId: notification._id,
+			title: title,
+			expertRequires: false,
+			sentTo: senttoID
+		})
 
+		await notsummary.save()
 
-}	
-catch(err){
-	console.log(err);
+	}
+	catch (err) {
+		console.log(err)
+	}
 }
-}
-  
 
+// exports
+module.exports.sendCourseRecommendationsNotification = sendCourseRecommendationsNotification
+module.exports.sendToAdminRequestNotification = sendToAdminRequestNotification
+module.exports.sendToUserRequestNotification = sendToUserRequestNotification
+module.exports.sendCourseRequestNotification = sendCourseRequestNotification
+module.exports.sendTaskNotification = sendTaskNotification
 
-//exports
-module.exports.Send_CourseRecommendations_Notification = Send_CourseRecommendations_Notification;
-module.exports.SendToAdminRequestNotification = SendToAdminRequestNotification;
-module.exports.SendToUserRequestNotification = SendToUserRequestNotification;
-module.exports.Send_CourseRequest_Notification=Send_CourseRequest_Notification;
-module.exports.Send_Task_Notification=Send_Task_Notification;
-
-
-//
 
