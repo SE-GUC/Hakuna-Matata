@@ -13,7 +13,9 @@ import GetSpecRoom from './components/pages/getSpecRoom'
 import GetAllAgencies from "./components/pages/GetAllAgencies";
 import GetSpecificAgency from "./components/pages/GetSpecificAgency";
 import GetAllTasks from "./components/pages/GetAllTasks";
-
+import GetAllMc from './components/pages/GetAllMc'
+import GetAllTrain from './components/pages/GetAllTrain'
+import GetSpecificTrain from './components/pages/GetSpecificTrain'
 import GetAllEdu from './components/pages/GetAllEdu'
 import GetSpecificEdu from './components/pages/GetSpecificEdu'
 class App extends Component {
@@ -94,6 +96,10 @@ class App extends Component {
             )} />
             <Route exact path ="/educationalOrganizations/" component ={GetAllEdu}></Route>
       <Route exact path ="/educationalOrganizations/:id" component ={GetSpecificEdu}></Route>
+      <Route exact path ="/educationalOrganizations/trainingProgram/:id/" component ={GetAllTrain}></Route>
+      <Route exact path ="/educationalOrganizations/trainingProgram/:id/:programId" component ={GetSpecificTrain}></Route>
+      <Route exact path ="/educationalOrganizations/masterClass/:id/" component ={GetAllMc}></Route>
+      
             <Footer></Footer>
 
           </div>
