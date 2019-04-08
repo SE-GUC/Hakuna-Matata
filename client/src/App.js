@@ -18,6 +18,9 @@ import GetAllTrain from './components/pages/GetAllTrain'
 import GetSpecificTrain from './components/pages/GetSpecificTrain'
 import GetAllEdu from './components/pages/GetAllEdu'
 import GetSpecificEdu from './components/pages/GetSpecificEdu'
+import GetAllCourses from './components/pages/GetAllCourses'
+import GetSpecificCourse from './components/pages/GetSpecificCourse'
+import GetSpecificmasterclass from './components/pages/Getspecificmasterclass'
 class App extends Component {
   // creatTable() {
   //   let buttons = []
@@ -99,7 +102,9 @@ class App extends Component {
       <Route exact path ="/educationalOrganizations/trainingProgram/:id/" component ={GetAllTrain}></Route>
       <Route exact path ="/educationalOrganizations/trainingProgram/:id/:programId" component ={GetSpecificTrain}></Route>
       <Route exact path ="/educationalOrganizations/masterClass/:id/" component ={GetAllMc}></Route>
-      
+      <Route exact path ="/educationalOrganizations/masterClass/:id/:masterClassId" component ={GetSpecificmasterclass}></Route>
+      <Route exact path ="/Courses/" component ={GetAllCourses}></Route>
+      <Route exact path ="/Courses/:id" component ={GetSpecificCourse}></Route>
             <Footer></Footer>
 
           </div>
