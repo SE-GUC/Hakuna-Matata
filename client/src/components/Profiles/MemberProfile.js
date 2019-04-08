@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Link } from "react-router-dom";
 
 
 class MemberProfile extends Component {
@@ -35,7 +36,17 @@ class MemberProfile extends Component {
             style={{
                 color:'black'
             }}>
-        {this.state.deactivated} <br></br>{this.state.fullName} <br></br>{this.state.webName} <br></br>{this.state.levelOfExperience} <br></br>{this.state.dateJoied }</p> )
+        {this.state.deactivated} <br></br>{this.state.fullName} <br></br>{this.state.webName} <br></br>{this.state.levelOfExperience} <br></br>{this.state.dateJoied }</p>)
+        memberData.push(             <Link
+          to={{
+            pathname: `/tasks/${'5ca8efd35bb8f4166005d7ef'}`,
+            state: {
+              fromNotifications: true
+            }
+          }}
+        >
+          show task
+        </Link>)
           return memberData
       }else{
         return " "
