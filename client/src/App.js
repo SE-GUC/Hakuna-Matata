@@ -24,6 +24,10 @@ import GetSpecificCourse from './components/pages/GetSpecificCourse'
 import GetSpecificmasterclass from './components/pages/Getspecificmasterclass'
 import GetSpecificRoomAtom from "./components/pages/GetSpecificRoomAtom"
 import GetAllRoomsAtom from "./components/pages/GetAllRoomsAtom"
+import GetAllcertificate from "./components/pages/GetAllcertificates";
+import GetAlleducator from "./components/pages/GetAlleducators";
+import Getspecificeducator from "./components/pages/Getspecificeducator"
+
 class App extends Component {
   // creatTable() {
   //   let buttons = []
@@ -109,6 +113,9 @@ class App extends Component {
       <Route exact path ="/Courses/" component ={GetAllCourses}></Route>
       <Route exact path ="/Courses/:id" component ={GetSpecificCourse}></Route>
       <Route exact path="/allRoomsAtom" component={GetAllRoomsAtom} /> 
+      <Route exact path="/certificate" component={GetAllcertificate} />
+            <Route exact path="/educator" component={GetAlleducator} />
+            <Route exact path="/educator/:id" component={Getspecificeducator} />
             <Route exact path="/Room/:id" component={GetSpecificRoomAtom} />
             <Footer></Footer>
 
