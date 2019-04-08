@@ -10,9 +10,10 @@ import MemberProfile from './components/Profiles/MemberProfile';
 import GetAll from './components/pages/getAll'
 import GetSpec from './components/pages/getSpec'
 import GetSpecRoom from './components/pages/getSpecRoom'
-import GetAllAgencies from "./components/pages/GetAllAgencies";
-import GetSpecificAgency from "./components/pages/GetSpecificAgency";
-import GetAllTasks from "./components/pages/GetAllTasks";
+import GetAllAgencies from './components/pages/GetAllAgencies';
+import GetSpecificAgency from './components/pages/GetSpecificAgency';
+import GetSpecificTask from './components/pages/GetSpecificTask';
+import GetAllTasks from './components/pages/GetAllTasks';
 import GetAllMc from './components/pages/GetAllMc'
 import GetAllTrain from './components/pages/GetAllTrain'
 import GetSpecificTrain from './components/pages/GetSpecificTrain'
@@ -21,6 +22,8 @@ import GetSpecificEdu from './components/pages/GetSpecificEdu'
 import GetAllCourses from './components/pages/GetAllCourses'
 import GetSpecificCourse from './components/pages/GetSpecificCourse'
 import GetSpecificmasterclass from './components/pages/Getspecificmasterclass'
+import GetSpecificRoomAtom from "./components/pages/GetSpecificRoomAtom"
+import GetAllRoomsAtom from "./components/pages/GetAllRoomsAtom"
 class App extends Component {
   // creatTable() {
   //   let buttons = []
@@ -86,7 +89,7 @@ class App extends Component {
             <Route exact path="/consultancyAgencies/" component={GetAllAgencies} />
             <Route path="/consultancyAgencies/:id" component={GetSpecificAgency} />
             <Route exact path="/tasks/" component={GetAllTasks} />
-     
+            <Route  path="/tasks/:id" component={GetSpecificTask} />
             <Route exact path="/consultancyAgency" render={props => (
               <React.Fragment>
                 <div className="App-list">
@@ -105,6 +108,8 @@ class App extends Component {
       <Route exact path ="/educationalOrganizations/masterClass/:id/:masterClassId" component ={GetSpecificmasterclass}></Route>
       <Route exact path ="/Courses/" component ={GetAllCourses}></Route>
       <Route exact path ="/Courses/:id" component ={GetSpecificCourse}></Route>
+      <Route exact path="/allRoomsAtom" component={GetAllRoomsAtom} /> 
+            <Route exact path="/Room/:id" component={GetSpecificRoomAtom} />
             <Footer></Footer>
 
           </div>

@@ -5,12 +5,12 @@ import  CardStack  from '../../../../node_modules/react-cardstack/dist/CardStack
 const axios = require('axios')
 
 
-
-class PartnerComp extends React.Component {
+class PartnerComp  extends React.Component {
     constructor(props){
         super(props);
         this.state={
-            partners: [1,2],
+			partners: [],
+			isloaded: false
             
         }
     }
@@ -32,7 +32,8 @@ class PartnerComp extends React.Component {
             // create a new "State" object without mutating 
             // the original State object. 
             const newState = Object.assign({}, this.state, {
-                partners: newPartners
+				partners: newPartners,
+				isloaded: true
             });
     
             // store the new state object in the component's state
@@ -45,7 +46,7 @@ class PartnerComp extends React.Component {
           .catch(error => console.log(error));
       }
       getColorCode(i){
-          if(i%2===0){
+          if(i%2==0){
               return "#D50000"
           }
           else{
@@ -53,26 +54,34 @@ class PartnerComp extends React.Component {
           }
       }
     render(){
-        return(<div>
-            <CardStack
-                height={900}
-                width={400}
-                background="#f8f8f8"
-                hoverOffset={25}>
-
-                 
-    
-                {this.state.partners.map((person, i) =>
-                    <Card
-                        key={i}
-                        background={this.getColorCode(i)}>
-                        
-                        <TeamMemberCard {...person} />
-                    </Card>
-                )}
-    
-            </CardStack>
-        </div>)
+		if(this.state.isloaded){
+			return(<div>
+				<CardStack
+					height={500}
+					width={400}
+					background="#f8f8f8"
+					hoverOffset={25}>
+	
+					
+		
+					{this.state.partners.map((person, i) =>
+					
+						<Card
+							key={i}
+							
+							background={this.getColorCode(i)}>
+							
+							<TeamMemberCard {...person} />
+						</Card>
+					)}
+		
+				</CardStack>
+			</div>)
+		}
+		else{
+			return(<div><p>loading...</p></div>)
+		}
+        
     }
 	
 }
@@ -115,12 +124,12 @@ const TeamMemberCard = (props) => (
 		<div style={{color: '#fff'}}>
 			<DetailsRow
 			
-				title={props.information}
+				title={"info: "+props.information}
 			/>
 
 			<DetailsRow
 				
-				title={props.fieldOfWork}
+				title={"field of work: "+props.fieldOfWork}
 			/>
 
 			
