@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-var moment = require('moment');
-const Joi = require('joi');
 
 const Course = require('../models/Course.js')
 const courseValidator = require('../validations/CourseValidations.js')
@@ -23,7 +21,6 @@ router.post("/", async (req, res) => {
 })
 
 //get Show all Cousres
-//1
 router.get("/", async (req, res) => {
     try {
         const courses = await Course.find();
@@ -35,9 +32,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-//(id  => CourseId)
 //get course by id using mongo
-//1
 router.get("/:id", async (req, res) => {
     try {
         const id = req.params.id
@@ -51,17 +46,13 @@ router.get("/:id", async (req, res) => {
 });
 
 //update course using mongo
-//(course_id => courseId)
-//1
 router.put("/:id", async (req, res) => {
     try {
         const courseId = req.params.id
         const isValidated = courseValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
         const updatedCourse = await Course.findOneAndUpdate({ "_id": courseId }, req.body)
-        console.log(updatedCourse)
         const cousreAfterUpdate = await Course.findById(courseId)
-        console.log(cousreAfterUpdate)
         res.json({ data: cousreAfterUpdate});
     } catch (error) {
         // We will be handling the error later
@@ -69,9 +60,7 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-//(id  => educational_organizationId  ,course_id => courseId)
 //delete course using mongo
-//1
 router.delete("/:id", async (req, res) => {
     try {
         const id = req.params.id;
@@ -89,25 +78,5 @@ router.delete("/:id", async (req, res) => {
     }
 
 });
-
 // End of Course CRUDS
-
-
-
-//Badr
-
-router.put('/applyforacourse/:id', async (request, response) => {
-    const courseId = request.params.id;
-    const memberId = request.body.memberId;
-    const schema = {
-        memberId: Joi.number().required(),
-    }
-    const result = Joi.validate(request.body, schema);
-    if (result.error) return response.status(400).send({ error: result.error.details[0].message });
-    const course = await Course.findById(courseId)
-    course.listOfApplies.push({ 'memberId': memberId, dateofapply: moment().format('MMMM Do YYYY, h:mm:ss a') })
-    course.save()
-    response.sendStatus(200);
-});
-//End Badr
 module.exports = router;

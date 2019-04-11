@@ -1,38 +1,50 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const TaskInfoSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true
+    }
 
+});
+// Skill Schema
+const SkillSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    }
+});
+const ChangedTaskFieldSchema = new Schema({
+  //Field is allowed to change in task 
+})
 // Create the schema
 const TaskSchema = new Schema({
-    partnerId: {
-        type: String,
-        required: false
+    tag:{
+        type:String,
+        required:true,
+        enum:['Task','Project']
     },
-    consultancyAgencyId: {
-        type: String,
-        required: false,
-        default: ""
+    name:{
+        type:String,
+        required:true
     },
-    memberId: {
-        type: String,
-        required: false
-    },
-    adminId: {
-        type: String,
-        required: false
-    },
-    appliedId: {
-        type: [String],
-        required: false
-    },
+    taskPartner: TaskInfoSchema,
+    project:TaskInfoSchema,
+    taskMember: TaskInfoSchema,
+    adminId:mongoose.Schema.Types.ObjectId,
+    taskConsultancyAgency: TaskInfoSchema,
+    appliedConsultancyAgencies: [TaskInfoSchema],
+    appliedMembers: [TaskInfoSchema],
     description: {
         type: String,
         required: false
     },
     // why array ?
-    requiredSkills: {
-        type: [String],
-        required: false
-    },
+    requiredSkills: [SkillSchema],
     monetaryCompensation: {
         type: Number,
         required: false
@@ -62,7 +74,7 @@ const TaskSchema = new Schema({
         required: false
     },
     workCycle: {
-        type: String,
+        type: Number,
         required: false
     },
     linkOfTask: {
@@ -81,14 +93,24 @@ const TaskSchema = new Schema({
         type: Number,
         required: false
     },
-    consultyNeeded: {
+    // consultyNeeded: {
+    //     type: Boolean,
+    //     required: false
+    // },
+    consultancyChanges: ChangedTaskFieldSchema,
+    isChanged:  {
         type: Boolean,
         required: false
     },
-    consultanciesDone: {
-        type: Array,
+    consultyNeeded:{
+        type: Boolean,
         required: false
-    }
+    },
+    changeIsAccpted:  {
+        type: Boolean,
+        required: false
+    },
 })
 
-module.exports = Task = mongoose.model('tasks', TaskSchema)
+const Task = mongoose.model('tasks', TaskSchema)
+module.exports = Task

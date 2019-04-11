@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router();
 const Joi = require('joi');
 const {Notification,NotSummary,sendToUserRequestNotification}= require('../models/Notification.js');
-const Member= require('../models/Member.js');
+const User= require('../models/User.js');
 
 //get all notifications   
 //1
@@ -24,7 +24,7 @@ router.get('/:id/',async (request,response)=>{
 })
 
 // get all notif sum
-router.get('/get/NotSummary/',async (request,response)=>{
+router.get('/NotSummary',async (request,response)=>{
     const notSummaries = await NotSummary.find()
     response.json({data: notSummaries})
 }) 
@@ -70,7 +70,7 @@ router.delete('/NotSummary/:id',async function(req,res){
     
 
 // delete all not summary
-router.delete('/NotSummary/d/Remove',async function(req,res){
+router.delete('/NotSummary/Remove',async function(req,res){
 
     await  NotSummary.remove()
 })
@@ -100,7 +100,7 @@ router.get('/member/:id',async(request,response)=>{
             }
         } else {
             if (object.expert_requires){
-            const members= await Member.find()
+            const members= await User.find({tags:'Member'})
                 for (const object2 of members){
                     if (object2._id==request.params.id) {
                         if (object2.levelOfExperience>=4) {

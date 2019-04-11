@@ -25,6 +25,7 @@ const courseRequests = require('./routers/courseRequests.js');
 const notifications = require('./routers/notifications.js');
 const members =require('./routers/members');
 const partners =require('./routers/partners');
+const users =require('./routers/users');
 const admins= require('./routers/admins');
 const rooms= require('./routers/rooms');
 
@@ -39,7 +40,7 @@ app.get('/', (req, res) => {
    <li> <a href="/consultancyAgencies">Consultancy Agencys</a> </li>
    <li> <a href="/educationalOrganizations">Educational Organizations</a> </li>
    <li> <a href="/coWorkingSpaces">Co-working Spaces</a> </li>
-   <li> <a href="/admins">Admin</a> </li>
+   <li> <a href="/users">users</a> </li>
     </ul>
     `);
 })
@@ -53,6 +54,7 @@ app.use('/tasks',tasks);
 app.use('/coWorkingSpaces', coWorkingSpaces);
 app.use('/educationalOrganizations',educationalOrganizations);
 app.use('/members',members);
+app.use('/users',users);
 app.use('/partners',partners);
 app.use('/consultancyAgencies',consultancyAgencies);
 app.use('/admins',admins);
