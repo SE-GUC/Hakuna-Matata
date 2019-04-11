@@ -1,94 +1,97 @@
 const express = require('express')
 const router = express.Router();
 const Joi = require('joi');
-const { Member } = require('../models/Member.js');
 
-const Project = require('../models/Project.js');
-const projectValidator = require('../validations/projectValidations.js')
 
-const notObject = require('../models/Notification.js');
+const User = require('../models/User.js');
+const { Skill } = require('../models/Skill.js');
+const Task = require('../models/Task')
+const { sendToAdminRequestNotification } = require('../models/Notification.js')
+
 // Member CRUD
 // create member
-// changed request instead of req
-router.post('/', async (request, response) => {
+router.post('/:id', async (req, res) => {
   const schema = {
-    fullName: Joi.string().required(),
+    memberFullName: Joi.string().required(),
     skills: Joi.array().items(Joi.string())
   }
-  const result = Joi.validate(request.body, schema);
+  const result = Joi.validate(req.body, schema);
   if (result.error) {
-    return response.status(400).send({ error: result.error.details[0].message })
+    return res.status(400).send({ error: result.error.details[0].message })
   } else {
-    const fullName = request.body.fullName;
-    var splitted = fullName.split(" ");
-    var webName = splitted[0];
-    const skills = request.body.skills;
-    const member = new Member({
+    for (var skill of req.body.skills) {
+      var currSkills = await Skill.findOne({ name: skill })
+      if (!currSkills) return res.status(404).send(`${skill} is not supported by the site we will handel  that and send u notification`)
+    }
 
-      fullName: fullName,
-      webName: webName,
-      completedTaskId: [],
-      appliedTaskId: [],
-      levelOfExperience: 0,
-      Rating: 0,
+    console.log(req.body.memberFullName)
+    const currUser = await User.findOne({ _id: req.params.id, tags: 'Member' })
+    if (currUser) return res.status(404).send('You are already a Member on the site')
+
+    const memberSchema = {
+      memberFullName: req.body.memberFullName,
+      memberWebName: req.body.memberFullName.split(' ')[0],
+      completedTasksId: [],
+      appliedTasksId: [],
+      experienceLevel: 0,
+      memberRating: 0,
       allRatedReco: 0,
       averageRecoRate: 0,
       allRatedTasks: 0,
-      skills: skills
+      skills: req.body.skills,
+      memberWorksIn: [],
+      memberMasterclasses: [],
+      memberCertificates: [],
+      memberEvents: [],
+      memberHirePerHour: 0,
+      memberPhoneNumber: '',
+      memberDateJoined: new Date().getDate(),
+      memberLocation: ''
 
-    })
-    await member.save();
-    response.send(member);
+    }
+    await User.findByIdAndUpdate(req.params.id, memberSchema)
+    await User.findByIdAndUpdate(req.params.id, { $push: { tags: 'Member' } })
+    const member = await User.findById(req.params.id)
+    res.send(member);
   }
 })
-// Get all members
+//get all members
 router.get('/', async (req, res) => {
-  await Member.find({}, function (err, members) {
-    if (!err) {
-      res.send(members);
-    } else {
-      res.status(404).send('Not found')
-    }
-  })
+  const members = await User.find({ tags: 'Member' })
+  res.json({ data: members })
 })
-// get member by id
+//get Certin member
 router.get('/:id', async (req, res) => {
-  await Member.findById(req.params.id, function (err, members) {
-    if (!err) {
-      if (members !== null) {
-        res.send(members);
-      } else {
-        res.send('Not found')
-      }
-    } else {
-      res.status(404).send('Not found')
-    }
-  })
+  const member = await User.findOne({ _id: req.params.id, tags: 'Member' })
+  res.json({ data: member })
+
 })
 
-// update member name and skills
 router.put("/:id", async (req, res) => {
   const schema = {
-    fullName: Joi.string().required(),
+    memberFullName: Joi.string()
   }
   const result = Joi.validate(req.body, schema);
   if (result.error) return res.status(400).send(result.error.details[0].message)
 
   try {
-    const member = await Member.findByIdAndUpdate(req.params.id, { fullName: req.body.fullName })
-    const updatedMember = await Member.findById(req.params.id)
+    const member = await User.findOneAndUpdate({ _id: req.params.id, tags: 'Member' }, { memberFullName: req.body.memberFullName })
+    const updatedMember = await User.findById(req.params.id)
     res.send(updatedMember)
   } catch (error) {
 
   }
 })
 // delete member 
+// Delete Member delete 
 router.delete('/:id', async (req, res) => {
   try {
-    const id = req.params.id
-    const deletedMember = await Member.findOneAndRemove({ "_id": id })
-    if (deletedMember !== null) {
-      res.json({ msg: 'Member was deleted successfully', data: deletedMember })
+    const currMember = await User.findOne({ _id: req.params.id, tags: 'Member' })
+    if (currMember) {
+      const index = currMember.tags.indexOf('Member')
+      currMember.tags.splice(index, 1) 
+      currMember.save()
+      res.json({ msg: 'Member was deleted successfully'})
     } else {
       res.json({ msg: 'Member was deleted Already or Not Found' })
     }
@@ -100,166 +103,84 @@ router.delete('/:id', async (req, res) => {
 })
 // End Member CRUD
 
-//create project
-router.post('/project/:id', async (request, response) => {
-  try {
-    const isValidated = projectValidator.createValidation(request.body);
-    if (isValidated.error) return response.status(400).send({ error: isValidated.error.details[0].message })
-    const project = new Project({
-      taskId: request.body.taskId,
-      partnerId: request.body.partnerId,
-      memberId: request.params.id,
-      link: request.body.link
-    })
-    await project.save()
-    response.sendStatus(200)
-  } catch (error) {
-    // We will be handling the error later
-    response.status(404).send("Not found")
-  }
-})
-// get project by member id
-router.get('/project/:id/', (req, res) => {
-  var temp = [];
-  Project.find({}, function (err, projects) {
-    if (!err) {
-      for (var i = 0; i < projects.length; i++) {
-        if (projects[i].memberId == req.params.id) {
-          temp.push(projects[i])
-        }
-      }
-      res.send(temp)
-    } else {
-      res.status(404).send('Not found')
-    }
-  })
-})
-// delete project 
-router.delete('/project/:id/:projectId', function (req, res) {
-  Project.findById(req.params.projectId, function (err, project) {
-    if (!err) {
-      if (project.memberId == req.params.id) {
-        Project.findByIdAndRemove(
-          req.params.projectId,
-          function (err) {
-            if (!err) {
-              res.sendStatus(200)
-            } else {
-              res.status(404).send('Not found')
-            }
-          }
-        )
-      } else {
-        res.status(404).send('not allowed to delete this project')
-      }
-    } else {
-      res.status(404).send('Error!')
-    }
-  })
-})
-// update project 
-router.put("/project/:id/:projectId", (req, res) => {
-  const schema = {
 
-    link: Joi.string().required(),
 
-  }
-  const result = Joi.validate(req.body, schema);
-  if (result.error) {
-    res.status(400).send(result.error.details[0].message)
-    return
-  }
-  Project.findById(req.params.projectId, function (err, project) {
-    if (!err) {
-      if (project.memberId == req.params.id) {
-        project.link = req.body.link
-        project.save()
-        res.send(project)
-      } else {
-        res.status(404).send('not allowed to delete this project')
-      }
-    } else {
-      res.status(404).send('Error!')
-    }
-  })
-})
-// Badr Part
-// update rating (id =>memberId)
+
 router.put('/rate/:id', async (req, res) => {
   var id = req.params.id;
   const newRate = req.body.newRate;
   var noofTasks;
   const schema = {
-    newRate: Joi.number().integer().max(5).required(),
+    newRate: Joi.number().max(5).required(),
   }
   const result = Joi.validate(req.body, schema);
-  if (result.error) {
-    return res.status(400).send({ error: result.error.details[0].message })
-  }
-  var object = await Member.findById(id)
-  if (object !== null) {
-    if (object.allRatedTasks == null)
-      object.allRatedTasks = []
-    if (object.rating == undefined)
-      object.rating = 0
-    noofTasks = object.allRatedTasks;
-    const x = object.allRatedTasks + 1;
+  if (result.error) return res.status(400).send({ error: result.error.details[0].message })
+
+  var member = await User.findById(id)
+  if (member !== null) {
+    if (member.allRatedTasks == null) member.allRatedTasks = []
+    if (member.memberRating == undefined) member.rating = 0
+    noofTasks = member.allRatedTasks;
+    const x = member.allRatedTasks + 1;
     var tempRate
-    if (Math.round(((object.rating * noofTasks) + newRate) / x) > 5) {
-      tempRate = 5
-    } else {
-      tempRate = Math.round(((object.rating * noofTasks) + newRate) / x)
+    if ((((member.memberRating * noofTasks) + newRate) / x) > 5) tempRate = 5
+
+    else {
+      tempRate = (((member.memberRating * noofTasks) + newRate) / x)
     }
-    object = await Member.findOneAndUpdate({ "_id": id }, { "allRatedTasks": x, "rating": tempRate })
-    res.sendStatus(200)
+    member = await User.findOneAndUpdate({ "_id": id, tags: 'Member' }, { allRatedTasks: x, memberRating: tempRate })
+    res.send('Done')
   } else {
     res.send("Not found")
   }
 })
-//2
 router.put('/applyForTask/:id', async (req, res) => {
   const memberId = req.params.id
   const taskId = req.body.taskId
   const task = await Task.findById(taskId)
-  
-  if (task !== null) {
-    const member = await Member.findById(memberId)
-  
 
-    if (member !== null) {
+  if (task) {
+    const member = await User.findOne({ _id: memberId, tags: 'Member' })
+    if (member) {
       if (task.accepted) {
-        var matches = 0
-        for (var requires of task.requiredSkills) {
-          for (var memberskill of member.skills) {
-            if ((memberskill) === (requires)) {
-              matches++
-            }
-          }
+        var matches = true
+        var memberSkills = member.skills
+        console.log(memberSkills)
+        console.log(task.requiredSkills)
+        for (var index=0;index<  task.requiredSkills.length;index++){
+          console.log(task.requiredSkills[index])
         }
-        console.log(matches)
-        console.log(task.requiredSkills.length)
-        console.log( member.levelOfExperience)
-        console.log(task.experienceLevel)
-        if (matches >= task.requiredSkills.length & member.levelOfExperience >= task.experienceLevel) {
-          if (task.appliedId === null) {
-            task.appliedId = []
-          }
-          task.appliedId.push(member._id)
-          if (member.appliedTaskId === null) {
-            member.appliedTaskId = []
-          }
-          member.appliedTaskId.push(task._id)
-          member.save()
-          task.save()
-          res.send(member)
+          //matches = matches & memberSkills.includes(require)
+       
+        if (matches & member.experienceLevel >= task.experienceLevel) {
+          if (task.appliedMembers === null) task.appliedMembers = []
+          if (member.appliedTasks === null) member.appliedTasks = []
+          await User.findByIdAndUpdate({ _id: memberId }, {
+            $push: {
+              appliedInTasks:
+              {
+                name: task.name,
+                id: task._id
+              }
+            }
+          })
+          await Task.findByIdAndUpdate({ _id: taskId }, {
+            $push: {
+              appliedMembers:
+              {
+                name: member.memberFullName,
+                id: member._id
+              }
+            }
+          })
+          res.status(200).send('Done')
         } else {
-          res.status(400);
-          res.send("Sorry u can not Apply , u Dont have the required Specifications")
+          res.status(400).send("Sorry u can not Apply , u Dont have the required Specifications")
         }
       }
-       else {
+      else {
         res.status(400).send("task id is not available")
-        
+
       }
     } else {
       res.status(400).send("member id is not available")
@@ -269,11 +190,128 @@ router.put('/applyForTask/:id', async (req, res) => {
     res.send('This task has not yet been accepted')
   }
 })
-//2
-router.post('/editRequest/:id', (request, response) => {
-  var id = request.params.id;
-  var e = notObject.sendToAdminRequestNotification("Member " + id + " wants to edit his profile")
-  response.sendStatus(200);
+router.put('/applyForProject/:id', async (req, res) => {
+  const memberId = req.params.id
+  const projectId = req.body.projectId
+  const project = await Project.findById(projectId)
+
+  if (project) {
+    const member = await User.findOne({ _id: memberId, tags: 'Member' })
+    if (member) {
+      if (project.accepted) {
+        var matches = true
+        var memberSkills = member.skills
+        for (var require of project.requiredSkills)
+          matches = matches & memberSkills.includes(require)
+
+        if (matches & member.experienceLevel >= project.experienceLevel) {
+          if (project.appliedMembers === null) project.appliedMembers = []
+          if (member.appliedProjects === null) member.appliedProjects = []
+          await User.findByIdAndUpdate({ _id: memberId }, {
+            $push: {
+              appliedInProjects:
+              {
+                name: project.name,
+                id: project._id
+              }
+            }
+          })
+          await Project.findByIdAndUpdate({ _id: projectId }, {
+            $push: {
+              appliedMembers:
+              {
+                name: member.memberFullName,
+                id: member._id
+              }
+            }
+          })
+          res.status(200).send('Done')
+        } else {
+          res.status(400).send("Sorry u can not Apply , u Dont have the required Specifications")
+        }
+      }
+      else {
+        res.status(400).send("project id is not available")
+
+      }
+    } else {
+      res.status(400).send("member id is not available")
+    }
+  } else {
+    res.status(400);
+    res.send('This project has not yet been accepted')
+  }
 })
-// End Badr Part
+router.post('/editRequest/:id', (req, res) => {
+  var id = req.params.id;
+  var e = sendToAdminRequestNotification("Member " + id + " wants to edit his profile")
+  res.sendStatus(200);
+})
+router.put('/applyForCourse/:id', async (request, response) => {
+  const memberId = request.params.id;
+  const courseId = request.body.courseId;
+  const schema = {
+    courseId: Joi.string().required()
+  }
+  const result = Joi.validate(request.body, schema);
+  if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+  const course = await Course.findById(courseId)
+  const member = await User.findOne({ _id: memberId, tags: 'Member' })
+  if (member & course) {
+    if (course.availablePlaces > 0 & course.isAvailable) {
+      course.listOfApplied.push({
+        id: memberId,
+        name: member.memberFullName,
+        date: moment().format('MMMM Do YYYY, h:mm:ss a')
+      })
+      course.save()
+      member.memberCoursesAppliedIn.push({
+        id: course._id,
+        name: course.name,
+        date: moment().format('MMMM Do YYYY, h:mm:ss a')
+      })
+      member.save()
+      response.sendStatus(200);
+    } else {
+      return response.status(404).send('this course is not availabe right now its Full');
+    }
+  } else {
+    if (!member) return response.status(404).send('Your are not member in the site');
+    if (!course) return response.status(404).send('there is not such course in the site');
+  }
+});
+router.put('/applyForMasterClass/:id', async (request, response) => {
+  const memberId = request.params.id;
+  const masterClassId = request.body.masterClassId;
+  const schema = {
+    masterClassId: Joi.string().required()
+  }
+  const result = Joi.validate(request.body, schema);
+  if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+  const masterClass = await MasterClass.findById(masterClassId)
+  const member = await User.findOne({ _id: memberId, tags: 'Member' })
+  if (member & masterClass) {
+    if (masterClass.availablePlaces > 0 & masterClass.isAvailable) {
+      masterClass.listOfApplied.push({
+        id: memberId,
+        name: member.memberFullName,
+        date: moment().format('MMMM Do YYYY, h:mm:ss a')
+      })
+      masterClass.save()
+      member.memberMasterClassesAppliedIn.push({
+        id: masterClass._id,
+        name: masterClass.name,
+        date: moment().format('MMMM Do YYYY, h:mm:ss a')
+      })
+      member.save()
+      response.sendStatus(200);
+    } else {
+      return response.status(404).send('this masterClass is not availabe right now its Full');
+    }
+  } else {
+    if (!member) return response.status(404).send('Your are not member in the site');
+    if (!masterClass) return response.status(404).send('there is not such masterClass in the site');
+  }
+});
+
 module.exports = router

@@ -1,5 +1,7 @@
 const Joi = require("joi");
 
+
+
 module.exports = {
   createValidation: request => {
     const createSchema = {
@@ -25,7 +27,8 @@ module.exports = {
         .min(3)
         .max(500)
         .required(),
-      courseDuration: Joi.string()
+
+      MasterClassDuration: Joi.string()
         .min(3)
         .max(500)
         .required(),
@@ -45,7 +48,12 @@ module.exports = {
         .min(3)
         .max(500)
         .required(),
-      available: Joi.boolean().required()
+      isAvailable: Joi.boolean().required(),
+      courses:Joi.array(),
+      listOfApplied:Joi.array(),
+      listOfAccepted:Joi.array(),
+      educationalOrganization:Joi.object()
+
     };
 
     return Joi.validate(request, createSchema);
@@ -56,6 +64,12 @@ module.exports = {
       name: Joi.string()
         .min(3)
         .max(500),
+      description: Joi.string()
+        .min(3)
+        .max(500),
+      payment: Joi.string()
+        .min(3)
+        .max(500),
       places: Joi.number()
         .integer()
         .min(3)
@@ -64,16 +78,8 @@ module.exports = {
         .integer()
         .min(3)
         .max(500),
-      payment: Joi.string()
-        .min(3)
-        .max(500),
-      description: Joi.string()
-        .min(3)
-        .max(500),
-      courses: Joi.array()
-        .min(3)
-        .max(500),
-      courseDuration: Joi.string()
+
+      MasterClassDuration: Joi.string()
         .min(3)
         .max(500),
       startDate: Joi.string()
@@ -88,7 +94,11 @@ module.exports = {
       effort: Joi.string()
         .min(3)
         .max(500),
-      available: Joi.boolean()
+      isAvailable: Joi.boolean(),
+      courses:Joi.array(),
+      listOfApplied:Joi.array(),
+      listOfAccepted:Joi.array(),
+      educationalOrganization:Joi.object()
     };
 
     return Joi.validate(request, updateSchema);

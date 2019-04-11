@@ -1,145 +1,174 @@
 const express = require('express')
 const router = express.Router()
 
-const Partner = require('../models/Partner')
+const User = require('../models/User')
 const partnerValidator = require('../validations/partnerValidations.js')
 
-const { sendToAdminRequestNotification } = require('../models/Notification.js')
+ const { sendToAdminRequestNotification,NotSummary } = require('../models/Notification.js')
 
 // Partner CRUD
-// create a partner
-router.post('/', async (request, response) => {
-  try {
-    const isValidated = partnerValidator.createValidation(request.body);
-    if (isValidated.error) return response.status(400).send({ error: isValidated.error.details[0].message })
-    const partner = await Partner.create(request.body)
-    response.sendStatus(200)
-} catch (error) {
-    // We will be handling the error later
-    response.status(404).send("Not found")
-}  
-})
-// get all partners
-router.get('/', async (req, res) => {
-  await Partner.find({}, function (err, partners) {
-    if (!err) {
-      res.send(partners)
-    } else {
-      res.status(404).send('Not found');
-
-    }
-  })
-
-})
-// get partner by id
-router.get('/:id', async (req, res) => {
-  await Partner.findById(req.params.id, function (err, partners) {
-    if (!err) {
-      res.send(partners);
-    } else {
-      res.status(404).send('Not found')
-    }
-  })
-
-
-})
-// update a partner
-router.put("/:id", async (req, res) => {
-try{
-  const isValidated = partnerValidator.updateValidation(req.body);
+router.post('/:id', async (req, res) => {
+    try {
+        const isValidated = partnerValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
-  await Partner.findById(req.params.id, function (err, partners) {
-    if (!err) {
-      if (req.body.name != null) {
-        partners.name = req.body.name
-      } if (req.body.information != null) {
-        partners.information = req.body.information
-      } if (req.body.partners != null) {
-        partners.partners = req.body.partners
-      } if (req.body.fieldOfWork != null) {
-        partners.fieldOfWork = req.body.fieldOfWork
-      } if (req.body.projects != null) {
-        partners.projects = req.body.projects
-      } if (req.body.feedbackForm != null) {
-        partners.feedbackForm = req.body.feedbackForm
-      }
-      const result = partners.save()
-      res.send(partners)
-    } else {
-      res.status(404).send('Not found')
-    }
-  })
-}catch(err){
-  console.log(err)
-}
-})
-// delete partner
-router.delete('/:id', async function (req, res) {
-  try {
-    const id = req.params.id
-    const deletedPartner = await Partner.findOneAndRemove({ "_id": id })
-    if (deletedPartner !== null) {
-      res.json({ msg: 'Partner was deleted successfully', data: deletedPartner })
-    } else {
-      // res.json({msg:'Partner was deleted Already or Not Found'})
-      res.status(404).send('Not found');
-    }
-  }
-  catch (error) {
-    // We will be handling the error later
-    console.log(error)
-  }
-})
-// End of Partner
-// get partner project
-router.get('/project/:id/', async (req, res) => {
-  await Partner.findOne({ "_id": req.params.id }, function (err, tPartner) {
-    if (!err) {
-      if (tPartner !== null) {
-        res.send(tPartner.projects);
-      } else {
-        res.send("Not Found")
-      }
-    } else {
-      res.status(404).send('Not found')
-    }
-  })
-})
-//badr
-//1
-router.get('acceptedTask/:id', async (request, response) => {
-  const not = await Not_summary.find({ "sent_to": request.params.id, "title": "Your task has been accepted" });
-  response.send({
-    data: not
-  });
-});
-//1
-router.get('assignedTask/:id', async (request, response) => {
-  const not = await Not_summary.find({ "sent_to": request.params.id, "title": "You task has been assigned to a member!" });
-  response.send({
-    data: not
-  })
-});
-//1
-router.post('/editRequest/:id', (request, response) => {
-  var id = request.params.id
-  var e = sendToAdminRequestNotification("Partner " + id + " wants to edit his profile")
-  response.sendStatus(200)
-});
-
-//show my project (id =>partnerId)
-//1
-/*
-router.get('/project/:id', async (req, res) => {
-  const projects = await Project.find({
-    partnerId: req.params.id
-  })
-  if (projects.length == 0)
-    res.send("You don't have projects")
-  else
-    res.send({
-      data: projects
+        
+            const currUser = await User.findOne({ _id: req.params.id, tags: 'Partner' })
+            if (currUser) return res.status(404).send('You are already a Partner on the site')
+            await User.findByIdAndUpdate(req.params.id ,req.body)
+            await User.findByIdAndUpdate(req.params.id ,{partnerDateJoined:new Date().getDate()})
+            await User.findByIdAndUpdate(req.params.id,{$push:{tags:'Partner'}})
+            // console.log(3)
+            const partner = await User.findById(req.params.id)
+            res.send(partner);
+          
+    } catch (err) {
+        // We will be handling the error later
+        res.status(404).send("error")
+    }  
     })
-});*/
-// end badr
+
+
+  //get all Partners
+  router.get('/', async (req, res) => {
+    const partners = await User.find({ tags: 'Partner' })
+    res.json({ data: partners })
+  })
+  //get Certin partner
+  router.get('/:id', async (req,res) => {
+    const partner = await User.findOne({_id:req.params.id ,tags: 'Partner' })
+    res.json({ data: partner })
+  
+  })
+  
+  // update partner name 
+  router.put("/:id", async (req, res) => {
+    const isValidated = partnerValidator.updateValidation(req.body);
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+  
+    try {
+      const partner = await User.findOneAndUpdate({_id:req.params.id ,tags: 'Partner' } ,req.body)
+      const updatedPartner = await User.findById(req.params.id)
+      res.send(updatedPartner)
+    } catch (error) {
+  
+    }
+  })
+  // delete Partner 
+  // Delete Partner delete 
+  router.delete('/:id', async (req, res) => {
+    try {
+      const currPartner = await User.findOne({_id:req.params.id ,tags: 'Partner' })     
+      if (currPartner) {
+        const index=currPartner.tags.indexOf('Partner')
+       currPartner.tags.splice(index,1)
+       currPartner.save()
+        res.json({ msg: 'Partner was deleted successfully'})
+      } else {
+        res.json({ msg: 'Partner was deleted Already or Not Found' })
+      }
+    }
+    catch (error) {
+      // We will be handling the error later
+      console.log(error)
+    }
+  })
+// End Partner CRUD
+
+
+
+  // get partner projects
+router.get('/project/:id', async (req,res) => {
+    const partner = await User.findOne({_id:req.params.id ,tags: 'Partner' })
+    res.send( partner.partnerProjects)
+  
+})
+  // get partner projects
+  router.get('/task/:id', async (req,res) => {
+    const partner = await User.findOne({_id:req.params.id ,tags: 'Partner' })
+    res.send( partner.partnerTasks)
+  
+})
+//1
+router.get('/acceptedTask/:id', async (req, res) => {
+  const not = await NotSummary.find({ "sent_to": req.params.id, "title": "Your task has been accepted" });
+  res.send( not);
+})
+//3
+router.get('/assignedTask/:id', async (req, res) => {
+  const not = await NotSummary.find({ "sent_to": req.params.id, "title": "You task has been assigned to a member!" });
+  res.send({
+    data: not
+  })
+})
+//1
+router.post('/editRequest/:id', (req, res) => {
+  var id = req.params.id
+  var e = sendToAdminRequestNotification("Partner " + id + " wants to edit his profile")
+  res.sendStatus(200)
+})
+
+  
+//s
+router.put('/assignConstlancyAgencyToTask/:id', async (req, res) => {
+  const partnerId=req.params.id
+  const taskId=req.body.taskId
+  const consultancyAgencyId=req.body.consultancyAgencyId
+  var task =await Task.findOne({_id:taskId, accepted:true})
+  if(task){
+    if(task.taskPartner.id===partnerId){
+      const assignedConsultancyAgency=await User.findOne({_id:consultancyAgencyId, tags:'ConsultancyAgency' })
+      for(var consultancyAgency of  task.appliedConsultancies){
+        if(consultancyAgency.id===consultancyAgencyId){
+          task.consultancyAgency=consultancyAgency
+          assignedConsultancyAgency.consultancyAgencyAcceptedInTasks.push({
+            id:task._id,
+            name:task.name,
+            date:new Date().getDate()
+          })
+        }
+      }
+      //Should be Remove from PlateForm and notify consultancy
+      task.save()
+      assignedConsultancyAgency.save()
+
+    }else{
+      res.status(404).send("You are not the owner")
+
+    }
+  }else{
+    res.status(404).send('this task not found')
+  }
+})
+router.put('/assignConstlancyAgencyToProject/:id', async (req, res) => {
+  const partnerId=req.params.id
+  const projectId=req.body.projectId
+  const consultancyAgencyId=req.body.consultancyAgencyId
+  var project =await Project.findOne({_id:projectId, accepted:true})
+  if(project){
+    if(project.projectPartner.id===partnerId){
+      const assignedConsultancyAgency=await User.findOne({_id:consultancyAgencyId, tags:'ConsultancyAgency' })
+      for(var consultancyAgency of  project.appliedConsultancies){
+        if(consultancyAgency.id===consultancyAgencyId){
+          project.consultancyAgency=consultancyAgency
+          assignedConsultancyAgency.consultancyAgencyAcceptedInPorjects.push({
+            id:project._id,
+            name:project.name,
+            date:new Date().getDate()
+          })
+        }
+      }
+      //Should be Remove from PlateForm and notify consultancy
+      project.save()
+      assignedConsultancyAgency.save()
+
+    }else{
+      res.status(404).send("You are not the owner")
+
+    }
+  }else{
+    res.status(404).send('this porject not found')
+  }
+})
+
+
 module.exports = router;

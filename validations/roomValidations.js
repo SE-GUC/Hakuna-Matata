@@ -3,23 +3,24 @@ const Joi = require('joi')
 module.exports = {
     createValidation: request => {
         const createSchema = {
-            reservedId: Joi.string(),
             capacity: Joi.number().integer().required(),
-            reservedDate: Joi.date(),
-            endOfReservation: Joi.date(),
-            reserved: Joi.boolean()
+            slots: Joi.array().string().required(),
+            reviews: Joi.array(),
+            reservations: Joi.array(),
+            coworkingSpace: Joi.object()
         }
 
         return Joi.validate(request, createSchema)
     },
-
+    
     updateValidation: request => {
         const updateSchema = {
             capacity: Joi.number().integer(),
-            reserved: Joi.boolean(),
-            reservedDate: Joi.date(),
-            endOfReservation: Joi.date(),
-            reservedId: Joi.string()
+            slots: Joi.array(),
+            reviews: Joi.array(),
+            reservations: Joi.array(),
+            comments: Joi.string()
+            
         }
 
         return Joi.validate(request, updateSchema)
@@ -27,9 +28,10 @@ module.exports = {
 
     reserveValidation: request => {
         const reserveSchema = {
-            reservedDate: Joi.date().required(),
-            endOfReservation: Joi.date().required(),
-            reservedId: Joi.string().required()
+            slot: Joi.string().required(),
+            reservationDate: Joi.date().required(),
+            reserver: Joi.object().required(),
+            isAccpted: Joi.boolean()
         }
 
         return Joi.validate(request, reserveSchema)

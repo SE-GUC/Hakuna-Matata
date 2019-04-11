@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "v10.15.1"
+    "node": "v10.15.1",
+    "nodemon": "^1.18.11"
   },
   "scripts": {
     "start": "node index.js",
@@ -28,12 +29,13 @@
     "moment": "^2.24.0",
     "mongoose": "^5.4.15",
     "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0"
+    "passport-jwt": "^4.0.0",
+    "nodemon": "^1.18.11"
   },
   "devDependencies": {
     "axios": "^0.18.0",
     "jest": "^24.5.0",
-    "nodemon": "^1.18.10",
+    "nodemon": "^1.18.11",
     "test": "^0.6.0"
   }
 }

@@ -1,273 +1,157 @@
 const express = require("express")
 const router = express.Router()
 router.use(express.json())
-const Joi = require("joi")
-
+  
 const courseValidator = require("../validations/courseValidations.js")
 const masterClassValidator = require('../validations/masterClassValidations.js')
 const trainingProgramValidator = require('../validations/trainingProgramsValidations.js')
-const educationalOrganiztionValidator = require("../validations/educationalOrganizationValidations.js")
+const educationOrganizationValidator = require("../validations/educationalOrganizationValidations.js")
 const educatorValidator = require('../validations/educatorValidations.js')
 const certificateValidator = require('../validations/certificateValidations.js')
 
-const EducationalOrganization = require("../models/EducationalOrganization.js")
+const User = require("../models/User.js")
 const MasterClass = require("../models/masterClass.js")
 const TrainingProgram = require("../models/TrainingProgram.js")
 const Certificate = require("../models/Certificate.js")
-const Educator = require("../models/Educator.js")
-const Courses= require("../models/Course.js")
-//create educational organization
-router.post("/:id", async (req, res) => {
-  try {
-    req.body.partnerId= parseInt(req.params.id);
-    const isValidated = educationalOrganiztionValidator.createValidation(req.body);
-    if (isValidated.error)
-      return res
-        .status(400)
-        .send({ error: isValidated.error.details[0].message });
-
-    const educationalOrganization = await EducationalOrganization.create(req.body);
-
-    res.json({
-      msg: "EducationalOrganization was created successfully",
-      data: educationalOrganization 
-    });
-  } catch (error) {
-    res.status(404).send("Not found");
-  }
-});
-//get all educational organization
-router.get("/", async (req, res) => {
-  try {
-    const educationalOrganization = await EducationalOrganization.find();
-    if (!educationalOrganization)
-      return res.status(404).send({ error: "EducationalOrganization does not exist" });
-    res.json({
-      msg: " EducationalOrganization",
-      data: educationalOrganization
-    });
-  } catch (error) {
-    res.status(404).send("Not found");
-  }
-});
-//get one  educational organization using mongo
-//(id  => EducationalOrganizationId)
-//1
-router.get("/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const educationalOrganization = await EducationalOrganization.findById(id);
-    if (!educationalOrganization)
-      return res
-        .status(404)
-        .send({ error: "EducationalOrganization does not exist" });
-    res.json({ msg: "You get the EducationalOrganization", data: educationalOrganization });
-  } catch (error) {
-    res.status(404).send("Not found");
-  }
-});
-//(id  => educationalOrganizationId)
-//1
-router.put("/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const educationalOrganization = await EducationalOrganization.findById(id);
-    if (!educationalOrganization)
-      return res.status(404).send({ error: "organization does not exist" });
-    const isValidated = educationalOrganiztionValidator.updateValidation(req.body);
-    if (isValidated.error)
-      return res
-        .status(400)
-        .send({ error: isValidated.error.details[0].message });
-    const educationalOrganizationUpdated = await EducationalOrganization.findOneAndUpdate(
-      { _id: id },
-      req.body
-    );
-
-    res.json({
-      msg: "You update EducationalOrganization",
-      data: educationalOrganizationUpdated
-    });
-  } catch (error) {
-    res.sendStatus(404).send("Not found");
-  }
-});
-
-//delete EducationalOrganization using mongo(id  => EducationalOrganizationId)
-//1
-router.delete("/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const educationalOrganizationDeleted = await EducationalOrganization.findByIdAndRemove(
-      id
-    );
-    if (!educationalOrganizationDeleted)
-      return res
-        .status(404)
-        .send({ error: "EducationalOrganization does not exist" });
-    res.json({
-      msg: "EducationalOrganization was deleted successfully",
-      data: educationalOrganizationDeleted
-    });
-  } catch (error) {
-    res.status(404).send("educationalOrganization does not exist");
-  }
-});
-
-//End of educationaOrganization CRUDS
-
-//Course CRUDS
+const Course= require("../models/Course.js")
 
 
-// get all Courses of One EducationalOrganizationId
-//(id  => EducationalOrganizationId)
-//1
-router.get("/course/:id/", async (req, res) => {
+// educationOrganization CRUD
+router.post('/:id', async (request, response) => {
     try {
-      EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-        if (!err) {
-          
-          res.send(educationalOrganization.courses);
-          
+        const isValidated = educationOrganizationValidator.createValidation(request.body);
+        if (isValidated.error) return response.status(400).send({ error: isValidated.error.details[0].message })
+
+        const currUser = await User.findOne({ _id: request.params.id, tags: 'EducationOrganization' })
+        if (currUser) return response.status(404).send('You are already a EducationOrganization on the site')
+        await User.findByIdAndUpdate(request.params.id, request.body)
+        await User.findByIdAndUpdate(request.params.id, { educationOrganizationDateJoined: new Date().getDate() })
+        await User.findByIdAndUpdate(request.params.id, { $push: { tags: 'EducationOrganization' } })
+        const educationOrganization = await User.findById(request.params.id)
+        response.send(educationOrganization);
+
+    } catch (err) {
+        // We will be handling the error later
+        response.status(404).send("error")
+    }
+})
+//get all educationOrganizations
+router.get('/', async (req, res) => {
+    const educationOrganizations = await User.find({ tags: 'EducationOrganization' })
+    res.json({ data: educationOrganizations })
+})
+//get Certin EducationOrganization
+router.get('/:id', async (req, res) => {
+    const educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    res.json({ data: educationOrganization })
+
+})
+// update EducationOrganization name 
+router.put("/:id", async (req, res) => {
+    const isValidated = educationOrganizationValidator.updateValidation(req.body);
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+
+    try {
+        const educationOrganization = await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' }, req.body)
+        const updatedEducationOrganization = await User.findById(req.params.id)
+        res.send(updatedEducationOrganization)
+    } catch (error) {
+
+    }
+})
+// delete EducationOrganization 
+// Delete EducationOrganization delete 
+router.delete('/:id', async (req, res) => {
+    try {
+        const id = req.params.id
+        const currEducationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        if (currEducationOrganization) {
+            const index = currEducationOrganization.tags.indexOf('EducationOrganization')
+            const deletedEducationOrganization = await User.findOneAndUpdate({ _id: id }, { tags: currEducationOrganization.tags.splice(index, 1) })
+            res.json({ msg: 'EducationOrganization was deleted successfully', data: deletedEducationOrganization })
         } else {
-          res.status(404).send("Not found");
+            res.json({ msg: 'EducationOrganization was deleted Already or Not Found' })
         }
-      });
+    }
+    catch (error) {
+        // We will be handling the error later
+        console.log(error)
+    }
+})
+// End educationOrganization CRUD 
+
+// Course CRUDS
+// get all Courses of One EducationalOrganizationId
+router.get("/course/:id", async (req, res) => {
+    try {
+        const educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.json({ data: educationOrganization.educationOrganizationCourses })
     } catch (error) {
       res.status(404).send("Not found");
     }
-  }
-);
-
-
-//update create course using mongo (id  => EducationalOrganizationId)
+});
+//get course of specific educational organization
+router.get("/course/:id/:courseId", async(req, res) => {
+    try {
+        var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        if(educationOrganization){
+           
+            for(var index=0; index<educationOrganization.educationOrganizationCourses.length;index++){
+                if(courses[index].id===req.params.courseId){
+                    var course= await Course.findById(req.params.courseId)
+                     return res.send(course)
+    
+                }
+            }
+            return  res.status(404).send("Not found");
+        } else {
+          res.status(404).send("Not found");
+        }
+      } catch (error) {
+        res.status(404).send("Not found");
+      }
+});
 //Create Course for educations_orgization
-//1
 router.post("/course/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    console.log(id)
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
     const isValidated = courseValidator.createValidation(req.body);
-    if (isValidated.error)
-      return res
-        .status(400)
-        .send({ error: isValidated.error.details[0].message });
-    const educationalOrganization = await EducationalOrganization.findById(id);
-    console.log(id)
-    if (educationalOrganization._id !== undefined) {
-      console.log(id)
-      const course = await Courses.create(req.body);
-      console.log(id)
-      educationalOrganization.courses.push(course);
-       educationalOrganization.save()
-      res.send(course);
-    } else {
-      res.status(404).send("Not found");
-    }
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+    const course = await Course.create(req.body)
+        await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationCourses:{
+           id:course._id,
+           name:course.name
+        }}})
+        educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.send(educationOrganization.educationOrganizationCourses)
+}else{
+    res.status(404).send("Not found");
+
+}
+
   } catch (error) {
     
     res.sendStatus(404).send("Not found");
   }
 });
-
-
-
-
-
-//update course using mongo
-//(id  => EducationalOrganizationId  ,course_id => courseId)
-//1
-router.put("/course/:id/:courseId", async (req, res) => {
-  try {
-    const isValidated = courseValidator.updateValidation(req.body);
-    if (isValidated.error)
-      return res
-        .status(400)
-        .send({ error: isValidated.error.details[0].message });
-        const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-       
-    if (educationalOrganization !== undefined) {
-      
-      const course = educationalOrganization.courses.find(course => course._id ==req.params.courseId);
-      
-      educationalOrganization.courses.remove(course);
-     
-      if (req.body.name != null) {
-        course.name = req.body.name;
-        
-      }
-      if (req.body.educatorName != null) {
-        course.educatorName = req.body.educatorName;
-        
-      }
-      if (req.body.description != null) {
-        course.description = req.body.description;
-        
-      }
-      if (req.body.places != null) {
-        course.places = req.body.places;
-        
-      }
-      if (req.body.availablePlaces != null) {
-        course.availablePlaces = req.body.availablePlaces;
-        
-      }
-      if (req.body.payment != null) {
-        course.payment = req.body.payment;
-       
-      }
-      if (req.body.courseDuration != null) {
-        course.courseDuration = req.body.courseDuration;
-       
-      }
-      if (req.body.startDate != null) {
-        course.startDate = req.body.startDate;
-        
-      }
-      if (req.body.endDate != null) {
-        course.endDate = req.body.endDate;
-        
-      }
-      if (req.body.categories != null) {
-        course.categories = req.body.categories;
-        
-      }
-      if (req.body.available != null) {
-        course.available = req.body.available;
-        
-      }
-      
-      educationalOrganization.courses.push(course);
-      
-      
-      const educationalOrganizationUpdated = await EducationalOrganization.findOneAndUpdate(
-        {_id:req.params.id},
-        educationalOrganization
-      )
-      
-      res.send(educationalOrganizationUpdated);
-      
-    } else {
-      res.send("Not Found");
-    }
-  } catch (error) {
-   
-    res.status(404).send("Not found");
-  }
-});
-
-//(id  => EducationalOrganizationId  ,course_id => courseId)
 //delete course using mongo
-//1
 router.delete("/course/:id/:courseId", async (req, res) => {
   try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+        var courses=educationOrganization.educationOrganizationCourses
+        for(var index=0; index<courses.length;index++){
+            if(courses[index].id===req.params.courseId){
+                educationOrganization.educationOrganizationCourses.splice(index,1)
+                courses=educationOrganization.educationOrganizationCourses
+                 educationOrganization = await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{educationOrganizationCourses:courses})
+                 await Course.findByIdAndRemove(req.params.courseId)
+                 return res.send(educationOrganization.educationOrganizationCourses)
 
-    const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-    if (educationalOrganization!== undefined) {
-      const course = educationalOrganization.courses.find(course => course._id ==req.params.courseId);
-      educationalOrganization.courses.remove(course);
-      educationalOrganization.save();
-      res.send(educationalOrganization);
+            }
+        }
+        return  res.status(404).send("Not found");
     } else {
       res.status(404).send("Not found");
     }
@@ -276,164 +160,79 @@ router.delete("/course/:id/:courseId", async (req, res) => {
   }
 });
 
-//get course of specific educational organization
-router.get("/course/:id/:courseId", (req, res) => {
-  try{
-    EducationalOrganization.findById(req.params.id, function async(err,educationalOrganization) {
-    if (!err) {
-      const course = educationalOrganization.courses.find(course=> course._id == req.params.courseId);
-      res.send(course);
-    } else {
-      res.status(404).send("Not found");
-    }
-  });
-}
-catch(error){
-  res.status(404).send("Not found");
-}
-});
 //End of Course CRUDS
 
-// Master Class CRUD
-// get one   Show_masterClasses of One EducationalOrganizationId
-//(id  => EducationalOrganizationId ,masterClassId => masterClassID)
-//1
-router.get("/masterClass/:id/:masterClassId",async (req, res) => {
-  try{
-    EducationalOrganization.findById(req.params.id, function async(err,educationalOrganization) {
-    if (!err) {
-      const master = educationalOrganization.masterClass.find(master=> master._id == req.params.masterClassId);
-      res.send(master);
-    } else {
+// MasterClass CRUD
+router.get("/masterClass/:id", async (req, res) => {
+    try {
+        const educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.json({ data: educationOrganization.educationOrganizationMasterClasses })
+    } catch (error) {
       res.status(404).send("Not found");
     }
-  });
-}
-catch(error){
-  res.status(404).send("Not found");
-}
 });
-
-
-//URL to create master classes   (id  => EducationalOrganizationId)
-router.post("/masterClass/:id", async (req, res) => {//tmam
-    const isValidated = masterClassValidator.createValidation(req.body);
-    if (isValidated.error)
-      return res
-        .status(400)
-        .send({ error: isValidated.error.details[0].message });
-
-        const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-        // console.log("hello");
-       
-         if (educationalOrganization !== undefined) {
-           const masterClass = await MasterClass.create(req.body);
-           educationalOrganization.masterClass.push(masterClass);
-           educationalOrganization.save();
-           res.send(masterClass);
-         } else {
-           res.status(404).send("Not found");
-         }
-       });
-
-//(id  => EducationalOrganizationId)
-router.get("/masterClass/:id/", async (req, res) => { //tmam
-  EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-    if (!err) {
-      res.send(educationalOrganization.masterClass);
-    } else {
-      res.status(404).send("Not found");
-    }
-  });
-});
-
-//(id  => EducationalOrganizationId  ,masterClassId => masterClassId)
-router.put("/masterClass/:id/:masterClassId", async (req, res) => {/////baiza
-  try {
+//get masterClass of specific educational organization
+router.get("/masterClass/:id/:masterClassId", async(req, res) => {
+    try {
+        var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        if(educationOrganization){
+           
+            for(var index=0; index<educationOrganization.educationOrganizationMasterClasses.length;index++){
+                if(masterClasss[index].id===req.params.masterClassId){
+                    var masterClass= await MasterClass.findById(req.params.masterClassId)
+                     return res.send(masterClass)
     
-    const isValidated = masterClassValidator.updateValidation(req.body);
-    if (isValidated.error)
-      return res
-        .status(400)
-        .send({ error: isValidated.error.details[0].message });
-        const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-       
-    if (educationalOrganization !== undefined) {
-      
-      const master = educationalOrganization.masterClass.find(master => master._id ==req.params.masterClassId);
-      
-      educationalOrganization.masterClass.remove(master);
-     
-      if (req.body.name !== undefined) {
-        master.name = req.body.name;
+                }
+            }
+            return  res.status(404).send("Not found");
+        } else {
+          res.status(404).send("Not found");
+        }
+      } catch (error) {
+        res.status(404).send("Not found");
       }
-      if (req.body.places !== undefined) {
-        master.places = req.body.places;
-      }
-      if (req.body.availablePlaces !== undefined) {
-        master.availablePlaces = req.body.availablePlaces;
-      }
-      if (req.body.courses !== undefined) {
-        master.courses = req.body.courses;
-      }
-      if (req.body.payment !== undefined) {
-        master.payment = req.body.payment;
-      }
-      if (req.body.description !== undefined) {
-        master.description = req.body.description;
-      }
-
-      if (req.body.courseDuration !== undefined) {
-        master.courseDuration = req.body.courseDuration;
-      }
-      if (req.body.startDate !== undefined) {
-        master.startDate = req.body.startDate;
-      }
-      if (req.body.endDate !== undefined) {
-        master.endDate = req.body.endDate;
-      }
-      if (req.body.levelOfStudents !== undefined) {
-        master.levelOfStudents = req.body.levelOfStudents;
-      }
-      if (req.body.effort !== undefined) {
-        master.effort = req.body.effort;
-      }
-      if (req.body.available !== undefined) {
-        master.available = req.body.available;
-      }
-        
-      
-      
-      educationalOrganization.masterClass.push(master);
-      
-      
-      const educationalOrganizationUpdated = await EducationalOrganization.findOneAndUpdate(
-        {_id:req.params.id},
-        educationalOrganization
-      )
-      
-      res.send(educationalOrganizationUpdated);
-      
-    } else {
-      res.send("Not Found");
-    }
-  } catch (error) {
-   
+});
+//Create MasterClass for educations_orgization
+router.post("/masterClass/:id", async (req, res) => {
+  try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+    const isValidated = masterClassValidator.createValidation(req.body);
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+    const masterClass = await MasterClass.create(req.body)
+        await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationMasterClasses:{
+           id:masterClass._id,
+           name:masterClass.name
+        }}})
+        educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.send(educationOrganization.educationOrganizationMasterClasses)
+}else{
     res.status(404).send("Not found");
+
+}
+
+  } catch (error) {
+    
+    res.sendStatus(404).send("Not found");
   }
-});  
-
-
-//(id  => EducationalOrganizationId  ,masterClassId => masterClassId)
+});
+//delete masterClass using mongo
 router.delete("/masterClass/:id/:masterClassId", async (req, res) => {
   try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+        var masterClasses=educationOrganization.educationOrganizationMasterClasses
+        for(var index=0; index<masterClasses.length;index++){
+            if(masterClasses[index].id===req.params.masterClassId){
+                educationOrganization.educationOrganizationMasterClasses.splice(index,1)
+                masterClasses=educationOrganization.educationOrganizationMasterClasses
+                 educationOrganization = await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{educationOrganizationMasterClasses:masterClasses})
+                 await MasterClass.findByIdAndRemove(req.params.masterClassId)
+                 return res.send(educationOrganization.educationOrganizationMasterClasses)
 
-    const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-    if (educationalOrganization!== undefined) {
-      const master = educationalOrganization.masterClass.find(master => master._id ==req.params.masterClassId);
-      educationalOrganization.masterClass.remove(master);
-      educationalOrganization.save();
-      res.send(educationalOrganization);
+            }
+        }
+        return  res.status(404).send("Not found");
     } else {
       res.status(404).send("Not found");
     }
@@ -441,103 +240,80 @@ router.delete("/masterClass/:id/:masterClassId", async (req, res) => {
     res.status(404).send("Not found");
   }
 });
-
 // End Master Class CRUD
 
 //  Educator CRUD
-
-//URL to add info about educators  (id  => educationalOrganizationId)
-router.post("/educator/:id", async (req, res) => {//tmam
+router.get("/educator/:id", async (req, res) => {
+    try {
+        const educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.json({ data: educationOrganization.educationOrganizationEducators })
+    } catch (error) {
+      res.status(404).send("Not found");
+    }
+});
+//get educator of specific educational organization
+router.get("/educator/:id/:educatorId", async(req, res) => {
+    try {
+        var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        if(educationOrganization){
+           
+            for(var index=0; index<educationOrganization.educationOrganizationEducators.length;index++){
+                if(educators[index].id===req.params.educatorId){
+                    var educator= await User.findById(req.params.educatorId)
+                     return res.send(educator)
+    
+                }
+            }
+            return  res.status(404).send("Not found");
+        } else {
+          res.status(404).send("Not found");
+        }
+      } catch (error) {
+        res.status(404).send("Not found");
+      }
+});
+//Create Educator for educations_orgization
+router.post("/educator/:id", async (req, res) => {
+  try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
     const isValidated = educatorValidator.createValidation(req.body);
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
-  
-  const educationalOrganization = await EducationalOrganization.findById(req.params.id);
- // console.log("hello");
-
-  if (educationalOrganization !== undefined) {
-    const educator = await Educator.create(req.body);
-    educationalOrganization.educators.push(educator);
-    educationalOrganization.save();
-    res.send(educator);
-  } else {
+    //
+    //const educator = await Educator.create(req.body)
+        await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationEducators:{
+           id:req.body._id,
+           name:req.body.name
+        }}})
+        educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.send(educationOrganization.educationOrganizationEducators)
+}else{
     res.status(404).send("Not found");
-  }
-});
 
-// get all educator of one EducationalOrganization  (id  => EducationalOrganizationId)
-router.get("/educator/:id/", async (req, res) => {//tmam
-  EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-    if (!err) {
-      res.send(educationalOrganization.educators);
-    } else {
-      res.status(404).send("Not found");
-    }
-  });
-});
-// update   one educator of one EducationalOrganization  (id  => EducationalOrganizationId, educator_id=> EducatorID)
-router.put("/educator/:id/:educatorId", async (req, res) => {//tmam
-  try {
+}
+
+  } catch (error) {
     
-    const isValidated = educatorValidator.updateValidation(req.body);
-    if (isValidated.error)
-      return res
-        .status(400)
-        .send({ error: isValidated.error.details[0].message });
-        const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-       
-    if (educationalOrganization !== undefined) {
-      
-      const educator = educationalOrganization.educators.find(educator => educator._id ==req.params.educatorId);
-      
-      educationalOrganization.educators.remove(educator);
-     
-      if (req.body.name != null) {
-        educator.name = req.body.name;
-        
-      }
-      if (req.body.experienceLevel != null) {
-        educator.experienceLevel = req.body.experienceLevel;
-        
-      }
-      if (req.body.contact!= null) {
-        educator.contact = req.body.contact;
-        
-      }
-      if (req.body.certifactes != null) {
-        educator.certifactes = req.body.certifactes;
-        
-      }
-      
-      
-      educationalOrganization.educators.push(educator);
-      
-      
-      const educationalOrganizationUpdated = await EducationalOrganization.findOneAndUpdate(
-        {_id:req.params.id},
-        educationalOrganization
-      )
-      
-      res.send(educationalOrganizationUpdated);
-      
-    } else {
-      res.send("Not Found");
-    }
-  } catch (error) {
-   
-    res.status(404).send("Not found");
+    res.sendStatus(404).send("Not found");
   }
 });
-// Delete one Educator of one educationaOrganization
-//(id  => EducationalOrganizationId  ,educator_profile_id => educatorProfileId)
-router.delete("/educator/:id/:educatorId",async (req, res) => {
+//delete educator using mongo
+router.delete("/educator/:id/:educatorId", async (req, res) => {
   try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+        var educatores=educationOrganization.educationOrganizationEducators
+        for(var index=0; index<educatores.length;index++){
+            if(educatores[index].id===req.params.educatorId){
+                educationOrganization.educationOrganizationEducators.splice(index,1)
+                educators=educationOrganization.educationOrganizationEducators
+                 educationOrganization = await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{educationOrganizationEducators:educators})
+                 //await Educator.findByIdAndRemove(req.params.educatorId)
+                 return res.send(educationOrganization.educationOrganizationEducatores)
 
-    const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-    if (educationalOrganization!== undefined) {
-      const educator = educationalOrganization.educators.find(educator => educator._id ==req.params.educatorId);
-      educationalOrganization.educators.remove(educator);
-      educationalOrganization.save();
-      res.send(educationalOrganization);
+            }
+        }
+        return  res.status(404).send("Not found");
     } else {
       res.status(404).send("Not found");
     }
@@ -545,276 +321,171 @@ router.delete("/educator/:id/:educatorId",async (req, res) => {
     res.status(404).send("Not found");
   }
 });
-router.get("/educator/:id/:educatorId", (req, res) => {
-  EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-    if (!err) {
-      const educator = educationalOrganization.educators.find(educator => educator._id == req.params.educatorId);
-      res.send(educator);
-    } else {
-      res.status(404).send("Not found");
-    }
-  });
-});
-
 // End Educator CRUD
 
 
 
 // Certificant CRUD
-
-//URL to create certificates  (id  => EducationalOrganizationId)
-router.post("/certificate/:id", async (req, res) => {
-  const isValidated = certificateValidator.createValidation(req.body);
-  if (isValidated.error)
-    return res
-      .status(400)
-      .send({ error: isValidated.error.details[0].message });
-
-
-const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-if (educationalOrganization !== undefined) {
-  const certificate = await Certificate.create(req.body);
-  educationalOrganization.certificates.push(certificate);
-  educationalOrganization.save();
-  res.send(certificate);
-} else {
-  res.status(404).send("Not found");
-}
-});
-
-//(id  => EducationalOrganizationId)
-router.get("/certificate/:id/", async (req, res) => {
-EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-  if (!err) {
-    if (educationalOrganization !== null) {
-      res.send(educationalOrganization.certificates);
-    } else {
+// get all Certificates of One EducationalOrganizationId
+router.get("/certificate/:id", async (req, res) => {
+    try {
+        const educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.json({ data: educationOrganization.educationOrganizationCertificates })
+    } catch (error) {
       res.status(404).send("Not found");
     }
-  } else {
-    res.status(404).send("Not found");
-  }
 });
-});
-//(id  => EducationalOrganizationId  ,training_program_id => trainingProgramId)
-router.get("/certificate/:id/:certificateId", async (req, res) => {
-EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-  if (!err) {
-    const certificate = educationalOrganization.certificates.find(certificate => certificate._id == req.params.certificateId);
-    res.send(certificate);
-  } else {
-    res.status(404).send("Not found");
-  }
-});
-});
-//(id  => EducationalOrganizationId  ,certificate_id => certificateId)
-router.put("/certificate/:id/:certificateId", async (req, res) => {
-
-  const isValidated = certificateValidator.updateValidation(req.body);
-  
-  if (isValidated.error)
-    return res
-      .status(400)
-      .send({ error: isValidated.error.details[0].message });
+//get certificate of specific educational organization
+router.get("/certificate/:id/:certificateId",async (req, res) => {
+    try {
+        var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        if(educationOrganization){
+           
+            for(var index=0; index<educationOrganization.educationOrganizationCertificates.length;index++){
+                if(certificates[index].id===req.params.certificateId){
+                    var certificate= await Certificate.findById(req.params.certificateId)
+                     return res.send(certificate)
     
-
-EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-  
-
-  if (!err) {
-    //const certifacatee = co.certificates.find(m=>m._id==req.params.certificate_id);
-    var certifacate1; ///here
-    for (const certifacate of educationalOrganization.certificates) {
-      if (certifacate !== null) {
-        if (certifacate._id == req.params.certificateId) {
-          certifacate1 = certifacate;
-          //console.log(end)
+                }
+            }
+            return  res.status(404).send("Not found");
+        } else {
+          res.status(404).send("Not found");
         }
+      } catch (error) {
+        res.status(404).send("Not found");
       }
-    }
-    
-
-    if (certifacate1 !== undefined) {
-      educationalOrganization.certificates.remove(certifacate1);
-
-      if (req.body.name !== null) {
-          certifacate1.name = req.body.name;
-      }
-      if (req.body.type !== null) {
-          certifacate1.type = req.body.type;
-      }
-      if (req.body.accreditation !== null) {
-          certifacate1.accreditation = req.body.accreditation;
-      }
-
-      
-      educationalOrganization.certificates.push(certifacate1);
-      educationalOrganization.save();
-     
-      res.send(certifacate1);
-    } else {
-      res.send("this  certificate is not Found");
-    }
-  } else {
-    res.status(404).send("Not found");
-  }
 });
-});
-//(id  => EducationalOrganizationId  ,certificate_id => certificateId)
-router.delete("/certificate/:id/:certificateId", async (req, res) => {
-EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-  if (!err) {
-    const certifacate = educationalOrganization.certificates.find(certifacate => certifacate._id == req.params.certificateId);
-    res.send(certifacate);
-    educationalOrganization.certificates.remove(certifacate);
-    educationalOrganization.save();
-  } else {
-    res.status(404).send("Not found");
-  }
-});
-});
-//End Certificant CRUD
-
-// Training Program CRUD
-//URL to add trainings programs  (id  => EducationalOrganizationId)
-router.post("/trainingProgram/:id", async (req, res) => {
-try {
-  const id = req.params.id;
-  const isValidated = trainingProgramValidator.createValidation(req.body);
-  if (isValidated.error)
-    return res
-      .status(400)
-      .send({ error: isValidated.error.details[0].message });
-  const educationalOrganization = await EducationalOrganization.findById(id);
-  if (educationalOrganization._id !== undefined) {
-    const trainingProgram = await TrainingProgram.create(req.body);
-    //course.save();
-    educationalOrganization.trainingPrograms.push(trainingProgram);
-     educationalOrganization.save();
-    res.send(trainingProgram);
-  } else {
-    res.status(404).send("Not found");
-  }
-} catch (error) {
-  
-  res.status(404).send("Not found");
-}
-});
-//(id  => EducationalOrganizationId)
-router.get("/trainingProgram/:id/", async (req, res) => {
-
-try {
-  EducationalOrganization.findById(req.params.id, function(err, educationalOrganization) {
-    if (!err) {
-      
-      res.send(educationalOrganization.trainingPrograms);
-      
-    } else {
-      res.status(404).send("Not found");
-    }
-  });
-} catch (error) {
-  res.status(404).send("Not found");
-}
-});
-//(id  => EducationalOrganizationId  ,training_program_id => trainingProgramId)
-router.get("/trainingProgram/:id/:trainingProgramId", async (req, res) => {
-try{
-  EducationalOrganization.findById(req.params.id, function async(err,educationalOrganization) {
-  if (!err) {
-
-    const trainingProgram = educationalOrganization.trainingPrograms.find(trainingProgram => trainingProgram ._id == req.params.trainingProgramId);
-    res.send(trainingProgram);
-
-  } else {
-    res.status(404).send("Not found");
-  }
-});
-}
-catch(error){
-res.status(404).send("Not found");
-}
-}
-);
-//(id  => EducationalOrganizationId  ,programs_id => programsId)
-router.put("/trainingProgram/:id/:traingProgramId", async (req, res) => {
-try {
-
-  const isValidated = trainingProgramValidator.updateValidation(req.body);
-  if (isValidated.error)
-    
-    return res.status(400).send({ error: isValidated.error.details[0].message });
-      const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-    
-
-  if (educationalOrganization !== undefined) {
-  
-    const trainingProgram = educationalOrganization.trainingPrograms.find(trainingProgram => trainingProgram._id ==req.params.traingProgramId);
-     
-     
-    educationalOrganization.trainingPrograms.remove(trainingProgram);
-    if (req.body.name != null) {
-      trainingProgram.name = req.body.name;
-    }
-    if (req.body.trainerId!= null) {
-      trainingProgram.trainerId= req.body.trainerId;
-    }
-    if (req.body.trainerName != null) {
-      trainingProgram.trainerName= req.body.trainerName;
-    }
-    if (req.body.description != null) {
-      trainingProgram.description = req.body.description;
-    }
-    if (req.body.type != null) {
-      trainingProgram.type = req.body.type;
-    }
-    if (req.body.duration != null) {
-      trainingProgram.duration = req.body.duration;
-    }
-    if (req.body.applyDueDate != null) {
-      trainingProgram.applyDueDate = req.body.applyDueDate;
-    }
-    if (req.body.startDate != null) {
-      trainingProgram.startDate = req.body.startDate;
-    }
-    if (req.body.requiredSkills != null) {
-      trainingProgram.requiredSkills = req.body.requiredSkills;
-    }
-    educationalOrganization.trainingPrograms.push(trainingProgram);
-    educationalOrganization.save();
-    
-  
-   
-    res.send(trainingProgram);
-  } else {
-    res.send("training program is not found");
-  }
-} catch (error) {
- 
-  res.status(404).send("Not found");
-}
-});
-
-//(id  => EducationalOrganizationId  ,training_program_id => trainingProgramId)
-router.delete("/trainingProgram/:id/:trainingProgramId",async (req, res) => {
+//Create Certificate for educations_orgization
+router.post("/certificate/:id", async (req, res) => {
   try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+    const isValidated = certificateValidator.createValidation(req.body);
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+    const certificate = await Certificate.create(req.body)
+        await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationCertificates:{
+           id:certificate._id,
+           name:certificate.name
+        }}})
+        educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.send(educationOrganization.educationOrganizationCertificates)
+}else{
+    res.status(404).send("Not found");
 
-    const educationalOrganization = await EducationalOrganization.findById(req.params.id);
-    if (educationalOrganization!== undefined) {
-      const traingProgram = educationalOrganization.trainingPrograms
-              .find(traingProgram  => traingProgram ._id ==req.params.trainingProgramId);
-      educationalOrganization.trainingPrograms.remove(traingProgram);
-      educationalOrganization.save();
-      res.send(traingProgram);
+}
+
+  } catch (error) {
+    
+    res.sendStatus(404).send("Not found");
+  }
+});
+//delete certificate using mongo
+router.delete("/certificate/:id/:certificateId", async (req, res) => {
+  try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+        var certificates=educationOrganization.educationOrganizationCertificates
+        for(var index=0; index<certificates.length;index++){
+            if(certificates[index].id===req.params.certificateId){
+                educationOrganization.educationOrganizationCertificates.splice(index,1)
+                certificates=educationOrganization.educationOrganizationCertificates
+                 educationOrganization = await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{educationOrganizationCertificates:certificates})
+                 await Certificate.findByIdAndRemove(req.params.certificateId)
+                 return res.send(educationOrganization.educationOrganizationCertificates)
+
+            }
+        }
+        return  res.status(404).send("Not found");
     } else {
       res.status(404).send("Not found");
     }
   } catch (error) {
     res.status(404).send("Not found");
   }
-}
-);
+});
+//End Certificant CRUD
 
+
+// Training Program CRUD
+// get all TrainingPrograms of One EducationalOrganizationId
+router.get("/trainingProgram/:id", async (req, res) => {
+    try {
+        const educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.json({ data: educationOrganization.educationOrganizationTrainingPrograms })
+    } catch (error) {
+      res.status(404).send("Not found");
+    }
+});
+//get trainingProgram of specific educational organization
+router.get("/trainingProgram/:id/:trainingProgramId", async(req, res) => {
+    try {
+        var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        if(educationOrganization){
+           
+            for(var index=0; index<educationOrganization.educationOrganizationTrainingPrograms.length;index++){
+                if(trainingPrograms[index].id===req.params.trainingProgramId){
+                    var trainingProgram= await TrainingProgram.findById(req.params.trainingProgramId)
+                     return res.send(trainingProgram)
+    
+                }
+            }
+            return  res.status(404).send("Not found");
+        } else {
+          res.status(404).send("Not found");
+        }
+      } catch (error) {
+        res.status(404).send("Not found");
+      }
+});
+//Create TrainingProgram for educations_orgization
+router.post("/trainingProgram/:id", async (req, res) => {
+  try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+    const isValidated = trainingProgramValidator.createValidation(req.body);
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+    const trainingProgram = await TrainingProgram.create(req.body)
+        await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationTrainingPrograms:{
+           id:trainingProgram._id,
+           name:trainingProgram.name
+        }}})
+        educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        res.send(educationOrganization.educationOrganizationTrainingPrograms)
+}else{
+    res.status(404).send("Not found");
+
+}
+
+  } catch (error) {
+    
+    res.sendStatus(404).send("Not found");
+  }
+});
+//delete trainingProgram using mongo
+router.delete("/trainingProgram/:id/:trainingProgramId", async (req, res) => {
+  try {
+    var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+    if(educationOrganization){
+        var trainingPrograms=educationOrganization.educationOrganizationTrainingPrograms
+        for(var index=0; index<trainingPrograms.length;index++){
+            if(trainingPrograms[index].id===req.params.trainingProgramId){
+                educationOrganization.educationOrganizationTrainingPrograms.splice(index,1)
+                trainingPrograms=educationOrganization.educationOrganizationTrainingPrograms
+                 educationOrganization = await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{educationOrganizationTrainingPrograms:trainingPrograms})
+                 await TrainingProgram.findByIdAndRemove(req.params.trainingProgramId)
+                 return res.send(educationOrganization.educationOrganizationTrainingPrograms)
+
+            }
+        }
+        return  res.status(404).send("Not found");
+    } else {
+      res.status(404).send("Not found");
+    }
+  } catch (error) {
+    res.status(404).send("Not found");
+  }
+});
 // End Training Program CRUD
 
 
@@ -822,93 +493,109 @@ router.delete("/trainingProgram/:id/:trainingProgramId",async (req, res) => {
 //1
 //accept member for course
 //(id  => EducationalOrganizationId  ,course_id => courseId,memberId=>studentId)
-router.put(
-  "acceptMember/:id/:courseId/:memberId",
-  async (req, res) => {
-    const educationalOrganization= await EducationalOrganization.findById(req.params.id);
-    const course = educationalOrganization.courses.find(course=> course._id == req.params.courseId);
-    const courseModel = await Courses.findById(req.params.courseId);
-    if (course !== undefined && courseModel !== null) {
-      if (course.available === true) {
-        const courses = educationalOrganization.courses;
-
-        if (course.acceptedMembers == null) course.acceptedMembers = [];
-
-        if (courseModel.acceptedMembers == null)
-          courseModel.acceptedmembers = [];
-
-        for (var i = 0; i < courses.length; i++) {
-          if (courses[i]._id == req.params.courseId) {
-            courses.splice(i, 1);
-          }
+router.put("/acceptMemberInCourse/:id",async (req, res) => {
+    const educationOrganizationId=req.params.id
+    const memberId=req.body.memberId
+    const courseId=req.body.courseId
+    const state=req.body.state
+    const course= await Course.findById(courseId);
+    if(course & course.educationalOrganization.id===educationOrganizationId){
+        const member= await User.findone({_id:memberId,tags:'Member'})
+        if(member){
+            for(var index=0;course.listOfApplied.length;index++){
+                if(course.listOfApplied[index].id===memberId){
+                    course.listOfApplied.splice(index,1)
+                    index--;
+                }
+            }
+           
+            for(var index=0;member.memberCoursesAppliedIn.length;index++){
+                if(member.memberCoursesAppliedIn[index].id===courseId){
+                    member.memberCoursesAppliedIn.splice(index,1)
+                    index--;
+                }
+            }
+            
+            if(course.availablePlaces>0&state){
+             
+                member.memberCoursesAcceptedIn.push({
+                    id: course._id,
+                    name: course.name,
+                    date: moment().format('MMMM Do YYYY, h:mm:ss a')
+                  })
+                  member.save()
+                  course.listOfAccepted.push({
+                    id: memberId,
+                    name: member.memberFullName,
+                    date: moment().format('MMMM Do YYYY, h:mm:ss a')
+                  })
+                  course.availablePlaces--;
+                  course.save()
+                  return res.status(200).send('Done')
+            }else{
+                course.save()
+                member.save()
+                if(!state) return res.status(200).send('Should send Notification for the member')
+                return res.status(200).send('No available Places')
+            }
+        }else{
+            if(!member)return res.status(404).send('member not Found')
+            
         }
-
-        course.acceptedMembers.push(req.params.memberId);
-        courseModel.acceptedMembers.push(req.params.memberId);
-        courseModel.save();
-        courses.push(course);
-        //  console.log(masterClasses)
-        educationalOrganization.save();
-        const educationalOrganizationUpdated = await EducationalOrganization.findOneAndUpdate(
-          { _id: req.params.id },
-          { courses: courses }
-        );
-
-        res.send(educationalOrganizationUpdated.courses);
-      } else {
-        res.send("this Course is not available");
-      }
-    } else {
-      res.send("There is no such Course Here");
     }
-  }
-);
-//1
-//accept member for master class
-//(id  => EducationalOrganizationId  ,masterClassId => masterClassId,memberId=>studentId)
-router.put("/acceptMember/:id/:masterClassId/:memberId",async (req, res) => {
-    const educationaOrganization = await EducationalOrganization.findById(req.params.id);
-    const masterClass = educationaOrganization.masterClass.find(
-      masterClass => masterClass._id == req.params.masterClassId
-    );
-    const masterClassModel = await masters.findById(
-      req.params.masterClassId
-    );
-    if (masterClass !== undefined) {
-      if (masterClass.available === true) {
-        const masterClasses = educationaOrganization.masterClass;
-
-        if (masterClass.studentsAssigened == null)
-          masterClass.studentsAssigened = [];
-
-        if (masterClassModel.studentsAssigened == null)
-          masterClassModel.studentsAssigened = [];
-
-        for (var i = 0; i < masterClasses.length; i++) {
-          if (masterClasses[i]._id == req.params.masterClassId) {
-            masterClasses.splice(i, 1);
-          }
+  });
+  
+  router.put("/acceptMemberInMasterClass/:id",async (req, res) => {
+    const educationOrganizationId=req.params.id
+    const memberId=req.body.memberId
+    const masterClassId=req.body.masterClassId
+    const state=req.body.state
+    const masterClass= await MasterClass.findById(masterClassId);
+    if(masterClass & masterClass.educationalOrganization.id===educationOrganizationId){
+        const member= await User.findone({_id:memberId,tags:'Member'})
+        if(member){
+            for(var index=0;masterClass.listOfApplied.length;index++){
+                if(masterClass.listOfApplied[index].id===memberId){
+                    masterClass.listOfApplied.splice(index,1)
+                    index--;
+                }
+            }
+           
+            for(var index=0;member.memberMasterClassesAppliedIn.length;index++){
+                if(member.memberMasterClassesAppliedIn[index].id===masterClassId){
+                    member.memberMasterClassesAppliedIn.splice(index,1)
+                    index--;
+                }
+            }
+            
+            if(masterClass.availablePlaces>0&state){
+             
+                member.memberMasterClassesAcceptedIn.push({
+                    id: masterClass._id,
+                    name: masterClass.name,
+                    date: moment().format('MMMM Do YYYY, h:mm:ss a')
+                  })
+                  member.save()
+                  masterClass.listOfAccepted.push({
+                    id: memberId,
+                    name: member.memberFullName,
+                    date: moment().format('MMMM Do YYYY, h:mm:ss a')
+                  })
+                  masterClass.availablePlaces--;
+                  masterClass.save()
+                  return res.status(200).send('Done')
+            }else{
+                masterClass.save()
+                member.save()
+                if(!state) return res.status(200).send('Should send Notification for the member')
+                return res.status(200).send('No available Places')
+            }
+        }else{
+            if(!member)return res.status(404).send('member not Found')
+            
         }
-        masterClass.studentsAssigened.push(req.params.memberId);
-        masterClassModel.studentsAssigened.push(req.params.memberId);
-        masterClassModel.save();
-        masterClasses.push(masterClass);
-        //  console.log(masterClasses)
-        educationaOrganization.save();
-        const educationalOrganizationUpdated = await EducationalOrganization.findOneAndUpdate(
-          { _id: req.params.id },
-          { masterClass: masterClasses }
-        );
-        res.send(educationalOrganizationUpdated.masterClass);
-      } else {
-        res.send("this Master Class is not available");
-      }
-    } else {
-      res.send("There is no such Master Class Here");
     }
-  }
-);
-
-//End Badr
+  });
 
 module.exports = router;
+

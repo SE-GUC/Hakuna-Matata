@@ -14,4 +14,5 @@ const CertificateSchema = new Schema({
     }
 })
 
-module.exports = Certificate = mongoose.model('certificates', CertificateSchema)
+const Certificate= mongoose.model('certificates', CertificateSchema)
+module.exports = Certificate 

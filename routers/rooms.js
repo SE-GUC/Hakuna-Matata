@@ -3,13 +3,13 @@ const router = express.Router();
 
 const Room = require('../models/Room');
 const roomValidator = require('../validations/roomValidations')
-const CoWorkingSpace = require('../models/coWorkingSpace')
+const User = require('../models/User')
 
 router.post("/", async (req, res) => {
     try {
         const isValidated = roomValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
-       const room = await Room.create(req.body)
+        const room = await Room.create(req.body)
         res.send(room);
     } catch (error) {
         // We will be handling the error later
@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
 
 })
 // show one rooms  
-router.get('/:id', async(req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id
         const roomFind = await Room.findById(id);
@@ -48,19 +48,31 @@ router.put("/:id", async (req, res) => {
         const id = req.params.id
         const isValidated = roomValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+        await Room.findOneAndUpdate({ _id: id }, req.body)
+        const room = await Room.findOne({ _id: id })
+        if (room) {
+            const coworkingSpace = await User.findById(room.coworkingSpace.id)
+            const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
+            for (var index = 0; index < coworkingSpaceRooms.length; index++) {
+                if (coworkingSpaceRooms[index].id === room._id) {
+                    coworkingSpaceRooms.splice(index, 1)
+                    coworkingSpace.coworkingSpaceRooms.push({
+                        id: room._id,
+                        capacity: room.capacity,
+                        slots: room.slots,
+                        reviews: room.reviews,
+                        comments: room.comments,
+                        reservations: room.reservations
+                    })
+                    coworkingSpace.save()
+                    //const coworkingSpaceNew = await User.findOneAndUpdate({ _id: room.coworkingSpace.id }, { coworkingSpaceRooms: newRooms })
 
-        const room = await Room.findOneAndUpdate({ "_id": id }, req.body)
-        const room1 = await Room.findOne({ "_id": id })
-        const coWorkingSpaces = await CoWorkingSpace.find()
-        for (const coWorkingSpace of coWorkingSpaces) {
-            const room2 = coWorkingSpace.rooms.find(room2 => room2._id == id)
-            if (room2 !== undefined) {
-                coWorkingSpace.rooms.remove(room2)
-                coWorkingSpace.rooms.push(room1)
-                await coWorkingSpaces.save()
+                }
             }
-        }
-        res.send(room1);
+            res.send(room)
+        } else
+            res.send('room not found')
+
     } catch (error) {
         // We will be handling the error later
         res.status(404).send('Cannot find it ')

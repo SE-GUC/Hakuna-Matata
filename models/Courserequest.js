@@ -1,5 +1,34 @@
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema
+const InfoSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true
+    }
+
+});
+const RecomendationsSchema = new Schema({
+    expert: {
+        type: InfoSchema
+    },
+    masterClass: {
+        type: InfoSchema
+    },
+    content: String, 
+    rating: {
+        type: Number,
+        enum: [1, 2, 3, 4, 5]
+    },
+    numberOfRatings: {
+        type: Number
+    },
+    reviewer:[mongoose.Schema.Types.ObjectId]
+})
 
 // Create the schema
 const CourseRequestSchema = new Schema({
@@ -17,7 +46,7 @@ const CourseRequestSchema = new Schema({
         type:String
     },
     recomendations: { 
-        type: []
+        type: [RecomendationsSchema]
     },
     active: {
         type: Boolean,

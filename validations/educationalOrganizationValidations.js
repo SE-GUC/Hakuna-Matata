@@ -3,20 +3,28 @@ const Joi = require('joi')
 module.exports = {
     createValidation: request => {
         const createSchema = {
-            partnerId:Joi.number().required(),
-            name:Joi.string().required()
+            educationalOrganizationName:Joi.string().required(),
+            educationalOrganizationPhoneNumber:Joi.string(),
+            educationalOrganizationLocation:Joi.string(),
+            educationalOrganizationCertificates:Joi.array(),
+            educationalOrganizationTrainingPrograms:Joi.array(),
+            educationalOrganizationCourses:Joi.array(),
+            educationalOrganizationMasterClasses:Joi.array(),
+            educationalOrganizationEducators:Joi.array(),
         }
         return Joi.validate(request, createSchema)
     
     },
     updateValidation:request=>{
         const updateSchema={
-            name:Joi.string(),
-            certificates:Joi.array(),
-            trainingPrograms:Joi.array(),
-            courses:Joi.array(),
-            masterClass:Joi.array(),
-            educators:Joi.array()
+            educationalOrganizationName:Joi.string().required(),
+            educationalOrganizationPhoneNumber:Joi.string(),
+            educationalOrganizationLocation:Joi.string(),
+            educationalOrganizationCertificates:Joi.array(),
+            educationalOrganizationTrainingPrograms:Joi.array(),
+            educationalOrganizationCourses:Joi.array(),
+            educationalOrganizationMasterClasses:Joi.array(),
+            educationalOrganizationEducators:Joi.array(),
         }
         return Joi.validate(request,updateSchema)
 
