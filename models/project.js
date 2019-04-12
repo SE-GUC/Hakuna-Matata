@@ -15,7 +15,7 @@ const PorjectInfoSchema = new Schema({
 });
 // Skill Schema
 const SkillSchema = new Schema({
-    type: {
+    name: {
         type: String,
        // required: true
     }

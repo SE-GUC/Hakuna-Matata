@@ -40,9 +40,9 @@ const CourseRequestSchema = new Schema({
         default: Date.now
     },
     applyingMemberId: { 
-        type:String
+        type:mongoose.Schema.Types.ObjectId
     },
-    categories: { 
+    category: { 
         type:String
     },
     recomendations: { 

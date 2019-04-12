@@ -94,7 +94,7 @@ const TrainingProgramSchema = new Schema({
         type:Date
     },
     requiredSkills: {
-        type: [String]
+        type: [SkillSchema]
     }
 })
 
@@ -252,7 +252,7 @@ const UserSchema = new Schema({
         type: Number,
     },
     //this should be pairs 
-    skills: [String],
+    skills: [SkillSchema],
     memberEvents:[InfoSchema],
     memberCertificates:[InfoSchema],
     memberCourses:[InfoSchema],
