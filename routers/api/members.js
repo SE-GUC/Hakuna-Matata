@@ -22,10 +22,13 @@ router.post('/:id', async (req, res) => {
   if (result.error) {
     return res.status(400).send({ error: result.error.details[0].message })
   } else {
+    console.log(req.body.skills)
+    if(req.body.skills != undefined){
     for (var skill of req.body.skills) {
       var currSkills = await Skill.findOne( skill )
       if (!currSkills) return res.status(404).send(`${skill} is not supported by the site we will handel  that and send u notification`)
     }
+  }
 
     console.log(req.body.memberFullName)
     const currUser = await User.findOne({ _id: req.params.id, tags: 'Member' })

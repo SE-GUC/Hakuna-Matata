@@ -123,7 +123,7 @@ router.put('/edit/:id/:adminId', async (req, res) => {
             res.send('there is not such project')
         }
 
-    } catch(err){
+    } catch{
         res.status(400).send('Error');
     }
 

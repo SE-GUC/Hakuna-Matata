@@ -127,7 +127,7 @@ router.delete('/:id', async (req, res) => {
 router.put('/Report/:id', async (req, res) => {
     try {
         const id = req.params.id
-        var oldConsultancyAgency = await ConsultancyAgency.findOne({ '_id': id })
+        var oldConsultancyAgency = await User.findOne({ '_id': id })
         if (!oldConsultancyAgency) return res.status(404).send('consultancy agency not found')
         oldConsultancyAgency.reports.push(req.body.report)
         await ConsultancyAgency.findOneAndUpdate({ '_id': id }, { 'reports': oldConsultancyAgency.reports })

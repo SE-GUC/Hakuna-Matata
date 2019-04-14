@@ -122,7 +122,7 @@ router.put('/edit/:id/:adminId', async (req, res) => {
             res.send('there is not such task')
         }
 
-    } catch(err){
+    } catch{
         res.status(400).send('Error');
     }
 

@@ -9,7 +9,7 @@ module.exports = {
             consultancyAgencyRate: Joi.number(),
             consultancyAgencyRevenues: Joi.number(),
             consultancyAgencyRevenuePerEmployee: Joi.number(),
-            consultancyAgencyLocation: Joi.array().required(),
+            consultancyAgencyLocation: Joi.array(),
             consultancyAgencyPhoneNumber: Joi.array(),
             consultancyAgencyPartners: Joi.array(),
             consultancyAgencyMembers: Joi.array(),

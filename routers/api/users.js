@@ -101,7 +101,7 @@ router.post('/login', async (req, res) => {
                 email: userfound.email
             }   
             const token = jwt.sign(user, tokenKey, { expiresIn: '1h' })
-            return res.json({token: `Bearer ${token}`})
+            return res.json({token: `Bearer ${token}`,id:userfound._id, tags:userfound.tags})
         }
 		else return res.status(400).send({ password: 'Wrong password' });
 	} catch (e) {}

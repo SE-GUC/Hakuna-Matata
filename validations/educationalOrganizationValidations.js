@@ -17,7 +17,7 @@ module.exports = {
     },
     updateValidation:request=>{
         const updateSchema={
-            educationOrganizationName:Joi.string().required(),
+            educationOrganizationName:Joi.string(),
             educationOrganizationPhoneNumber:Joi.string(),
             educationOrganizationLocation:Joi.string(),
             educationOrganizationCertificates:Joi.array(),
