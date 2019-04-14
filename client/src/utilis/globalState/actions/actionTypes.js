@@ -1,4 +1,0 @@
-export const GET_USERS = 'GET_USERS'
-export const CREATE_USER = 'CREATE_USER'
-export const LOGIN = 'LOGIN'
-export const LOGOUT = 'LOGOUT'
