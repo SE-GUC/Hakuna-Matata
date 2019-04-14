@@ -13,7 +13,10 @@ import UserViewMember from './components/profiles/UserViewMember';
 import AdminViewMember from './components/profiles/AdminViewMember';
 import PartnerAsPartner from './components/profiles/PartnerAsPartner'
 import PartnerAsUser from './components/profiles/PatnerAsUser';
-import AdminAsUser from './components/profiles/PartnerAsAdmin'
+import AdminAsUser from './components/profiles/PartnerAsAdmin';
+import AdminNAProject from './components/projectTask/pages/AdminNAProject';
+import PartnerNAProject from './components/projectTask/pages/PartnerNAProject';
+import MemberNAProject from './components/projectTask/pages/MemberNAProject';
 
 class App extends Component {
 
@@ -35,6 +38,10 @@ class App extends Component {
 
         <Route exact path="/user/partner" component={PartnerAsUser} />
         <Route exact path="/admin/partner" component={AdminAsUser} />
+
+        <Route exact path="/projects1/:id" component={AdminNAProject}/> 
+             <Route exact path="/projects2/:id" component={PartnerNAProject} /> 
+            <Route exact path="/projects3/:id" component={MemberNAProject} />
        
 
 
