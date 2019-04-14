@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import PhotoComponent from '../../components/profileComponents/PhotoComponent'
-import Coloredline from '../../components/profileComponents/Coloredline'
-import Data from '../../components/profileComponents/Data'
-import WithDate from'../../components/profileComponents/WithDate'
-import NavBar from '../../components/profileComponents/NavBar'
+import PhotoComponent from '../profileComponents/PhotoComponent'
+import Coloredline from '../profileComponents/Coloredline'
+import Data from '../profileComponents/Data'
+import WithDate from'../profileComponents/WithDate'
+import NavBar from '../profileComponents/NavBar'
 import KeyImage from '../../assessments/member_icon.svg'
 
-import Buttons from '../../components/profileComponents/ButtonsAdmin'
+import Buttons from '../profileComponents/ButtonsAdmin'
 import axios from 'axios'
 
 
