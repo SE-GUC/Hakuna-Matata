@@ -33,7 +33,7 @@ const partners =require('./routers/api/partners');
 const users =require('./routers/api/users');
 const admins= require('./routers/api/admins');
 const rooms= require('./routers/api/rooms');
-
+const projects=require('./routers/api/projects');
 app.get('/', (req, res) => {
     res.send(`
     <h1><b>7zalqom <i>yrqod</i> hona </b></h1>
@@ -64,7 +64,7 @@ app.use('/partners',partners);
 app.use('/consultancyAgencies',consultancyAgencies);
 app.use('/admins',admins);
 app.use('/rooms',rooms);
-
+app.use('/projects',projects)
 app.use((req,res) => res.status(404).send(`<h1>Can not find what you're looking for</h1>`))
 
 const port = process.env.PORT || 3333
