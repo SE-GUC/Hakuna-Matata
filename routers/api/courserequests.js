@@ -62,7 +62,7 @@ router.put('/:id', async (req,res) => {
  router.delete('/:id', async (req,res) => {
     try {
      const id = req.params.id
-     const deleteCourseRequest = await CourseRequest.findOneAndRemove({"_id": id})
+     const deleteCourseRequest = await CourseRequest.findOneAndRemove({'_id': id})
      res.json({msg:'CourseRequest was deleted successfully', data: deleteCourseRequest})
     }
     catch(error) {
@@ -103,7 +103,7 @@ router.put('/giveRecomendation/:id', async (req, res) => {
                 masterClass:req.body.masterClass,
                 content:req.body.content,
             })
-            Notification.sendCourseRecommendationsNotification(req.body.masterClass, expert._id, "%od elcourse dah yalaaa")
+            Notification.sendCourseRecommendationsNotification(req.body.masterClass, expert._id, '%od elcourse dah yalaaa')
             courseRequest.save()
             return res.status(200).send('Done')
 
@@ -116,7 +116,7 @@ router.put('/giveRecomendation/:id', async (req, res) => {
                 },
                 masterClass:req.body.masterClass,
             })
-            Notification.sendCourseRecommendationsNotification(req.body.masterClass, expert._id, "%od elcourse dah yalaaa")
+            Notification.sendCourseRecommendationsNotification(req.body.masterClass, expert._id, '%od elcourse dah yalaaa')
             courseRequest.save()
             res.status(200).send('Done')
             return res.status(200).send('Done')
@@ -129,7 +129,7 @@ router.put('/giveRecomendation/:id', async (req, res) => {
                 },
                 content:req.body.content,
             })
-            Notification.sendCourseRecommendationsNotification(req.body.content, expert._id, "%od elcourse dah yalaaa")
+            Notification.sendCourseRecommendationsNotification(req.body.content, expert._id, '%od elcourse dah yalaaa')
             courseRequest.save()
             return res.status(200).send('Done')
         }    

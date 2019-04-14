@@ -21,7 +21,7 @@ router.post('/:id', async (request, response) => {
 
     } catch (err) {
         // We will be handling the error later
-        response.status(404).send("error")
+        response.status(404).send('error')
     }
 })
 //get all ConsultancyAgencies
@@ -36,7 +36,7 @@ router.get('/:id', async (req, res) => {
 
 })
 // update CoworkingSpace  
-router.put("/:id", async (req, res) => {
+router.put('/:id', async (req, res) => {
     const isValidated = coworkingSpaceValidator.updateValidation(req.body);
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
 
@@ -74,7 +74,7 @@ router.delete('/:id', async (req, res) => {
 
 // create room
 // change in the body of Coworking Space and new body in Room so it should be put or post 
-router.post("/room/:id", async (req, res) => {
+router.post('/room/:id', async (req, res) => {
     try {
         const isValidated = roomValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })

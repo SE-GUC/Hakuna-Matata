@@ -11,7 +11,7 @@ const InfoSchema = new Schema({
         type: String,
     }
 
-});
+},{ _id : false });
 // reservation Schema
 const ReservationSchema = new Schema({
     index:Number,
@@ -34,7 +34,7 @@ const ReservationSchema = new Schema({
         default:false
        // required:true
     },
-})
+},{ _id : false })
 //Room for coworkingSpace
 const RoomSchema = new Schema({
     capacity: {

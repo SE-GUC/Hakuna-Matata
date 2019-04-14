@@ -100,7 +100,7 @@ router.put('/edit/:id/:adminId', async (req, res) => {
                 vartask.accepted = acceptancy
                 vartask.save()
                 //
-                console.log("here")
+                console.log('here')
                 const partner =await User.findOne({_id:vartask.taskPartner.id ,tags: 'Partner'})
                 partner.partnerTasks.push({
                     id:vartask._id,
@@ -123,7 +123,7 @@ router.put('/edit/:id/:adminId', async (req, res) => {
         }
 
     } catch{
-        res.status(400).send("Error");
+        res.status(400).send('Error');
     }
 
 })
@@ -216,11 +216,11 @@ router.put('/updateWorkCycle/:id', async (request, response) => {
 
     }
     else {
-        response.send("There is no Such Task")
+        response.send('There is no Such Task')
     }
 })
 // rate a task by his partner (id =>taskId , partner_id=> owner of the task)
-router.put("/giveRate/:id/:partnerId", async (req, res) => {
+router.put('/giveRate/:id/:partnerId', async (req, res) => {
     const task = await Task.findById(req.params.id);
     if (task.taskPartner.id == req.params.partnerId) {
         const schema = {
@@ -239,7 +239,7 @@ router.put("/giveRate/:id/:partnerId", async (req, res) => {
 
     }
     else
-        res.send("YOU CANT RATE THIS TASK");
+        res.send('YOU CANT RATE THIS TASK');
 })
 // Get a All member of specific task
 router.get('/membersTask/:id', async (req, res) => {

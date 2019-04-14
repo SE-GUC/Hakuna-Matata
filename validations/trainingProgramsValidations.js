@@ -7,24 +7,13 @@ module.exports = {
         .min(3)
         .max(500)
         .required(),
-      trainerId: Joi.string()
-        .integer(),
-      trainerName: Joi.string()
-      ,
-      description: Joi.string()
-
-        .required(),
-      type: Joi.string()
-
-        .required(),
-      duration: Joi.string()
-        .required(),
-      applyDueDate: Joi.date()
-
-        .required(),
-      startDate: Joi.date()
-
-        .required(),
+      trainerId: Joi.string().integer(),
+      trainerName: Joi.string(),
+      description: Joi.string().required(),
+      type: Joi.string().required(),
+      duration: Joi.string().required(),
+      applyDueDate: Joi.date().required(),
+      startDate: Joi.date().required(),
       requiredSkills: Joi.array()
     };
 

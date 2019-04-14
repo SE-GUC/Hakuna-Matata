@@ -5,7 +5,7 @@ const Room = require('../../models/Room');
 const roomValidator = require('../../validations/roomValidations')
 const User = require('../../models/User')
 
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const isValidated = roomValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
@@ -13,20 +13,20 @@ router.post("/", async (req, res) => {
         res.send(room);
     } catch (error) {
         // We will be handling the error later
-        res.status(404).send("Not found")
+        res.status(404).send('Not found')
     }
 
 })
 
 // show all rooms  
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const rooms = await Room.find()
         if (!rooms) return res.status(404).send({ error: 'rooms do not exist' })
         res.send(rooms);
     }
     catch (error) {
-        res.status(404).send("Not found")
+        res.status(404).send('Not found')
     }
 
 })
@@ -43,7 +43,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 // update room
-router.put("/:id", async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const id = req.params.id
         const isValidated = roomValidator.updateValidation(req.body);
@@ -81,7 +81,7 @@ router.put("/:id", async (req, res) => {
 })
 
 // Delete Room
-router.delete("/:id", async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
         const room = await Room.findByIdAndRemove(id)

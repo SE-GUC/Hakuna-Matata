@@ -18,7 +18,7 @@ router.get('/:id/',async (request,response)=>{
        if (!err) {
        response.send(noti)
        }else {
-          response.status(404).send("not found") 
+          response.status(404).send('not found') 
        }
     })
 })
@@ -44,7 +44,7 @@ router.delete('/:id', async function(req,res){
             function(err) {
               if(!err){
                 res.sendStatus(200);
-                NotSummary.remove({"notParentId":req.params.id}, function(err, result){
+                NotSummary.remove({'notParentId':req.params.id}, function(err, result){
                 })
               } else {
                 res.status(404).send('Not found')

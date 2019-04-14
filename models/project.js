@@ -12,14 +12,14 @@ const PorjectInfoSchema = new Schema({
         //required: true
     }
 
-});
+},{ _id : false });
 // Skill Schema
 const SkillSchema = new Schema({
     name: {
         type: String,
        // required: true
     }
-});
+},{ _id : false });
 const ChangedProjectFieldSchema = new Schema({
     //Field is allowed to change in project 
 })

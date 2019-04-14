@@ -14,7 +14,7 @@ const InfoSchema = new Schema({
         type:Date
     }
 
-});
+},{ _id : false });
 // reservation Schema
 const ReservationSchema = new Schema({
     slot:{
@@ -36,7 +36,7 @@ const ReservationSchema = new Schema({
         default:false
        // required:true
     },
-})
+},{ _id : false })
 //Room for coworkingSpace
 const RoomSchema = new Schema({
     id:{
@@ -62,7 +62,7 @@ const RoomSchema = new Schema({
     reservations:[ReservationSchema]
     
 
-});
+},{ _id : false });
 
 // Skill Schema
 const SkillSchema = new Schema({
@@ -70,7 +70,7 @@ const SkillSchema = new Schema({
         type: String,
         //required: true
     }
-})
+},{ _id : false })
 
 // TrainingProgram Schema 
 const TrainingProgramSchema = new Schema({

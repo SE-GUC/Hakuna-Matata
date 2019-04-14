@@ -124,7 +124,7 @@ router.put('/edit/:id/:adminId', async (req, res) => {
         }
 
     } catch{
-        res.status(400).send("Error");
+        res.status(400).send('Error');
     }
 
 })
@@ -203,11 +203,11 @@ router.put('/updateWorkCycle/:id', async (request, response) => {
 
     }
     else {
-        response.send("There is no Such Project")
+        response.send('There is no Such Project')
     }
 })
 // rate a project by his partner (id =>projectId , partner_id=> owner of the project)
-router.put("/giveRate/:id/:partnerId", async (req, res) => {
+router.put('/giveRate/:id/:partnerId', async (req, res) => {
     const project = await Project.findById(req.params.id);
     if (project.projectPartner.id == req.params.partnerId) {
         const schema = {
@@ -226,7 +226,7 @@ router.put("/giveRate/:id/:partnerId", async (req, res) => {
 
     }
     else
-        res.send("YOU CANT RATE THIS TASK");
+        res.send('YOU CANT RATE THIS TASK');
 })
 // Get a All member of specific project
 router.get('/membersProject/:id', async (req, res) => {

@@ -23,7 +23,7 @@ router.post('/:id', async (req, res) => {
           
     } catch (err) {
         // We will be handling the error later
-        res.status(404).send("error")
+        res.status(404).send('error')
     }  
     })
 
@@ -41,7 +41,7 @@ router.post('/:id', async (req, res) => {
   })
   
   // update partner name 
-  router.put("/:id", async (req, res) => {
+  router.put('/:id', async (req, res) => {
     const isValidated = partnerValidator.updateValidation(req.body);
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
   
@@ -90,12 +90,12 @@ router.get('/project/:id', async (req,res) => {
 })
 //1
 router.get('/acceptedTask/:id', async (req, res) => {
-  const not = await NotSummary.find({ "sent_to": req.params.id, "title": "Your task has been accepted" });
+  const not = await NotSummary.find({ 'sent_to': req.params.id, 'title': 'Your task has been accepted' });
   res.send( not);
 })
 //3
 router.get('/assignedTask/:id', async (req, res) => {
-  const not = await NotSummary.find({ "sent_to": req.params.id, "title": "You task has been assigned to a member!" });
+  const not = await NotSummary.find({ 'sent_to': req.params.id, 'title': 'You task has been assigned to a member!' });
   res.send({
     data: not
   })
@@ -103,7 +103,7 @@ router.get('/assignedTask/:id', async (req, res) => {
 //1
 router.post('/editRequest/:id', (req, res) => {
   var id = req.params.id
-  var e = sendToAdminRequestNotification("Partner " + id + " wants to edit his profile")
+  var e = sendToAdminRequestNotification('Partner ' + id + ' wants to edit his profile')
   res.sendStatus(200)
 })
 
@@ -132,7 +132,7 @@ router.put('/assignConstlancyAgencyToTask/:id', async (req, res) => {
       assignedConsultancyAgency.save()
 
     }else{
-      res.status(404).send("You are not the owner")
+      res.status(404).send('You are not the owner')
 
     }
   }else{
@@ -162,7 +162,7 @@ router.put('/assignConstlancyAgencyToProject/:id', async (req, res) => {
       assignedConsultancyAgency.save()
 
     }else{
-      res.status(404).send("You are not the owner")
+      res.status(404).send('You are not the owner')
 
     }
   }else{

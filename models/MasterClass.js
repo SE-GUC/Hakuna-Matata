@@ -10,7 +10,7 @@ const MasterClassInfoSchema = new Schema({
         //required: true
     }
 
-});
+},{ _id : false });
 
 // Create the schema
 const MasterClassSchema = new Schema({

@@ -13,7 +13,7 @@ router.get('/', async (req,res) => {
 //get Certin admin
 router.get('/:id', async (req,res) => {
     const id = req.params.id
-    const admin = await Admin.findOne({"id":id})
+    const admin = await Admin.findOne({'_id':id})
     res.json({msg:'get the admin successfully', data: admin})
 
 })
@@ -36,11 +36,11 @@ router.post('/', async (req,res) => {
 router.put('/:id', async (req,res) => {
     try {
      const id = req.params.id
-     const admin = await Admin.findOne({"id":id})
+     const admin = await Admin.findOne({'_id':id})
      if(!admin) return res.status(404).send({error: 'Amdin does not exist'})
      const isValidated = validator.updateValidation(req.body)
      if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
-     const uAdmin = await Admin.updateOne({"id":id},req.body)
+     const uAdmin = await Admin.updateOne({'_id':id},req.body)
      res.json({msg: 'Admin updated successfully', data: uAdmin})
     }
     catch(error) {
@@ -52,7 +52,7 @@ router.put('/:id', async (req,res) => {
  router.delete('/:id', async (req,res) => {
     try {
      const id = req.params.id
-     const deleteAdmin = await Admin.findOneAndRemove({"id": id})
+     const deleteAdmin = await Admin.findOneAndRemove({'_id': id})
      res.json({msg:'Admin was deleted successfully', data: deleteAdmin})
     }
     catch(error) {

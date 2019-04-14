@@ -70,7 +70,7 @@ router.get('/:id', async (req, res) => {
 
 })
 
-router.put("/:id", async (req, res) => {
+router.put('/:id', async (req, res) => {
   const schema = {
     memberFullName: Joi.string()
   }
@@ -131,10 +131,10 @@ router.put('/rate/:id', async (req, res) => {
     else {
       tempRate = (((member.memberRating * noofTasks) + newRate) / x)
     }
-    member = await User.findOneAndUpdate({ "_id": id, tags: 'Member' }, { allRatedTasks: x, memberRating: tempRate })
+    member = await User.findOneAndUpdate({ '_id': id, tags: 'Member' }, { allRatedTasks: x, memberRating: tempRate })
     res.send('Done')
   } else {
-    res.send("Not found")
+    res.send('Not found')
   }
 })
 router.put('/applyForTask/:id', async (req, res) => {
@@ -175,15 +175,15 @@ router.put('/applyForTask/:id', async (req, res) => {
           })
           res.status(200).send('Done')
         } else {
-          res.status(400).send("Sorry u can not Apply , u Dont have the required Specifications")
+          res.status(400).send('Sorry u can not Apply , u Dont have the required Specifications')
         }
       }
       else {
-        res.status(400).send("task id is not available")
+        res.status(400).send('task id is not available')
 
       }
     } else {
-      res.status(400).send("member id is not available")
+      res.status(400).send('member id is not available')
     }
   } else {
     res.status(400);
@@ -229,15 +229,15 @@ router.put('/applyForProject/:id', async (req, res) => {
           })
           res.status(200).send('Done')
         } else {
-          res.status(400).send("Sorry u can not Apply , u Dont have the required Specifications")
+          res.status(400).send('Sorry u can not Apply , u Dont have the required Specifications')
         }
       }
       else {
-        res.status(400).send("project id is not available")
+        res.status(400).send('project id is not available')
 
       }
     } else {
-      res.status(400).send("member id is not available")
+      res.status(400).send('member id is not available')
     }
   } else {
     res.status(400);
@@ -246,7 +246,7 @@ router.put('/applyForProject/:id', async (req, res) => {
 })
 router.post('/editRequest/:id', (req, res) => {
   var id = req.params.id;
-  var e = sendToAdminRequestNotification("Member " + id + " wants to edit his profile")
+  var e = sendToAdminRequestNotification('Member ' + id + ' wants to edit his profile')
   res.sendStatus(200);
 })
 router.put('/applyForCourse/:id', async (request, response) => {

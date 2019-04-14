@@ -14,7 +14,7 @@ const CourseInfoSchema = new Schema({
         //required: true
     }
 
-});
+},{ _id : false });
 // Create the schema
 const CourseSchema = new Schema({
     name: {

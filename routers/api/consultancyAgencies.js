@@ -24,7 +24,7 @@ router.post('/:id', async (request, response) => {
 
     } catch (err) {
         // We will be handling the error later
-        response.status(404).send("error")
+        response.status(404).send('error')
     }
 })
 //get all ConsultancyAgencies
@@ -86,9 +86,9 @@ router.delete('/:id', async (req, res) => {
 //         const consultedTask = await Task.findOne({
 //             '_id': taskId,
 //             'consultyNeeded': true,
-//             'consultancyAgencyId': ""
+//             'consultancyAgencyId': ''
 //         })
-//         if (!consultedTask) return res.status(404).json("task not found or don't need consultance")
+//         if (!consultedTask) return res.status(404).json('task not found or don't need consultance')
 //         const consult = new Consultance({
 //             partnerId: consultedTask.partnerId,
 //             consultancyAgencyId: id,
@@ -118,7 +118,7 @@ router.delete('/:id', async (req, res) => {
 //         res.json({ data: taskAfterCounsultance})
 //     }
 //     catch (error) {
-//         res.status(404).json("task not found or don't need consultance")
+//         res.status(404).json('task not found or don't need consultance')
 //     }
 // })
 
@@ -128,14 +128,14 @@ router.put('/Report/:id', async (req, res) => {
     try {
         const id = req.params.id
         var oldConsultancyAgency = await ConsultancyAgency.findOne({ '_id': id })
-        if (!oldConsultancyAgency) return res.status(404).send("consultancy agency not found")
+        if (!oldConsultancyAgency) return res.status(404).send('consultancy agency not found')
         oldConsultancyAgency.reports.push(req.body.report)
         await ConsultancyAgency.findOneAndUpdate({ '_id': id }, { 'reports': oldConsultancyAgency.reports })
         const returnedConsultancyAgency = await ConsultancyAgency.findOne({ '_id': id })
         res.json({ data: returnedConsultancyAgency })
     }
     catch (error) {
-        res.status(404).send("consultancy agency not found")
+        res.status(404).send('consultancy agency not found')
     }
 })
 
@@ -145,7 +145,7 @@ router.get('/UnconsultedTasks', async (req, res) => {
     try {
         const unconsulted = await Project.findOne({
             'consultyNeeded': true,
-            'consultancyAgencyId': ""
+            'consultancyAgencyId': ''
         })
         res.json({ data: unconsulted })
     }
@@ -186,15 +186,15 @@ router.put('/applyForTask/:id', async (req, res) => {
             })
             res.status(200).send('Done')
           } else {
-            res.status(400).send("Sorry u can not Apply , u Dont have the required Specifications")
+            res.status(400).send('Sorry u can not Apply , u Dont have the required Specifications')
           }
         }
         else {
-          res.status(400).send("task id is not available")
+          res.status(400).send('task id is not available')
   
         }
       } else {
-        res.status(400).send("member id is not available")
+        res.status(400).send('member id is not available')
       }
     } else {
       res.status(400);
@@ -235,15 +235,15 @@ router.put('/applyForProject/:id', async (req, res) => {
             })
             res.status(200).send('Done')
           } else {
-            res.status(400).send("Sorry u can not Apply , u Dont have the required Specifications")
+            res.status(400).send('Sorry u can not Apply , u Dont have the required Specifications')
           }
         }
         else {
-          res.status(400).send("project id is not available")
+          res.status(400).send('project id is not available')
   
         }
       } else {
-        res.status(400).send("consultancyAgency id is not available")
+        res.status(400).send('consultancyAgency id is not available')
       }
     } else {
       res.status(400);
@@ -285,13 +285,13 @@ module.exports = router
 //             '_id': req.params.taskId,
 //             'partnerId': req.params.partnerId
 //         })
-//         if (!consultedTask) return res.status(404).send("not found")
+//         if (!consultedTask) return res.status(404).send('not found')
 //         const consultance = consultedTask.consultanciesDone.find(consultancy => consultancy.consultancyAgencyId == req.params.consultanceId)
-//         if (!consultance) return res.status(404).send("not found")
+//         if (!consultance) return res.status(404).send('not found')
 //         res.send({ data: consultance })
 //     }
 //     catch (error) {
-//         res.status(404).send("not found")
+//         res.status(404).send('not found')
 //     }
 // })
 // // show all consultancies for a certain task
@@ -304,12 +304,12 @@ module.exports = router
 //             'partnerId': req.params.partnerId
 //         })
 //         if (!ConsultedTasks) {
-//             res.status(404).send("not found")
+//             res.status(404).send('not found')
 //         }else{
 //             res.send({ data: ConsultedTasks.consultanciesDone })
 //         }
 //     }
 //     catch (error) {
-//         res.status(404).send("not found")
+//         res.status(404).send('not found')
 //     }
 // })

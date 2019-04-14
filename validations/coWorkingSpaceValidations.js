@@ -24,7 +24,7 @@ module.exports = {
             coworkingSpaceFacilites: Joi.string(),
             coworkingSpaceMaxNoRooms: Joi.number().integer(),
             // this is right or not 
-            coworkingSpaceRooms: Joi.array().schemaType
+            coworkingSpaceRooms: Joi.array()
                 }
 
         return Joi.validate(request, updateSchema)

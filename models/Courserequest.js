@@ -11,7 +11,7 @@ const InfoSchema = new Schema({
         required: true
     }
 
-});
+},{ _id : false });
 const RecomendationsSchema = new Schema({
     expert: {
         type: InfoSchema
@@ -28,7 +28,7 @@ const RecomendationsSchema = new Schema({
         type: Number
     },
     reviewer:[mongoose.Schema.Types.ObjectId]
-})
+},{ _id : false })
 
 // Create the schema
 const CourseRequestSchema = new Schema({

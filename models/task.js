@@ -10,14 +10,14 @@ const TaskInfoSchema = new Schema({
         required: true
     }
 
-});
+},{ _id : false });
 // Skill Schema
 const SkillSchema = new Schema({
     name: {
         type: String,
         required: true
     }
-});
+},{ _id : false });
 const ChangedTaskFieldSchema = new Schema({
   //Field is allowed to change in task 
 })
