@@ -3,6 +3,10 @@ import './App.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 
+import adminAtomic from './components/projectTask/pages/adminAtomic';
+import memberatomic from './components/projectTask/pages/memberatomic';
+import partnerAtomic from './components/projectTask/pages/partnerAtomic';
+
 
 import Member from './components/profiles/Member'
 import UserViewMember from './components/profiles/UserViewMember';
@@ -25,6 +29,9 @@ class App extends Component {
         <Route exact path="/user/member" component={UserViewMember} />
         <Route exact path="/admin/member" component={AdminViewMember} />
         <Route exact path="/partner" component={PartnerAsPartner} />
+        <Route exact path="/adminAtomic/:id" component={adminAtomic} />
+            <Route exact path="/memberatomic/:id" component={memberatomic} />
+            <Route exact path="/partnerAtomic/:id" component={partnerAtomic} />
 
         <Route exact path="/user/partner" component={PartnerAsUser} />
         <Route exact path="/admin/partner" component={AdminAsUser} />

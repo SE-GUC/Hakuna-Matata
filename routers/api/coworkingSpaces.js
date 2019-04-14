@@ -94,7 +94,7 @@ router.post('/room/:id', async (req, res) => {
         coworkingSpaceOld.save()
         res.status(200).send(coworkingSpaceOld);
 
-    } catch{
+    } catch(err){
         res.status(404).send('Not found');
 
     }
