@@ -108,7 +108,7 @@ export class GetSpecificAgency extends Component {
             <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> RevenuePerEmployee:<font  color = "white"> {consultancyAgencyRevenuePerEmployee} </font></p>
             <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> Location:<font  color = "white"> {consultancyAgencyLocation} </font></p>
             <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> PhoneNumber:<font  color = "white"> {consultancyAgencyPhoneNumber} </font></p>
-            <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> FiscalYear:<font  color = "white"> {consultancyAgencyFiscalYear.toString()} </font></p>
+            <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> FiscalYear:<font  color = "white"> {consultancyAgencyFiscalYear} </font></p>
             
             </div>
     }else{

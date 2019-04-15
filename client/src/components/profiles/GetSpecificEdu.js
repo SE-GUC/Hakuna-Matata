@@ -14,10 +14,12 @@ export class GetSpecificEdu extends Component{
         educators :[],
         certificates :[],
         masterClasses :[],
-        trainingPrograms :[]
+        trainingPrograms :[],
+        eduId:null
     }
     componentDidMount(){
         const {id}=this.props.match.params
+        this.setState({eduId:id})
         axios.get(`http://localhost:3333/educationalOrganizations/${id}`).then(res=>{
             //console.log(res);
             this.setState({educationalOrganization: res.data.data})
@@ -100,7 +102,7 @@ export class GetSpecificEdu extends Component{
         <p style ={{color :"#F9BB32", textAlign: "left",fontSize: " 15px "}}>Courses:<button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >+</button></p>
         <hr style={lineStyle}></hr>
          
-         <Courses   courses={this.state.courses} educationalOrganization = {this.state.educationalOrganization} />
+         <Courses   courses={this.state.courses} educationalOrganizationId = {this.state.eduId} />
      <br></br>
      <p style ={{color :"#F9BB32", textAlign: "left",fontSize: " 15px "}}>Certificates:<button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >+</button></p>
         <hr style={lineStyle}></hr>

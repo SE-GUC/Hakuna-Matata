@@ -33,8 +33,8 @@ class PartnerAsUser extends Component{
      
     componentDidMount() {
       
-        const  handle  = '5cab83e86b8f820fc0bcf768'
-        axios.get(`http://localhost:3333/partners/${handle}`).then(res => {
+      const {id}=this.props.match.params
+        axios.get(`http://localhost:3333/partners/${id}`).then(res => {
       
           this.setState({ partnerName : res.data.data.partnerName})
           this.setState({ partnerLocation: res.data.data.partnerLocation})
@@ -49,6 +49,7 @@ class PartnerAsUser extends Component{
           this.setState({ email : res.data.data.email })
           this.setState({ age : res.data.data.age })
           this.setState({ fieldOfWork : res.data.data.fieldOfWork})
+          console.log("ameeen")
        
         })
       }

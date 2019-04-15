@@ -42,8 +42,8 @@ class UserViewMember extends Component{
      
 componentDidMount() {
   //console.log("Hello body")
-  const  handle  = '5cab83e86b8f820fc0bcf768'
-  axios.get(`http://localhost:3333/members/${handle}`).then(res => {
+  const {id}=this.props.match.params
+  axios.get(`http://localhost:3333/members/${id}`).then(res => {
 
     this.setState({ memberFullName : res.data.data.memberFullName})
     this.setState({ memberWebName: res.data.data.memberWebName })

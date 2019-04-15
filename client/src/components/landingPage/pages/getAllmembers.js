@@ -10,7 +10,11 @@ export class getAllmembers extends Component {
   componentDidMount() {
     axios
       .get('http://localhost:3333/members')
-      .then(res => this.setState({ members: res.data.data }))
+      .then(res => {this.setState({ members: res.data.data })
+      console.log(res.data.data)      
+  }
+      )
+
   }
   render() {
     return (
@@ -18,6 +22,7 @@ export class getAllmembers extends Component {
         <Members
           members={this.state.members}
         />
+        kllak
       </div>
     );
   }

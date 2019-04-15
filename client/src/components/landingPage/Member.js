@@ -49,7 +49,7 @@ for(let i=0 ; i<skills.length ; i++ ){
 
         </p>
         <p> </p>
-        <button style = {ButtonStyle} >visit</button>
+        <Link style = {ButtonStyle} to={"/member/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
       </div>
     );
   }

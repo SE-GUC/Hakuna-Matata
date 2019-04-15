@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import './edu.css'
 import { Link } from "react-router-dom";
 
-export class EducationalOrganization extends Component {
+export class CoWorkingSpace extends Component {
   getStyle = () => {
     return {
       background:  "#15161a",
@@ -17,9 +17,9 @@ export class EducationalOrganization extends Component {
   render() {
     const {
       _id,
-      educationOrganizationName,
+      coworkingSpaceName,
       
-    } = this.props.educationalorganization;
+    } = this.props.coWorkingSpace;
     const ButtonStyle = {
       backgroundColor:"#f9bb32",
       color :'black',
@@ -35,10 +35,10 @@ export class EducationalOrganization extends Component {
     return (
       <div style={this.getStyle()}>
         <p>
-        <t class="textcolor" > {educationOrganizationName}</t>
+        <t class="textcolor" > {coworkingSpaceName}</t>
         </p>
         <p> </p>
-        <Link style = {ButtonStyle} to={"/educationalOrganization/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
+        <Link style = {ButtonStyle} to={"/coWorkingSpaces/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
      
       </div>
     );
@@ -54,4 +54,4 @@ const btnStyle = {
   float: "right"
 };
 
-export default EducationalOrganization;
+export default CoWorkingSpace;

@@ -36,7 +36,7 @@ export class consultancyAgency extends Component {
         <t class="textcolor" > {consultancyAgencyName}</t>
         </p>
         <p> </p>
-        <button style = {ButtonStyle} >visit</button>
+        <Link style = {ButtonStyle} to={"/consultancyAgency/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
       </div>
     );
   }

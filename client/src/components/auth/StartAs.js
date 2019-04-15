@@ -7,7 +7,7 @@ import MemberForm from '../forms/MemberForm'
 import PartnerForm from '../forms/PartnerForm'
 import CoworkingSpaceForm from '../forms/CoworkingSpaceForm'
 import EducationOrganizationForm from '../forms/EducationOrganizationForm'
-import ConsultancyForm from '../forms/ConsultancyForm'
+import ConsultancyForm from '../../components/forms/ConsultancyForm'
 
 class StartAs extends Component {
   constructor(props) {
