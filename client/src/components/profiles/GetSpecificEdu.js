@@ -87,7 +87,7 @@ export class GetSpecificEdu extends Component{
         return(
             
       
-          <div style={{ width: '100%' , background : "#242424",margin:'0'}} >
+          <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
           <img className="App-img" src={educationalOrganization}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
   <br></br>

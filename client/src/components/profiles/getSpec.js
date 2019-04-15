@@ -78,9 +78,9 @@ export class GetSpec extends Component {
     render() {
       return (
       
-        <div style={{ width: '100%' , background : "#242424",margin:'0'}} >
+        <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
-        <img className="App-img" src={coWorkingSpace}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
+        <img className="App-img" src={coWorkingSpace} class="center"  borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
 <br></br>
 <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Give Feedback</button> <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Chat</button>  <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Creat new Account</button>
     <br></br>

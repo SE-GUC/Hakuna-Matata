@@ -71,7 +71,7 @@ export class GetCourse extends Component {
 
     render() {
       return (
-        <div style={{ width: '100%' , background : "#242424",margin:'0'}} >
+        <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
         <img className="App-img" src={course}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
 
