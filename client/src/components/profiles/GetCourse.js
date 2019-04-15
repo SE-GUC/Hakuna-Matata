@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
-import course from '../../components/courseicon.png'
-import AppliedUser from '../AppliedUser'
-import AcceptedUser from '../AcceptedUser'
+import course from '../profileComponents/courseicon.png'
+import AppliedUser from '../profileComponents/AppliedUser'
+import AcceptedUser from '../profileComponents/AcceptedUser'
 export class GetCourse extends Component {
     state = {
       course:null,

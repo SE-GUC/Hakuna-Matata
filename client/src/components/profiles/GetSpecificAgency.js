@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import axios from "axios";
-import consultancyAgency from '../agency_icon.jpg';
-import ConsultancyAgencyPartner from '../ConsultancyAgencyPartner.js'
-import ConsultancyAgencyMembers from '../ConsultancyAgencyMembers.js'
-import ConsultancyAgencyReports from '../ConsultancyAgencyReports.js'
-import ConsultancyAgencyOffer from '../ConsultancyAgencyOffer.js'
-import ConsultancyAgencyLocation from '../ConsultancyAgencyLocation.js'
-import ConsultancyAgencyEvent from '../ConsultancyAgencyEvent.js'
-import ConsultancyAgencyTask from '../ConsultancyAgencyTask.js'
-import ConsultancyAgencyProject from '../ConsultancyAgencyProject.js'
+import consultancyAgency from '../profileComponents/agency_icon.jpg';
+import ConsultancyAgencyPartner from '../profileComponents/ConsultancyAgencyPartner.js'
+import ConsultancyAgencyMembers from '../profileComponents/ConsultancyAgencyMembers.js'
+import ConsultancyAgencyReports from '../profileComponents/ConsultancyAgencyReports.js'
+import ConsultancyAgencyOffer from '../profileComponents/ConsultancyAgencyOffer.js'
+import ConsultancyAgencyLocation from '../profileComponents/ConsultancyAgencyLocation.js'
+import ConsultancyAgencyEvent from '../profileComponents/ConsultancyAgencyEvent.js'
+import ConsultancyAgencyTask from '../profileComponents/ConsultancyAgencyTask.js'
+import ConsultancyAgencyProject from '../profileComponents/ConsultancyAgencyProject.js'
 export class GetSpecificAgency extends Component {
     state = {
       consultancyAgency: null,

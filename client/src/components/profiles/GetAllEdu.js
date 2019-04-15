@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import EducationalOrganizations from '../EducationalOrganizations';
+import EducationalOrganizations from '../profileComponents/EducationalOrganizations';
 import axios from 'axios';
 
 export class GetAllEdu extends Component{

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Courses from '../../components/Courses'
-import Certificates from '../../components/Certificates'
-import Educators from '../../components/Educators'
-import MasterClasses from '../../components/MasterClasses'
-import TrainingPrograms from '../../components/TrainingPrograms'
-import educationalOrganization from '../educational_icon.jpg';
+import Courses from '../profileComponents/Courses'
+import Certificates from '../profileComponents/Certificates'
+import Educators from '../profileComponents/Educators'
+import MasterClasses from '../profileComponents/MasterClasses'
+import TrainingPrograms from '../profileComponents/TrainingPrograms'
+import educationalOrganization from '../profileComponents/educational_icon.jpg';
 
 export class GetSpecificEdu extends Component{
     state ={

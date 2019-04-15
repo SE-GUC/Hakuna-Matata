@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import axios from "axios";
-import Rooms from '../Rooms';
-import coWorkingSpace from '../coworkingspace_icon.jpg';
-import Facilite from '../Facilite';
+import Rooms from '../profileComponents/Rooms';
+import coWorkingSpace from '../profileComponents/coworkingspace_icon.jpg';
+import Facilite from '../profileComponents/Facilite';
 import {Link} from 'react-router-dom';
 
-import BusinessPlan from '../BusinessPlan';
+import BusinessPlan from '../profileComponents/BusinessPlan';
 export class GetSpec extends Component {
     state = {
       coWorkingSpace: null,

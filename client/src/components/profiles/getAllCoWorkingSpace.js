@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import CoWorkingSpaces from '../CoWorkingSpaces';
+import CoWorkingSpaces from '../profileComponents/CoWorkingSpaces';
 // import { BrowserRouter as Router, Route } from "react-router-dom";
 
 export class GetAll extends Component {

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
-import room from '../../components/room-icon.jpg'
-import Slot from '../../components/Slot.js'
-import Review from '../../components/Review.js'
+import room from '../profileComponents/room-icon.jpg'
+import Slot from '../profileComponents/Slot.js'
+import Review from '../profileComponents/Review.js'
 export class GetSpec extends Component {
     state = {
       room :null,
