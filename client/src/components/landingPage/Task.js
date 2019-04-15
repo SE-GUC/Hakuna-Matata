@@ -56,7 +56,8 @@ for(let i=0 ; i<requiredSkills.length ; i++ ){
         <p> </p>
         <t class="textcolor1" > {rskills}</t>
         <p> </p>
-        <button style = {ButtonStyle} >visit</button>
+        
+        <Link style = {ButtonStyle} to={"/task/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
         <button style = {ButtonStyle} >apply</button>
         </p>
       </div>

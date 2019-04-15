@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import axios from "axios";
-import { withStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import Select from "react-select";
+import React, { Component } from "../../../../node_modules/react";
+import axios from "../../../../node_modules/axios";
+import { withStyles } from "../../../../node_modules/@material-ui/core/styles";
+import TextField from "../../../../node_modules/@material-ui/core/TextField";
+import Select from "../../../../node_modules/react-select";
 import "./CreateTask.css";
-import { Form } from "react-bootstrap";
+import { Form } from "../../../../node_modules/react-bootstrap";
 // import console = require("console");
 const styles = theme => ({
   dropdown: {

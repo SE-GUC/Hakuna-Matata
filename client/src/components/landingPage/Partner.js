@@ -47,7 +47,7 @@ for(let i=0 ; i<skills.length ; i++ ){
         </p>
         <p> </p>
         <t class="textcolor1" > {rskills}</t>
-        <button style = {ButtonStyle} >visit</button>
+        <Link style = {ButtonStyle} to={"/partner/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
       </div>
     );
   }
