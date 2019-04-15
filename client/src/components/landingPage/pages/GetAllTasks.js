@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import Tasks from '../Tasks';
+import Chat from '../../chat/Chat';
 import '../Task.css';
 
 // import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -27,6 +28,8 @@ export class GetAllTasks extends Component {
         <Tasks
           tasks={this.state.tasks} 
         />
+                  <Chat/>
+
       </div>
     );
   }
