@@ -3,8 +3,8 @@
 import React, { Component } from 'react';
 import './Start.css';
 import StartHeader from './StartHeader.js';
-import LoginForm from '../LoginForm'
-import SignUpForm from '../SignUpForm'
+import LoginForm from '../forms/LoginForm'
+import SignUpForm from '../forms/SignUpForm'
 
 class Start extends Component {
   constructor(props) {
@@ -21,10 +21,13 @@ class Start extends Component {
   }
     handleClickClose(e) {
       console.log('hi world')
-    this.setState({ isClose: !this.state.isClose })
+    this.setState({ isClose: true })
   }
   handleClickSignUp() {
     this.setState({ signUpClick: true })
+    this.setState({ isClose: false })
+
+    console.log('hi')
     if(this.state.logInClick){
       this.setState({ logInClick: false })
       this.setState({ isClose: false })
@@ -33,6 +36,8 @@ class Start extends Component {
   }
   handleClickLogIn() {
     this.setState({ logInClick: true })
+    this.setState({ isClose: false })
+
     if(this.state.signUpClick){
       this.setState({ signUpClick: false })
       this.setState({ isClose: false })

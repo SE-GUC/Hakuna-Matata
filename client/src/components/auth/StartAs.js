@@ -3,11 +3,11 @@
 import React, { Component } from 'react';
 // import './Start.css';
 // import StartHeader from './StartHeader.js';
-import MemberForm from '../MemberForm'
-import PartnerForm from '../PartnerForm'
-import CoworkingSpaceForm from '../CoworkingSpaceForm'
-import EducationOrganizationForm from '../EducationOrganizationForm'
-import ConsultancyForm from '../ConsultancyForm'
+import MemberForm from '../forms/MemberForm'
+import PartnerForm from '../forms/PartnerForm'
+import CoworkingSpaceForm from '../forms/CoworkingSpaceForm'
+import EducationOrganizationForm from '../forms/EducationOrganizationForm'
+import ConsultancyForm from '../forms/ConsultancyForm'
 
 class StartAs extends Component {
   constructor(props) {

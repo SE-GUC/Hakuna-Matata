@@ -39,9 +39,7 @@ class App extends Component {
       <div className="App" style={{
         background:'black'
       }}>
-      {console.log('this.state.tags')}
-      {console.log(this.state.id)}
-      
+  
       <Router>
       <Route exact path="/HomePage" render={() => (
             <HomePage id={this.state.id}  />

@@ -37,10 +37,10 @@ class SignUpForm extends Component {
         password: this.state.password,
         fullName: 'Ali Mohamed'
       }).then(res => {
-        alert(res.state)
+        alert('Fola 3lek')
         console.log(res.data)
-        window.location.href='startAs';
-      })
+        this.props.handleClickClose()
+})
     } else {
       alert('the passwords Dont match')
     }
@@ -68,7 +68,7 @@ class SignUpForm extends Component {
     }
   }
   getSignUpStyle() {
-    if (!this.props.isClose&&this.props.logInClick) {
+    if (!this.props.isClose&&this.props.signUpClick) {
       return {
         position: 'Absolute',
         bottom: 350,

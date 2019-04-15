@@ -38,14 +38,13 @@ class LoginForm extends Component {
       this.setState({
         token: res.data
       })
-     
-
+      console.log('hi')
       this.props.handleChangetoken(res.data)
       
         this.setState({isLoaded:true})
         this.setState({id:res.data.id})
     }).catch(e => {
-      alert('error ')
+      alert(e)
       this.props.handleChangetoken('')
 
     }).then(alert('A email loged in was submitted: '))
