@@ -17,17 +17,19 @@ import AdminAsUser from './components/profiles/PartnerAsAdmin';
 import AdminNAProject from './components/projectTask/pages/AdminNAProject';
 import PartnerNAProject from './components/projectTask/pages/PartnerNAProject';
 import MemberNAProject from './components/projectTask/pages/MemberNAProject';
-
+import createTask from './components/Forms/CreateTask.js'
+import createConsultance from "./components/Forms/CreateConsultance";
 class App extends Component {
 
 
   render() {
     return (
       <Router>
-        <div  >
-
-
-        </div>
+        <div className="App" >
+        <div className="App-header">
+         <Route exact path="/createTask/:id" component={createTask} />
+         <Route exact path="/createConsultance/:id" component={createConsultance} />
+         </div>
         <Route exact path="/member" component={Member} />
         <Route exact path="/user/member" component={UserViewMember} />
         <Route exact path="/admin/member" component={AdminViewMember} />
@@ -42,6 +44,8 @@ class App extends Component {
         <Route exact path="/projects1/:id" component={AdminNAProject}/> 
              <Route exact path="/projects2/:id" component={PartnerNAProject} /> 
             <Route exact path="/projects3/:id" component={MemberNAProject} />
+
+        </div>
        
 
 
