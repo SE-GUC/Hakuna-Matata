@@ -4,33 +4,37 @@ module.exports = {
     createValidation: request => {
         const createSchema = {
             name:Joi.string().required(),
-            educator_name:Joi.string().required(),
+            educatorName:Joi.object().required(),
             description:Joi.string().required(),
             places:Joi.number().integer().required(),
-            available_places:Joi.number().integer().required(),
+            availablePlaces:Joi.number().integer().required(),
             payment:Joi.number().required(),
-            course_duration:Joi.number().required(),
-            start_date:Joi.date().required(),
-            end_date:Joi.date().required(),
-            categories:Joi.string().required(),
-            available:Joi.boolean().required()
+            courseDuration:Joi.string().required(),
+            startDate:Joi.date().required(),
+            endDate:Joi.date().required(),
+            category:Joi.string().required(),
+            isAvailable:Joi.boolean().required(),
+            listOfApplied:Joi.array(),
+            listOfAccepted:Joi.array()
         }
 
         return Joi.validate(request, createSchema)},
 
         updateValidation:request=>{
         const updateschema={
-            name:Joi.string().required(),
-            educator_name:Joi.string(),
+            name:Joi.string(),
+            educatorName:Joi.object(),
             description:Joi.string(),
             places:Joi.number().integer(),
-            available_places:Joi.number().integer(),
+            availablePlaces:Joi.number().integer(),
             payment:Joi.number(),
-            course_duration:Joi.number(),
-            start_date:Joi.date(),
-            end_date:Joi.date(),
-            categories:Joi.string(),
-            available:Joi.boolean()
+            courseDuration:Joi.string(),
+            startDate:Joi.date(),
+            endDate:Joi.date(),
+            category:Joi.string(),
+            isAvailable:Joi.boolean(),
+            listOfApplied:Joi.array(),
+            listOfAccepted:Joi.array()
         }
         return Joi.validate(request,updateschema)
    }
