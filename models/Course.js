@@ -21,7 +21,7 @@ const CourseSchema = new Schema({
         type: String,
         required: true
     },
-    educatorName: CourseInfoSchema,
+    educator: CourseInfoSchema,
     description: {
         type: String,
         required: true
@@ -75,4 +75,4 @@ const CourseSchema = new Schema({
 })
 
 const Course= mongoose.model('courses', CourseSchema)
-module.exports.Course = Course 
+module.exports = Course 

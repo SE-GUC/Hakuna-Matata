@@ -40,7 +40,7 @@ router.put('/:id', async (req,res) => {
      if(!admin) return res.status(404).send({error: 'Amdin does not exist'})
      const isValidated = validator.updateValidation(req.body)
      if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
-     const uAdmin = await Admin.updateOne({'_id':id},req.body)
+     const uAdmin = await Admin.findOneAndUpdate({'_id':id},req.body)
      res.json({msg: 'Admin updated successfully', data: uAdmin})
     }
     catch(error) {

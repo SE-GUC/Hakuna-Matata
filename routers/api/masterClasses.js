@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-var moment = require('moment');
-const Joi = require('joi');
+
 
 const MasterClass = require('../../models/MasterClass.js')
-const masterClassValidator = require('../../validations/MasterClassValidations.js')
+const masterClassValidator = require('../../validations/masterClassValidations.js')
 
 //MasterClass CRUDS
 
@@ -59,9 +58,7 @@ router.put('/:id', async (req, res) => {
         const isValidated = masterClassValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
         const updatedMasterClass = await MasterClass.findOneAndUpdate({ '_id': masterClassId }, req.body)
-        console.log(updatedMasterClass)
         const cousreAfterUpdate = await MasterClass.findById(masterClassId)
-        console.log(cousreAfterUpdate)
         res.json({ data: cousreAfterUpdate});
     } catch (error) {
         // We will be handling the error later
@@ -87,23 +84,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 // End of MasterClass CRUDS
-
-
-
-//Badr
-
-router.put('/applyforamasterClass/:id', async (request, response) => {
-    const masterClassId = request.params.id;
-    const memberId = request.body.memberId;
-    const schema = {
-        memberId: Joi.number().required(),
-    }
-    const result = Joi.validate(request.body, schema);
-    if (result.error) return response.status(400).send({ error: result.error.details[0].message });
-    const masterClass = await MasterClass.findById(masterClassId)
-    masterClass.listOfApplies.push({ 'memberId': memberId, dateofapply: moment().format('MMMM Do YYYY, h:mm:ss a') })
-    masterClass.save()
-    response.sendStatus(200);
-});
-//End Badr
 module.exports = router;

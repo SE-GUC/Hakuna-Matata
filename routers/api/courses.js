@@ -64,18 +64,13 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        console.log(id)
         const deletedformCourses = await Course.findOneAndRemove({ '_id': id })
-        console.log(id)
-        res.send(deletedformCourses)
         if (!deletedformCourses) return res.send('Not found')
-        console.log(id)
-        var courses = await Course.find()
-        res.json({ data: courses })
+        res.json({ data: deletedformCourses })
     }
     catch (error) {
-        res.sendStatus(404).send('Not found');
-    }
+        return res.status(400).send({ error: isValidated.error.details[0].message });
+        }
 
 });
 // End of Course CRUDS

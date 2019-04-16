@@ -5,9 +5,10 @@ var moment = require('moment')
 
 
 const User = require('../../models/User.js');
-const { Skill } = require('../../models/Skill.js');
+const  Skill  = require('../../models/Skill.js');
 const Task = require('../../models/Task')
-const {Course} = require('../../models/Course')
+const Course = require('../../models/Course')
+const MasterClass = require('../../models/MasterClass')
 const Project = require('../../models/Project')
 const { sendToAdminRequestNotification } = require('../../models/Notification.js')
 
@@ -27,7 +28,6 @@ router.post('/:id', async (req, res) => {
       if (!currSkills) return res.status(404).send(`${skill} is not supported by the site we will handel  that and send u notification`)
     }
 
-    console.log(req.body.memberFullName)
     const currUser = await User.findOne({ _id: req.params.id, tags: 'Member' })
     if (currUser) return res.status(404).send('You are already a Member on the site')
 
@@ -48,7 +48,7 @@ router.post('/:id', async (req, res) => {
       memberEvents: [],
       memberHirePerHour: 0,
       memberPhoneNumber: '',
-      memberDateJoined: new Date().getDate(),
+      memberDateJoined: new Date().toJSON(),
       memberLocation: ''
 
     }
@@ -121,8 +121,8 @@ router.put('/rate/:id', async (req, res) => {
 
   var member = await User.findById(id)
   if (member !== null) {
-    if (member.allRatedTasks == null) member.allRatedTasks = []
-    if (member.memberRating == undefined) member.rating = 0
+    if (member.allRatedTasks == undefined ||member.allRatedTasks == null) member.allRatedTasks = 0
+    if (member.memberRating == undefined ||member.memberRating == null) member.rating = 0
     noofTasks = member.allRatedTasks;
     const x = member.allRatedTasks + 1;
     var tempRate
@@ -150,7 +150,9 @@ router.put('/applyForTask/:id', async (req, res) => {
         var memberSkills = member.skills
 
         for (var index=0;index<  task.requiredSkills.length;index++){
-          matches=matches& memberSkills.includes(task.requiredSkills[index].name)
+          if (memberSkills.filter(e => e.name === task.requiredSkills[index].name).length <0) {
+              matches=false
+          }
         }       
         if (matches & member.experienceLevel >= task.experienceLevel) {
           if (task.appliedMembers === null) task.appliedMembers = []
@@ -160,7 +162,8 @@ router.put('/applyForTask/:id', async (req, res) => {
               appliedInTasks:
               {
                 name: task.name,
-                id: task._id
+                id: task._id,
+                date:new Date().toJSON()
               }
             }
           })
@@ -169,7 +172,9 @@ router.put('/applyForTask/:id', async (req, res) => {
               appliedMembers:
               {
                 name: member.memberFullName,
-                id: member._id
+                id: member._id,
+                date:new Date().toJSON()
+
               }
             }
           })
@@ -202,9 +207,9 @@ router.put('/applyForProject/:id', async (req, res) => {
         var matches = true
         var memberSkills = member.skills
         for (var index=0;index<  project.requiredSkills.length;index++){
-          matches=matches& memberSkills.includes(project.requiredSkills[index])
-          console.log(memberSkills)
-        }      
+          if (memberSkills.filter(e => e.name === project.requiredSkills[index].name).length <0) {
+            matches=false
+        }        }      
 
         if (matches & member.experienceLevel >= project.experienceLevel) {  
           if (project.appliedMembers === null) project.appliedMembers = []
@@ -214,7 +219,9 @@ router.put('/applyForProject/:id', async (req, res) => {
               appliedInProjects:
               {
                 name: project.name,
-                id: project._id
+                id: project._id,
+                date:new Date().toJSON()
+
               }
             }
           })
@@ -223,7 +230,9 @@ router.put('/applyForProject/:id', async (req, res) => {
               appliedMembers:
               {
                 name: member.memberFullName,
-                id: member._id
+                id: member._id,
+                date:new Date().toJSON()
+
               }
             }
           })
@@ -233,22 +242,17 @@ router.put('/applyForProject/:id', async (req, res) => {
         }
       }
       else {
-        res.status(400).send('project id is not available')
+        res.status(400).send('project  is not available')
 
       }
     } else {
-      res.status(400).send('member id is not available')
+      res.status(400).send('member  is not available')
     }
   } else {
-    res.status(400);
-    res.send('This project has not yet been accepted')
+    res.status(400).send('This project has not yet been accepted')
   }
 })
-router.post('/editRequest/:id', (req, res) => {
-  var id = req.params.id;
-  var e = sendToAdminRequestNotification('Member ' + id + ' wants to edit his profile')
-  res.sendStatus(200);
-})
+
 router.put('/applyForCourse/:id', async (request, response) => {
   const memberId = request.params.id;
   const courseId = request.body.courseId;
@@ -265,16 +269,18 @@ router.put('/applyForCourse/:id', async (request, response) => {
   if (member) {
     if ( course){
     if (course.availablePlaces > 0 & course.isAvailable) {
+      if( course.listOfApplied== undefined)  course.listOfApplied=[]
+      if( member.memberCoursesAppliedIn== undefined)  member.memberCoursesAppliedIn=[]
       course.listOfApplied.push({
         id: memberId,
         name: member.memberFullName,
-        date: new Date().getDate()
+        date: new Date().toJSON()
       })
       course.save()
       member.memberCoursesAppliedIn.push({
         id: course._id,
         name: course.name,
-        date:new Date().getDate()
+        date: new Date().toJSON()
       })
       member.save()
       response.sendStatus(200);
@@ -298,22 +304,26 @@ router.put('/applyForMasterClass/:id', async (request, response) => {
   const result = Joi.validate(request.body, schema);
   if (result.error) return response.status(400).send({ error: result.error.details[0].message });
   const masterClass = await MasterClass.findById(masterClassId)
-  const member = await User.findOne({ _id: memberId, tags: 'Member' })
+  var member = await User.findOne({ _id: memberId, tags: 'Member' })
   if (member  ) {
     if(masterClass){
     if (masterClass.availablePlaces > 0 & masterClass.isAvailable) {
+      if( masterClass.listOfApplied== undefined)  masterClass.listOfApplied=[]
+      if( member.memberMasterClassesAppliedIn == undefined)  member.memberMasterClassesAppliedIn=[]
       masterClass.listOfApplied.push({
         id: memberId,
         name: member.memberFullName,
-        date: new Date().getDate()
+        date: new Date().toJSON()
       })
       masterClass.save()
-      member.memberMasterClassesAppliedIn.push({
+      
+     member.memberMasterclassesAppliedIn.push({
         id: masterClass._id,
         name: masterClass.name,
-        date: new Date().getDate()
+        date: new Date().toJSON()
       })
       member.save()
+
       response.sendStatus(200);
     } else {
       return response.status(404).send('this masterClass is not availabe right now its Full');
@@ -326,5 +336,9 @@ router.put('/applyForMasterClass/:id', async (request, response) => {
 
   }
 });
-
+router.post('/editRequest/:id', (req, res) => {
+  var id = req.params.id;
+  var e = sendToAdminRequestNotification('Member ' + id + ' wants to edit his profile')
+  res.sendStatus(200);
+})
 module.exports = router

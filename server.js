@@ -26,6 +26,7 @@ const coWorkingSpaces =require('./routers/api/coWorkingSpaces');
 const consultancyAgencies =require('./routers/api/consultancyAgencies');
 const educationalOrganizations =require('./routers/api/educationalOrganizations');
 const courses = require('./routers/api/courses.js');
+const masterClasses = require('./routers/api/masterClasses.js');
 const courseRequests = require('./routers/api/courseRequests.js');
 const notifications = require('./routers/api/notifications.js');
 const members =require('./routers/api/members');
@@ -34,6 +35,7 @@ const users =require('./routers/api/users');
 const admins= require('./routers/api/admins');
 const rooms= require('./routers/api/rooms');
 const projects=require('./routers/api/projects');
+const certificates=require('./routers/api/certificates');
 app.get('/', (req, res) => {
     res.send(`
     <h1><b>7zalqom <i>yrqod</i> hona </b></h1>
@@ -60,11 +62,13 @@ app.use('/coWorkingSpaces', coWorkingSpaces);
 app.use('/educationalOrganizations',educationalOrganizations);
 app.use('/members',members);
 app.use('/users',users);
+app.use('/masterClasses',masterClasses);
 app.use('/partners',partners);
 app.use('/consultancyAgencies',consultancyAgencies);
 app.use('/admins',admins);
 app.use('/rooms',rooms);
 app.use('/projects',projects)
+app.use('/certificates',certificates)
 app.use((req,res) => res.status(404).send(`<h1>Can not find what you're looking for</h1>`))
 
 const port = process.env.PORT || 3333

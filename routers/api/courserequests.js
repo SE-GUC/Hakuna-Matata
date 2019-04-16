@@ -2,7 +2,6 @@
 // Dependencies
 const express = require('express')
 const router = express.Router()
-var moment = require('moment')
 const Joi = require('joi')
 
 
@@ -34,6 +33,14 @@ router.post('/', async (req,res) => {
     const isValidated = courseRequestValidator.createValidation(req.body)
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
     const newCourseRequest = await CourseRequest.create(req.body)
+    const user =await User.findOne({_id:req.body.applyingMemberId})
+if(user.courseRequests== undefined) user.courseRequests=[]
+user.courseRequests.push({
+            id:newCourseRequest._id,
+            name:newCourseRequest.description,
+            date:new Date().toJSON()})
+            user.save()
+
     res.json({msg:'courseRequest was created successfully', data: newCourseRequest})
    }
    catch(error) {
@@ -79,12 +86,17 @@ router.put('/giveRecomendation/:id', async (req, res) => {
         const expertId=req.body.expertId
         const schema = {
             content: Joi.string().required(),
+            expertId:Joi.string().required(),
         }
         const result = Joi.validate(req.body, schema)
         const schema1 = {
             masterClass: Joi.object().required(),
+            expertId:Joi.string().required(),
+
         }
         const result1 = Joi.validate(req.body, schema1)
+
+
         if (result.error&&result1.error) {
             if (result.error) return res.status(400).send(result.error.details[0].message)
             if (result1.error) return res.status(400).send(result1.error.details[0].message)
@@ -103,7 +115,7 @@ router.put('/giveRecomendation/:id', async (req, res) => {
                 masterClass:req.body.masterClass,
                 content:req.body.content,
             })
-            Notification.sendCourseRecommendationsNotification(req.body.masterClass, expert._id, '%od elcourse dah yalaaa')
+            Notification.sendCourseRecommendationsNotification(req.body.masterClass.name, expert._id, '%od elcourse dah yalaaa')
             courseRequest.save()
             return res.status(200).send('Done')
 
@@ -116,9 +128,8 @@ router.put('/giveRecomendation/:id', async (req, res) => {
                 },
                 masterClass:req.body.masterClass,
             })
-            Notification.sendCourseRecommendationsNotification(req.body.masterClass, expert._id, '%od elcourse dah yalaaa')
+            Notification.sendCourseRecommendationsNotification(req.body.masterClass.name, expert._id, '%od elcourse dah yalaaa')
             courseRequest.save()
-            res.status(200).send('Done')
             return res.status(200).send('Done')
         }
         if(!result.error){

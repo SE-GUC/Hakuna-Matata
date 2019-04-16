@@ -8,6 +8,9 @@ const TaskInfoSchema = new Schema({
     name: {
         type: String,
         required: true
+    },
+    date:{
+        type:Date
     }
 
 },{ _id : false });
@@ -37,7 +40,7 @@ const TaskSchema = new Schema({
     taskMember: TaskInfoSchema,
     adminId:mongoose.Schema.Types.ObjectId,
     taskConsultancyAgency: TaskInfoSchema,
-    appliedConsultancyAgencies: [TaskInfoSchema],
+    appliedConsultancies: [TaskInfoSchema],
     appliedMembers: [TaskInfoSchema],
     description: {
         type: String,
