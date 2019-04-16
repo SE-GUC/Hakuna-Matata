@@ -1,18 +1,12 @@
 import React, { Component } from "react";
 import './edu.css'
 import { Link } from "react-router-dom";
+import KeyImagee from '../../assessments/member_icon.svg'
+import Member from '../../components/profileComponents/CardPhoto';
+
 
 export class EducationalOrganization extends Component {
-  getStyle = () => {
-    return {
-      background:  "#15161a",
-      padding: "5px" ,
-      borderBottom: "1px #ccc dotted" ,
-      border : "thin solid #FFFFFF" ,
-      borderRadius : 25 ,
-  
-    };
-  };
+ 
 
   render() {
     const {
@@ -20,38 +14,43 @@ export class EducationalOrganization extends Component {
       educationOrganizationName,
       
     } = this.props.educationalorganization;
-    const ButtonStyle = {
-      backgroundColor:"#f9bb32",
-      color :'black',
-      testAlign:'right',
-      pading:'15px 32px',
-      borderRadius:'12px',
-      float :'right',
-      fontSize:'12px',
-      hight:'30px',
-      width:'70px'
-  
-  }
+ 
     return (
-      <div style={this.getStyle()}>
-        <p>
-        <t class="textcolor" > {educationOrganizationName}</t>
-        </p>
-        <p> </p>
-        <Link style = {ButtonStyle} to={"/educationalOrganization/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
+      
+        <div
+                style={{
+          position: "absoulte", paddingLeft: "1px",
+          paddingRight: "1px", border: "1px solid",width:"25rem",height:"10rem", borderRadius: (2, 2, 20, 20), color: "#707070", backgroundColor:"#15161A",top: "30%"
+        }}>
+        <Member style={{position:"relative",left:"3px",top:'1px'}} KeyImage={KeyImagee} />
+        <p style={{fontSize: '29px',
+                textAlign: 'center',
+                color:'#FFFFFF',
+                position:'relative',
+                left:'65px',
+                top:'-5px'
+          }}>{this.props.educationalorganization.educationOrganizationName}</p>
+        <Link  to={"/educationalOrganization/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
      
       </div>
     );
   }
 }
 
-const btnStyle = {
-  background: "#ff0000",
-  color: "#fff",
-  border: "none",
-  padding: "5px 9px",
-  cursor: "pointer",
-  float: "right"
-};
+const ButtonStyle = {
+
+  backgroundColor:'#F9BB32',
+    color :'#242424',
+    width:"130px",
+    testAlign:'center',
+    pading:'15px 32px',
+    borderRadius:'8px',
+    float :'center',
+    fontSize:'18px',
+    position:'relative',
+    left:'200px',
+    top:'20px'
+
+} 
 
 export default EducationalOrganization;

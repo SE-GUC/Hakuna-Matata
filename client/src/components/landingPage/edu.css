@@ -48,11 +48,13 @@
   }
   .grid-container {
   display: grid;
-  grid-column-gap: 10px;
-  grid-row-gap: 10px;
+  grid-column-gap:normal;
+  grid-row-gap:13px;
   grid-template-columns: auto auto auto; 
   background-color:#242424;
-  padding: 10px;
+
+  padding: 140px;
+
 }
 
 .grid-item {
