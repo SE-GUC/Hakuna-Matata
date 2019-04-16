@@ -10,7 +10,7 @@ const userValidator = require('../../validations/userValidations.js')
 const tokenKey = require('../../config/keys').secretOrKey
 
 //get all users
-router.get('/', async (req,res) => {
+router.get('/',passport.authenticate('jwt', {session: false}), async (req,res) => {
     const users = await User.find()
       return res.json(users)
 })
@@ -101,7 +101,7 @@ router.post('/login', async (req, res) => {
                 email: userfound.email
             }   
             const token = jwt.sign(user, tokenKey, { expiresIn: '1h' })
-            return res.json({token: `Bearer ${token}`})
+            return res.json({token: `Bearer ${token}`,id:userfound._id, tags:userfound.tags})
         }
 		else return res.status(400).send({ password: 'Wrong password' });
 	} catch (e) {}

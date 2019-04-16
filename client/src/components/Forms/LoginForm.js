@@ -15,6 +15,7 @@ class LoginForm extends Component {
       token: '',
       isLoaded: false,
       id:'',
+      tags:[]
     }
     this.onChange = this.onChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -38,11 +39,12 @@ class LoginForm extends Component {
       this.setState({
         token: res.data
       })
-      console.log('hi')
+    
       this.props.handleChangetoken(res.data)
-      
+      console.log(res.data)
         this.setState({isLoaded:true})
         this.setState({id:res.data.id})
+        this.setState({tags:res.data.tags})
     }).catch(e => {
       alert(e)
       this.props.handleChangetoken('')
@@ -131,7 +133,11 @@ class LoginForm extends Component {
     }
   }
 
-
+getpath(){
+  if(this.state.tags.length>0)
+    return `/HomePage`
+    return `/startAS`
+}
   render() {
     return (
       <div style={this.getLoginStyle()}>
@@ -158,8 +164,8 @@ class LoginForm extends Component {
             }}> Sign in
                 </div>
           </button>
-          <Link id={this.props.id} style={this.overRideButton()} to={{
-                        pathname: `/startAS`,
+          <Link id={this.state.id} tags={this.state.tags} style={this.overRideButton()} to={{
+                        pathname:this.getpath(),
 
                     }}> Go</Link>
           <br></br>
