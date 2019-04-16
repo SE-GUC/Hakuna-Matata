@@ -32,4 +32,5 @@ const TrainingProgramSchema = new Schema({
     }
 })
 
-module.exports = TrainingProgram = mongoose.model('trainingPrograms', TrainingProgramSchema)
+const TrainingProgram = mongoose.model('trainingPrograms', TrainingProgramSchema)
+module.exports = TrainingProgram

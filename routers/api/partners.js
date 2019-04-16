@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 
 const User = require('../../models/User')
+const Project = require('../../models/Project')
+const Task = require('../../models/Task')
 const partnerValidator = require('../../validations/partnerValidations.js')
 
  const { sendToAdminRequestNotification,NotSummary } = require('../../models/Notification.js')
@@ -15,7 +17,7 @@ router.post('/:id', async (req, res) => {
             const currUser = await User.findOne({ _id: req.params.id, tags: 'Partner' })
             if (currUser) return res.status(404).send('You are already a Partner on the site')
             await User.findByIdAndUpdate(req.params.id ,req.body)
-            await User.findByIdAndUpdate(req.params.id ,{partnerDateJoined:new Date().getDate()})
+            await User.findByIdAndUpdate(req.params.id ,{partnerDateJoined:new Date().toJSON()})
             await User.findByIdAndUpdate(req.params.id,{$push:{tags:'Partner'}})
             // console.log(3)
             const partner = await User.findById(req.params.id)
@@ -60,7 +62,7 @@ router.post('/:id', async (req, res) => {
       const currPartner = await User.findOne({_id:req.params.id ,tags: 'Partner' })     
       if (currPartner) {
         const index=currPartner.tags.indexOf('Partner')
-       currPartner.tags.splice(index,1)
+          currPartner.tags.splice(index,1)
        currPartner.save()
         res.json({ msg: 'Partner was deleted successfully'})
       } else {
@@ -115,21 +117,25 @@ router.put('/assignConstlancyAgencyToTask/:id', async (req, res) => {
   const consultancyAgencyId=req.body.consultancyAgencyId
   var task =await Task.findOne({_id:taskId, accepted:true})
   if(task){
-    if(task.taskPartner.id===partnerId){
+    if(task.taskPartner.id ==partnerId){
       const assignedConsultancyAgency=await User.findOne({_id:consultancyAgencyId, tags:'ConsultancyAgency' })
       for(var consultancyAgency of  task.appliedConsultancies){
-        if(consultancyAgency.id===consultancyAgencyId){
+        if(consultancyAgency.id==consultancyAgencyId){
           task.consultancyAgency=consultancyAgency
           assignedConsultancyAgency.consultancyAgencyAcceptedInTasks.push({
             id:task._id,
             name:task.name,
-            date:new Date().getDate()
+            date:new Date().toJSON()
           })
+        }else{
+          //should here  notify or/ and delete that task form other consultancy 
         }
       }
       //Should be Remove from PlateForm and notify consultancy
+      task.appliedConsultancies=[]
       task.save()
       assignedConsultancyAgency.save()
+      res.sendStatus(200)
 
     }else{
       res.status(404).send('You are not the owner')
@@ -145,22 +151,23 @@ router.put('/assignConstlancyAgencyToProject/:id', async (req, res) => {
   const consultancyAgencyId=req.body.consultancyAgencyId
   var project =await Project.findOne({_id:projectId, accepted:true})
   if(project){
-    if(project.projectPartner.id===partnerId){
+    if(project.projectPartner.id==partnerId){
       const assignedConsultancyAgency=await User.findOne({_id:consultancyAgencyId, tags:'ConsultancyAgency' })
       for(var consultancyAgency of  project.appliedConsultancies){
-        if(consultancyAgency.id===consultancyAgencyId){
+        if(consultancyAgency.id==consultancyAgencyId){
           project.consultancyAgency=consultancyAgency
           assignedConsultancyAgency.consultancyAgencyAcceptedInPorjects.push({
             id:project._id,
             name:project.name,
-            date:new Date().getDate()
+            date:new Date().toJSON()
           })
         }
       }
+      project.appliedConsultancies=[]
       //Should be Remove from PlateForm and notify consultancy
       project.save()
       assignedConsultancyAgency.save()
-
+      res.sendStatus(200)
     }else{
       res.status(404).send('You are not the owner')
 

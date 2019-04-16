@@ -76,8 +76,12 @@ router.delete('/:id', async (req, res) => {
 // change in the body of Coworking Space and new body in Room so it should be put or post 
 router.post('/room/:id', async (req, res) => {
     try {
+
         const isValidated = roomValidator.createValidation(req.body);
+        console.log(req.body)
+
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+
         const room = await Room.create(req.body)
         const coworkingSpaceOld = await User.findOneAndUpdate({ _id: req.params.id, tags: 'CoworkingSpace' }, {
             $push: {
@@ -94,8 +98,8 @@ router.post('/room/:id', async (req, res) => {
         coworkingSpaceOld.save()
         res.status(200).send(coworkingSpaceOld);
 
-    } catch(err){
-        res.status(404).send('Not found');
+    } catch (err) {
+        res.status(404).send(err);
 
     }
 })
@@ -147,15 +151,16 @@ router.put('/room/:id/:roomId', async (req, res) => {
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const coworkingSpace = await User.findById(req.params.id)
         var isExsits = false
+        const roomId = req.params.roomId
         if (coworkingSpace) {
             const oldroom = await Room.findOneAndUpdate({ _id: req.params.roomId }, req.body)
             if (oldroom) {
                 const room = await Room.findById(req.params.roomId)
                 const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
                 for (var index = 0; index < coworkingSpaceRooms.length; index++) {
-                    if (coworkingSpaceRooms[index].id === room._id) {
-                        coworkingSpaceRooms.splice(index, 1)
-                        const newRooms = coworkingSpaceRooms.push({
+                    if (coworkingSpace.coworkingSpaceRooms[index].id == roomId) {
+                        coworkingSpace.coworkingSpaceRooms.splice(index, 1)
+                        coworkingSpace.coworkingSpaceRooms.push({
                             id: room._id,
                             capacity: room.capacity,
                             slots: room.slots,
@@ -163,16 +168,17 @@ router.put('/room/:id/:roomId', async (req, res) => {
                             comments: room.comments,
                             reservations: room.reservations
                         })
-                        const coworkingSpaceNew = await User.findOneAndUpdate({ _id: req.params.id }, { coworkingSpaceRooms: newRooms })
+                        coworkingSpace.save()
                         isExsits = true
                         return res.status(200).send(room)
                     }
+
                 }
-                if (!isExsits) return res.status(404).send('room not found');
+                if (!isExsits) return res.status(404).send('room not found in co');
             } else
                 res.status(404).send('room not found')
         } else
-            res.status(404).send('room not found')
+            res.status(404).send('coworking room not found')
     } catch (err) {
         console.log(err)
     }
@@ -184,23 +190,28 @@ router.put('/room/reserve/:id/:roomId', async (req, res) => {
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const coworkingSpace = await User.findById(req.params.id)
         var isExsits = false
+        const roomId = req.params.roomId
+
         if (coworkingSpace) {
-            const oldroom = await Room.findById( req.params.roomId)
-            if (oldroom) {                
+            const oldroom = await Room.findById(req.params.roomId)
+            if (oldroom) {
                 const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
                 for (var index = 0; index < coworkingSpaceRooms.length; index++) {
-                    if (coworkingSpaceRooms[index].id === oldroom._id) {
-                        coworkingSpace.coworkingSpaceRooms.reservations.push(req.body)
+
+                    if (coworkingSpaceRooms[index].id == roomId) {
+                        if (coworkingSpace.coworkingSpaceRooms[index].reservations == undefined) coworkingSpace.coworkingSpaceRooms[index].reservations = []
+
                         oldroom.reservations.push(req.body)
+                        coworkingSpace.coworkingSpaceRooms[index].reservations.push(oldroom.reservations[oldroom.reservations.length - 1])
                         oldroom.save()
                         coworkingSpace.save()
                         isExsits = true
                         return res.status(200).send(oldroom)
                     }
                 }
-                if (!isExsits) return res.status(404).send('room not found');
+                if (!isExsits) return res.status(404).send('room not found1');
             } else
-                res.status(404).send('room not found')
+                res.status(404).send('room not found2')
         } else
             res.status(404).send('room not found')
     } catch (err) {
@@ -214,26 +225,54 @@ router.put('/reservation/:id/:roomId', async (req, res) => {
         const state = req.body.state
         const index = req.body.index
         if (!state) {
-            //here we should send notifcation  
-            return res.status(200).send('Notification of reject reservation is sent')
+            var coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
+            // const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
+            var room = coworkingSpace.coworkingSpaceRooms.find(room => room.id == req.params.roomId)
+            const roomReservations = room.reservations
+           
+            for ( var pos = 0; pos < roomReservations.length; pos++) {
+                    console.log(roomReservations[pos])
+                    if (roomReservations[pos]._id == index) {
+                        const deletedReservation=     room.reservations.splice(pos - 1, 1)  
+                        const updateRoom = await Room.findOneAndUpdate({ _id: req.params.roomId }, { reservations: room.reservations })
+                        coworkingSpace.save()
+                        return res.status(200).send({msg :'Reservation is Deleted ',data :deletedReservation})
+
+                     }
+
+            }
+           
+            return res.status(200).send('there is not such reservation here')
         } else {
             var coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
             var isResverved = false
             // const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
-            var room = coworkingSpace.coworkingSpaceRooms.find(room => room.id === req.params.roomId)
+            var room = coworkingSpace.coworkingSpaceRooms.find(room => room.id == req.params.roomId)
             const roomReservations = room.reservations
-            var reserved = room.reservations[index]
-            for (var pos = 0; pos < roomReservations.length; pos++) {
-                if (pos != index & roomReservations[pos].slot === reserved.slot & roomReservations[pos].reservationDate === reserved.reservationDate & roomReservations[pos].isAccpted) {
+            var reserved = room.reservations.find(reservation => reservation._id == req.body.index)
+            var pos = 0
+            for (pos = 0; pos < roomReservations.length; pos++) {
+                if (roomReservations[pos].slot === reserved.slot & roomReservations[pos].reservationDate.getTime() == reserved.reservationDate.getTime() & roomReservations[pos].isAccpted) {
+                    if (roomReservations[pos]._id == index) return res.status(200).send('you have already reserve it ');
                     isResverved = true
-                    return res.status(404).send('Not found');
+                    return res.status(404).send('is already accepted');
                 }
             }
             if (!isResverved) {
                 reserved.isAccpted = state
+                // console.log(pos)
+                room.reservations.splice(pos - 1, 1)
+                room.reservations.splice(pos - 1, 0, reserved)
+                // console.log(room.reservations)
+                for (var i = 0; i < room.reservations.length; i++) {
 
-                room.reservations.splice(index, 1)
-                room.reservations.splice(index, 0, reserved)
+                    if (room.reservations[i]._id != index & room.reservations[i].slot === reserved.slot & room.reservations[i].reservationDate.getTime() == reserved.reservationDate.getTime()) {
+
+                        room.reservations.splice(i, 1)
+                        i--
+
+                    }
+                }
                 //this may not work so i should loop on rooms to updated this room reservations explictly
                 coworkingSpace.save()
                 //coworkingSpace = await User.findOneAndUpdate({ _id: req.params.id, tags: 'CoworkingSpace' },{coworkingSpaceRooms:room})

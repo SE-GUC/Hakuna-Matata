@@ -132,21 +132,23 @@ router.put('/assignMemberToProject/:id', async (req, res) => {
     const projectId = req.params.id
     const memberId = req.body.memberId
     const ownerId = req.body.ownerId
+try{
 
     const project = await Project.findById(projectId)
     const member = await User.findOne({ _id: memberId, tags: 'Member' })
-   if(project.projectPartner.id===ownerId||project.projectConsultancyAgency.id===ownerId){
-    var indexOfMember = project.appliedMembers.findIndex(member => member.id === memberId)
-    var indexOfProject = member.appliedInProjects.findIndex(project => project.id === projectId)
+   if(project.projectPartner.id==ownerId||project.projectConsultancyAgency.id==ownerId){
+    var indexOfMember = project.appliedMembers.findIndex(member => member.id == memberId)
+    var indexOfProject = member.appliedInProjects.findIndex(project => project.id == projectId)
     if(indexOfMember >-1&indexOfProject>-1 ){
     project.appliedMembers.splice(indexOfMember, 1)
     member.appliedInProjects.splice(indexOfProject, 1)
     project.projectMember = {
         name: member.memberFullName,
-        id: member._id
+        id: member._id,
+        date:new Date().toJSON()
     }
     project.workCycle=0
-    member.acceptedInProjects.push({ name: project.name, id: project._id })
+    member.acceptedInProjects.push({ name: project.name, id: project._id ,        date:new Date().toJSON()    })
     
     var e = sendTaskNotification(projectId, memberId, 'You have been assigned!')
     var e = sendTaskNotification(projectId, project.partnerId, 'You project has been assigned to a member!')
@@ -160,6 +162,9 @@ router.put('/assignMemberToProject/:id', async (req, res) => {
 }
 }else{
     res.status(400).send('You are not the partner or consultancy')
+}
+}catch(err){
+
 }
 
 })
@@ -242,11 +247,11 @@ router.get('/membersProject/:id', async (req, res) => {
 router.get('/viewCycle/:id', async (req, res) => {
     const project = await Project.findById(req.params.id);
     if (project !== undefined)
-        if (project.workCycle === null)
+        if (project.workCycle == null || project.workCycle == undefined)
             res.send(null)
         else
-            res.send(project.workCycle)
-    else {
+        res.status(200).send({data:project.workCycle})
+            else {
         res.send('This project not Found !')
     }
 

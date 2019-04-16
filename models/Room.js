@@ -34,7 +34,7 @@ const ReservationSchema = new Schema({
         default:false
        // required:true
     },
-},{ _id : false })
+},{ _id : true })
 //Room for coworkingSpace
 const RoomSchema = new Schema({
     capacity: {

@@ -36,7 +36,7 @@ const ReservationSchema = new Schema({
         default:false
        // required:true
     },
-},{ _id : false })
+})
 //Room for coworkingSpace
 const RoomSchema = new Schema({
     id:{
@@ -373,6 +373,7 @@ const UserSchema = new Schema({
         type:Date
     },
     // End EducationalOrganization
+    courseRequests:[InfoSchema]
 
 })
 
