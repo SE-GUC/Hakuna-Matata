@@ -12,6 +12,7 @@ export class consultancyAgency extends Component {
       consultancyAgencyName,
     } = this.props.consultancyAgency;
   
+
   return (
       
     <div
@@ -32,6 +33,7 @@ export class consultancyAgency extends Component {
  
   </div>
 );
+
 }
 }
 

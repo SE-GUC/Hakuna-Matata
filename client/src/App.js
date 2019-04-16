@@ -79,9 +79,7 @@ import GetCertificate from './components/profiles/GetCertificate';
 import GetMasterClass from './components/profiles/GetMasterClass'
 
 import GetSpecTask from './components/profiles/getSpecTask';
-
 import GetAllProjects from './components/landingPage/pages/GetAllProjects'
-
 import GetSpecProject from './components/projectTask/pages/MemberNAProject'
 
 class App extends Component {
@@ -217,9 +215,7 @@ class App extends Component {
           <Route exact path="/member/:id" component={MemberProfile} />
 
           <Route exact path="/task/:id" component={GetSpecTask} />
-
          
-
           <Route exact path="/consultancyAgencies/:id" component={consultancyAgencyProfile} />
 
           <Route exact path="/educationalOrganization/:id" component={educationalOrganizationProfile} />
@@ -234,7 +230,6 @@ class App extends Component {
 
           <Route exact path='/projects/:id' component={GetSpecProject}/>
 
-         
 
           <Route exact path='/coWorkingSpaces/:id/showRooms/:roomId' component={GetSpecRoom}/>
 
@@ -251,6 +246,8 @@ class App extends Component {
           <Route exact path="/projects" component={GetAllProjects} />
 
           
+
+          <Route exact path="/projects" component={GetAllProjects} />
 
       </Router>
 

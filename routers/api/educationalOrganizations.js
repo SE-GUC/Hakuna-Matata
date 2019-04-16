@@ -347,7 +347,8 @@ router.get("/certificate/:id/:certificateId", async (req, res) => {
               if(educationOrganization.educationOrganizationCertificates[index].id==req.params.certificateId.toString()){
                 console.log(index)   
                 var certificate= await Certificate.findById(req.params.certificateId)
-                     return res.send(certificate)
+                console.log(certificate)   
+                return res.send(certificate)
     
                 }
             }
