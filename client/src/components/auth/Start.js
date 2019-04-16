@@ -3,8 +3,8 @@
 import React, { Component } from 'react';
 import './Start.css';
 import StartHeader from './StartHeader.js';
-import LoginForm from '../forms/LoginForm'
-import SignUpForm from '../forms/SignUpForm'
+import LoginForm from '../Forms/LoginForm'
+import SignUpForm from '../Forms/SignUpForm'
 
 class Start extends Component {
   constructor(props) {

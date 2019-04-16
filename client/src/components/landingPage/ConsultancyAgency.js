@@ -28,7 +28,7 @@ export class consultancyAgency extends Component {
             top:'-5px'
       }}>{consultancyAgencyName}</p>
       
-    <Link  to={"/consultancyAgency/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
+    <Link  to={"/consultancyAgencies/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
  
   </div>
 );
