@@ -1,5 +1,5 @@
 .body{
-  color: black;
+  color:#242424;
 
 }
 .App-left {
@@ -20,7 +20,7 @@
   text-indent: 400px;
 }
  .setc {
-  background: "#f4f4f4";
+  background: #f4f4f4;
   Color :'#ffff';
   border:'none';
   padding:'5px 9px';
@@ -47,17 +47,17 @@
   scroll-behavior: smooth
 }
 .grid-container {
-display: grid;
-grid-column-gap: 10px;
-grid-row-gap: 10px;
-grid-template-columns: auto auto auto; 
-background-color:rgb(0, 0, 0);
-padding: 10px;
+  display: grid;
+  grid-column-gap:normal;
+  grid-row-gap:13px;
+  grid-template-columns: auto auto auto; 
+  background-color:#242424;
+  padding: 140px;
 }
 
 .grid-item {
 background-color: rgb(41, 39, 39);
-border: 1px solid rgba(0, 0, 0, 0.8);
+border: 1px solid #242424;
 padding: 10px;
 font-size: 15px;
 text-align: center;

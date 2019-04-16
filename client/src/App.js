@@ -21,9 +21,9 @@ import GetAllCoworkingSpace from './components/landingPage/pages/GetAllCoworking
 import GetSpecCoworkingSpace from './components/profiles/getSpec'
 import NavBar from './components/common/NavBar';
 import memberTask from './components/projectTask/pages/memberTask' 
-import Start from './components/auth/Start'
+//import Start from './components/auth/Start'
 import StartAs from './components/auth/StartAs'
-// import HomePage from './components/search/HomePage'
+//import HomePage from './components/search/HomePage'
 
 import Member from './components/profiles/Member'
 import UserViewMember from './components/profiles/UserViewMember';
@@ -34,8 +34,8 @@ import AdminAsUser from './components/profiles/PartnerAsAdmin';
 import AdminNAProject from './components/projectTask/pages/AdminNAProject';
 import PartnerNAProject from './components/projectTask/pages/PartnerNAProject';
 import MemberNAProject from './components/projectTask/pages/MemberNAProject';
-import createTask from './components/forms/CreateTask.js'
-import createConsultance from "./components/forms/CreateConsultance";
+import createTask from './components/Forms/CreateTask.js'
+import createConsultance from "./components/Forms/CreateConsultance";
 import GetCertificate from './components/profiles/GetCertificate';
 import GetMasterClass from './components/profiles/GetMasterClass'
 class App extends Component {
@@ -93,15 +93,12 @@ class App extends Component {
           )} />      
                
           )} />   
-          <Route exact path="/" render={() => (
-            <Start id={this.state.id} handleChangetoken={this.handleChangetoken} />
-          )} />
+         
             <Route exact path="/task/:id" render={() => (
            <memberTask></memberTask>
           )} />
-                    <Route exact path="/startAS" render={() => (
-            <StartAs id={this.state.id} tags={this.state.tags}  />
-          )} />
+            >
+          
           <Route exact path="/partner/:id" component={PartnerProfile} />
           <Route exact path="/member/:id" component={MemberProfile} />
           <Route exact path="/consultancyAgency/:id" component={consultancyAgencyProfile} />

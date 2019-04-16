@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Partner.css'
+import './Member.css'
 import Member from './Member';
 
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ConsultancyAgency from './ConsultancyAgency';
 
-
+import './ConsultancyAgency.css'
 class ConsultancyAgencies extends Component {
   get () {
     return (this.props.consultancyAgencies.map((consultancyAgency) => (
