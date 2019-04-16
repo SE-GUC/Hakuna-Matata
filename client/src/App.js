@@ -38,6 +38,9 @@ import createTask from './components/forms/CreateTask.js'
 import createConsultance from "./components/forms/CreateConsultance";
 import GetCertificate from './components/profiles/GetCertificate';
 import GetMasterClass from './components/profiles/GetMasterClass'
+import GetSpecTask from './components/profiles/getSpecTask';
+import GetAllProjects from './components/landingPage/pages/GetAllProjects'
+import GetSpecProject from './components/projectTask/pages/MemberNAProject'
 class App extends Component {
 
   constructor(props) {
@@ -104,18 +107,23 @@ class App extends Component {
           )} />
           <Route exact path="/partner/:id" component={PartnerProfile} />
           <Route exact path="/member/:id" component={MemberProfile} />
-          <Route exact path="/consultancyAgency/:id" component={consultancyAgencyProfile} />
+          <Route exact path="/task/:id" component={GetSpecTask} />
+         
+          <Route exact path="/consultancyAgencies/:id" component={consultancyAgencyProfile} />
           <Route exact path="/educationalOrganization/:id" component={educationalOrganizationProfile} />
           <Route exact path='/educationalOrganizations/course/:id/:courseId' component={GetCourse}/>
           <Route exact path='/educationalOrganizations/masterClass/:id/:masterClassId' component={GetMasterClass}/>
           
           <Route exact path='/educationalOraganizations/certificate/:id/:certificateId' component={GetCertificate}/>
+          <Route exact path='/projects/:id' component={GetSpecProject}/>
          
           <Route exact path='/coWorkingSpaces/:id/showRooms/:roomId' component={GetSpecRoom}/>
           <Route exact path='/coWorkingSpaces/:id' component={GetSpecCoworkingSpace}/> 
           <Route exact path="/consultancyAgencies" component={GetAllAgencies} />
           <Route exact path="/educationalOrganizations" component={GetAllEdu} />
           <Route exact path="/coWorkingSpaces" component={GetAllCoworkingSpace} />
+          
+          <Route exact path="/projects" component={GetAllProjects} />
           
       </Router>
       </div>

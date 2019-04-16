@@ -44,7 +44,8 @@ export class project extends Component {
         <p> 
         <t class="textcolor" > {name}</t>
         <p> </p>
-        <button style = {ButtonStyle} >visit</button>
+        <Link style = {ButtonStyle} to={"/projects/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link>
+     
         </p>
       </div>
     );

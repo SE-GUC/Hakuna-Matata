@@ -8,7 +8,7 @@ class EducationalOrganizations extends Component{
        }
        render(){
         return(
-          <div className="grid-container">
+          <div className="grid-container" >
           { this.get()}
           </div>
           )

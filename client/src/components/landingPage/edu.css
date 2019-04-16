@@ -51,7 +51,7 @@
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   grid-template-columns: auto auto auto; 
-  background-color:rgb(0, 0, 0);
+  background-color:#242424;
   padding: 10px;
 }
 
