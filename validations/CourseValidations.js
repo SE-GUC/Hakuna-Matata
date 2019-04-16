@@ -4,7 +4,7 @@ module.exports = {
     createValidation: request => {
         const createSchema = {
             name:Joi.string().required(),
-            educator:Joi.object().required(),
+            educatorName:Joi.object().required(),
             description:Joi.string().required(),
             places:Joi.number().integer().required(),
             availablePlaces:Joi.number().integer().required(),
@@ -23,7 +23,7 @@ module.exports = {
         updateValidation:request=>{
         const updateschema={
             name:Joi.string(),
-            educator:Joi.object(),
+            educatorName:Joi.object(),
             description:Joi.string(),
             places:Joi.number().integer(),
             availablePlaces:Joi.number().integer(),

@@ -108,21 +108,20 @@ router.put('/edit/:id/:adminId', async (req, res) => {
                 vartask.accepted = acceptancy
                 vartask.save()
                 //
+                console.log("here")
                 const partner =await User.findOne({_id:vartask.taskPartner.id ,tags: 'Partner'})
                 partner.partnerTasks.push({
                     id:vartask._id,
-                    name:vartask.name,
-                    date: new Date().toJSON()
+                    name:vartask.name
                 })
                 partner.save()
-                //              
-
+                //
                 
-                var e = sendTaskNotification(taskId, vartask.taskPartner.id, 'Your task has been accepted');
+                var e = sendTaskNotification(taskId, vartask.partnerId, 'Your task has been accepted');
                 res.json({ data: vartask })
             }
             else {
-                var e = sendTaskNotification(taskId, vartask.taskPartner.id, 'Your task has been rejected');
+                var e = sendTaskNotification(taskId, vartask.partnerId, 'Your task has been rejected');
                 const temptask = await Task.findByIdAndRemove(taskId)
                 res.json({ data: temptask })
             }
@@ -142,24 +141,21 @@ router.put('/assignMemberToTask/:id', async (req, res) => {
     const taskId = req.params.id
     const memberId = req.body.memberId
     const ownerId = req.body.ownerId
-try{
 
     const task = await Task.findById(taskId)
     const member = await User.findOne({ _id: memberId, tags: 'Member' })
-
-   if(task.taskPartner.id==ownerId||task.taskPartner.id==ownerId){
-    var indexOfMember = task.appliedMembers.findIndex(member => member.id == memberId)
-    var indexOfTask = member.appliedInTasks.findIndex(task => task.id == taskId)
+   if(task.taskPartner.id===ownerId||task.taskConsultancyAgency.id===ownerId){
+    var indexOfMember = task.appliedMembers.findIndex(member => member.id === memberId)
+    var indexOfTask = member.appliedInTasks.findIndex(task => task.id === taskId)
     if(indexOfMember >-1&indexOfTask>-1 ){
     task.appliedMembers.splice(indexOfMember, 1)
     member.appliedInTasks.splice(indexOfTask, 1)
     task.taskMember = {
         name: member.memberFullName,
-        id: member._id,
-        date:new Date().toJSON()
+        id: member._id
     }
     task.workCycle=0
-    member.acceptedInTasks.push({ name: task.name, id: task._id, date:new Date().toJSON() })
+    member.acceptedInTasks.push({ name: task.name, id: task._id })
     
     var e = sendTaskNotification(taskId, memberId, 'You have been assigned!')
     var e = sendTaskNotification(taskId, task.partnerId, 'You task has been assigned to a member!')
@@ -173,22 +169,17 @@ try{
 }
 }else{
     res.status(400).send('You are not the partner or consultancy')
-}}
-catch (err){
-    res.status(400).send( 'error' )
-
 }
 })
 //View task Cycle 
 router.get('/viewCycle/:id', async (req, res) => {
     const task = await Task.findById(req.params.id);
-    if (task ){
-        if (task.workCycle ==null || task.workCycle ==undefined){
-            res.send(0)}
-        else{
-            res.status(200).send({data:task.workCycle})
-        }
-    }else {
+    if (task !== undefined)
+        if (task.workCycle === null)
+            res.send(null)
+        else
+            res.send(task.workCycle)
+    else {
         res.send('This task not Found !')
     }
 

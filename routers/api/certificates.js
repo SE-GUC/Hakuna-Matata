@@ -1,7 +1,8 @@
- 
+
 const express = require('express');
 const router = express.Router();
-
+var moment = require('moment');
+const Joi = require('joi');
 
 const Certificate = require('../../models/Certificate.js')
 const certificateValidator = require('../../validations/CertificateValidations.js')
@@ -74,7 +75,8 @@ router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
         const deletedformCertificates = await Certificate.findOneAndRemove({ '_id': id })
-        if (!deletedformCertificates) return res.status(404).send({ error: 'certificates do not exist' })
+        res.send(deletedformCertificates)
+        if (!deletedformCertificates) return res.send('Not found')
         res.json({ data: deletedformCertificates })
     }
     catch (error) {

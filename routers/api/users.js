@@ -10,7 +10,7 @@ const userValidator = require('../../validations/userValidations.js')
 const tokenKey = require('../../config/keys').secretOrKey
 
 //get all users
-router.get('/', async (req,res) => {
+router.get('/',passport.authenticate('jwt', {session: false}), async (req,res) => {
     const users = await User.find()
       return res.json(users)
 })

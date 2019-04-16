@@ -11,7 +11,7 @@ const InfoSchema = new Schema({
         required: true
     }
 
-}, { _id: false });
+},{ _id : false });
 const RecomendationsSchema = new Schema({
     expert: {
         type: InfoSchema
@@ -19,7 +19,7 @@ const RecomendationsSchema = new Schema({
     masterClass: {
         type: InfoSchema
     },
-    content: String,
+    content: String, 
     rating: {
         type: Number,
         enum: [1, 2, 3, 4, 5]
@@ -27,26 +27,25 @@ const RecomendationsSchema = new Schema({
     numberOfRatings: {
         type: Number
     },
-    reviewer: [mongoose.Schema.Types.ObjectId]
-})
+    reviewer:[mongoose.Schema.Types.ObjectId]
+},{ _id : false })
 
 // Create the schema
 const CourseRequestSchema = new Schema({
-    description: {
-        type: String,
-
+    description: { 
+        type:String
     },
     dateOfSubmission: {
         type: Date,
         default: Date.now
     },
-    applyingMemberId: {
-        type: mongoose.Schema.Types.ObjectId
+    applyingMemberId: { 
+        type:mongoose.Schema.Types.ObjectId
     },
-    category: {
-        type: String
+    category: { 
+        type:String
     },
-    recomendations: {
+    recomendations: { 
         type: [RecomendationsSchema]
     },
     active: {
@@ -54,9 +53,9 @@ const CourseRequestSchema = new Schema({
         default: true
     }
 })
-const CourseRequest = mongoose.model('courseRequests', CourseRequestSchema)
 
-module.exports = CourseRequest
+module.exports = CourseRequest = mongoose.model('courseRequests',CourseRequestSchema)
+ 
 
 
 

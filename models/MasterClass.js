@@ -8,9 +8,6 @@ const MasterClassInfoSchema = new Schema({
     name: {
         type: String,
         //required: true
-    },
-    date:{
-        type:Date
     }
 
 },{ _id : false });
@@ -52,8 +49,6 @@ const MasterClassSchema = new Schema({
         type: String,
         required: true
     },
-        // what is the use of that 
-
     levelOfStudents: {
         type: String,
         required: true
