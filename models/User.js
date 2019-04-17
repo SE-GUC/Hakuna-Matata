@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+
 // Displayed info better than repeate it agine in each array
 const InfoSchema = new Schema({
 
@@ -8,6 +9,35 @@ const InfoSchema = new Schema({
         required: false,
     },
     name: {
+        type: String,
+    },
+    date:{
+        type:Date
+    }
+
+},{ _id : false });
+const HistorySchema = new Schema({
+
+    action: {
+        type: String,
+        required: true,
+        enum:['Apply For Task', 'Apply For Project','Follow','Give Recomendation to','Apply For Course','Apply For Master Class','Reserve a','Rate','Assign','Accept']
+    },
+    name: {
+        type: InfoSchema,
+    },
+    date:{
+        type:Date
+    }
+
+});
+const MessageSchema = new Schema({
+
+    send: {
+        type: Boolean,
+        required: false,
+    },
+    message: {
         type: String,
     },
     date:{
@@ -373,7 +403,11 @@ const UserSchema = new Schema({
         type:Date
     },
     // End EducationalOrganization
-    courseRequests:[InfoSchema]
+    courseRequests:[InfoSchema],
+    history:[HistorySchema],
+    chatBot:[MessageSchema],
+    lastQuestionMatches:[],
+    recomendedTasks:[InfoSchema]
 
 })
 

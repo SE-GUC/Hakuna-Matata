@@ -59,9 +59,7 @@ router.put('/:id', async (req, res) => {
         const isValidated = trainingProgramValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
         const updatedTrainingProgram = await TrainingProgram.findOneAndUpdate({ '_id': trainingProgramId }, req.body)
-        console.log(updatedTrainingProgram)
         const cousreAfterUpdate = await TrainingProgram.findById(trainingProgramId)
-        console.log(cousreAfterUpdate)
         res.json({ data: cousreAfterUpdate});
     } catch (error) {
         // We will be handling the error later

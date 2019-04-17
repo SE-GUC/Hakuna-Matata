@@ -14,8 +14,7 @@ router.post('/:id', async (request, response) => {
         const currUser = await User.findOne({ _id: request.params.id, tags: 'CoworkingSpace' })
         if (currUser) return response.status(404).send('You are already a CoworkingSpace on the site')
         await User.findByIdAndUpdate(request.params.id, request.body)
-        await User.findByIdAndUpdate(request.params.id, { coworkingSpaceDateJoined: new Date().getDate() })
-        await User.findByIdAndUpdate(request.params.id, { $push: { tags: 'CoworkingSpace' } })
+        await User.findByIdAndUpdate(request.params.id, { coworkingSpaceDateJoined: new Date().getDate(), $push: { tags: 'CoworkingSpace' } })
         const coworkingSpace = await User.findById(request.params.id)
         response.send(coworkingSpace);
 
@@ -78,8 +77,6 @@ router.post('/room/:id', async (req, res) => {
     try {
 
         const isValidated = roomValidator.createValidation(req.body);
-        console.log(req.body)
-
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
 
         const room = await Room.create(req.body)
@@ -226,27 +223,20 @@ router.put('/reservation/:id/:roomId', async (req, res) => {
         const index = req.body.index
         if (!state) {
             var coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
-            // const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
             var room = coworkingSpace.coworkingSpaceRooms.find(room => room.id == req.params.roomId)
             const roomReservations = room.reservations
-           
             for ( var pos = 0; pos < roomReservations.length; pos++) {
-                    console.log(roomReservations[pos])
                     if (roomReservations[pos]._id == index) {
                         const deletedReservation=     room.reservations.splice(pos - 1, 1)  
                         const updateRoom = await Room.findOneAndUpdate({ _id: req.params.roomId }, { reservations: room.reservations })
                         coworkingSpace.save()
                         return res.status(200).send({msg :'Reservation is Deleted ',data :deletedReservation})
-
                      }
-
-            }
-           
+            }         
             return res.status(200).send('there is not such reservation here')
         } else {
             var coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
             var isResverved = false
-            // const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
             var room = coworkingSpace.coworkingSpaceRooms.find(room => room.id == req.params.roomId)
             const roomReservations = room.reservations
             var reserved = room.reservations.find(reservation => reservation._id == req.body.index)
@@ -260,22 +250,16 @@ router.put('/reservation/:id/:roomId', async (req, res) => {
             }
             if (!isResverved) {
                 reserved.isAccpted = state
-                // console.log(pos)
                 room.reservations.splice(pos - 1, 1)
                 room.reservations.splice(pos - 1, 0, reserved)
-                // console.log(room.reservations)
                 for (var i = 0; i < room.reservations.length; i++) {
-
                     if (room.reservations[i]._id != index & room.reservations[i].slot === reserved.slot & room.reservations[i].reservationDate.getTime() == reserved.reservationDate.getTime()) {
-
                         room.reservations.splice(i, 1)
                         i--
 
                     }
                 }
-                //this may not work so i should loop on rooms to updated this room reservations explictly
                 coworkingSpace.save()
-                //coworkingSpace = await User.findOneAndUpdate({ _id: req.params.id, tags: 'CoworkingSpace' },{coworkingSpaceRooms:room})
                 const updateRoom = await Room.findOneAndUpdate({ _id: req.params.roomId }, { reservations: room.reservations })
                 coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
                 return res.status(200).send(coworkingSpace);
