@@ -41,38 +41,33 @@ export class GetSpec extends Component {
         capacity,
    
       } = this.state.room;
-      return <div> <p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> info </p> 
-      <hr style={lineStyle}></hr>  <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> capacity:<font  color = "white"> {capacity} </font></p>
+
+      return <div> 
+          <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle} onClick ={this.updateFun.bind(this)} > update </button>
+        <p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> info </p> 
+      <hr style={lineStyle}></hr>  <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> capacity:<font  color = "white"> <input type="text" id="capacity_txt" defaultValue= {capacity}  ></input></font></p>
      </div>
     }else{
       return 'ya mo8fl eh ele d5lk hena'
     }
     }
     updateFun(){
-      var url = window.location.pathname;
-      var id = url.substring(url.lastIndexOf('/') + 1);
-      window.location = `http://localhost:3000/updateRoom/${id}`
-    }
-    deleteFun(){
-     
-
-      var url = window.location.pathname;
-      var url_array = url.split('/') 
-      var id = url_array[url_array.length-3];
-      var roomId = url.substring(url.lastIndexOf('/') + 1);
-      axios.delete('http://localhost:3333/coWorkingSpaces/room/' +id+ '/' +roomId)
-      window.location.reload(true); 
-      
+        var url = window.location.pathname;
+        var id = url.substring(url.lastIndexOf('/') + 1);
+        const capacity = document.getElementById("capacity_txt").value
+        const data = {
+            capacity
         }
-
+        axios.put('http://localhost:3333/rooms/' + id , data)
+      window.location = `http://localhost:3000/coWorkingSpaces/5cab83e86b8f820fc0bcf768/showRooms/${id}`
+    }
 
     render() {
       return (
         <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
         <img className="App-img" src={room}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
-     <br></br>
-        <button  className="btn btn-danger btn-sm m-2" style = {ButotnStyle} onClick = {this.updateFun.bind(this)} > update</button> <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle} onClick = {this.deleteFun.bind(this)} > delete</button>
+
         <div className="getSpecRoom" style={{marginLeft:'250px',marginRight:'250px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
            {this.getData()}  
            <br></br>

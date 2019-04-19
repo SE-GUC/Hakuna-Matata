@@ -24,8 +24,7 @@ router.post('/:id', async (request, response) => {
         const currUser = await User.findOne({ _id: request.params.id, tags: 'EducationOrganization' })
         if (currUser) return response.status(404).send('You are already a EducationOrganization on the site')
         await User.findByIdAndUpdate(request.params.id, request.body)
-        await User.findByIdAndUpdate(request.params.id, { educationOrganizationDateJoined: new Date().getDate() })
-        await User.findByIdAndUpdate(request.params.id, { $push: { tags: 'EducationOrganization' } })
+        await User.findByIdAndUpdate(request.params.id, { educationOrganizationDateJoined: new Date().getDate() ,$push: { tags: 'EducationOrganization' }})
         const educationOrganization = await User.findById(request.params.id)
         response.send(educationOrganization);
 
@@ -55,7 +54,7 @@ router.put('/:id', async (req, res) => {
         const updatedEducationOrganization = await User.findById(req.params.id)
         res.send(updatedEducationOrganization)
     } catch (error) {
-
+      
     }
 })
 // delete EducationOrganization 
@@ -118,13 +117,17 @@ router.post('/course/:id', async (req, res) => {
     const isValidated = courseValidator.createValidation(req.body);
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
     const course = await Course.create(req.body)
-    course.educationalOrganization={ id:educationOrganization._id,
-      name:educationOrganizationName.name
+    course.educationalOrganization={ 
+      id:educationOrganization._id,
+      name:educationOrganization.educationOrganizationName,
+      date:new Date().toJSON()
     }
     course.save()
         await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationCourses:{
            id:course._id,
-           name:course.name
+           name:course.name,
+           date:new Date().toJSON()
+
         }}})
         educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
         res.send(educationOrganization.educationOrganizationCourses)
@@ -203,9 +206,17 @@ router.post('/masterClass/:id', async (req, res) => {
     const isValidated = masterClassValidator.createValidation(req.body);
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
     const masterClass = await MasterClass.create(req.body)
+    masterClass.educationalOrganization={ 
+      id:educationOrganization._id,
+      name:educationOrganization.educationOrganizationName,
+      date:new Date().toJSON()
+    }
+    masterClass.save()
         await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationMasterClasses:{
            id:masterClass._id,
-           name:masterClass.name
+           name:masterClass.name,
+           date:new Date().toJSON()
+
         }}})
         educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
         res.send(educationOrganization.educationOrganizationMasterClasses)
@@ -286,11 +297,15 @@ router.post('/educator/:id', async (req, res) => {
     //const educator = await Educator.create(req.body)
         await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationEducators:{
            id:req.body._id,
-           name:req.body.name
+           name:req.body.name,
+           date:new Date().toJSON()
+
         }}})
         await User.findOneAndUpdate({ _id: req.body._id},{$push:{memberWorksIn:{
           id:educationOrganization._id,
-          name:educationOrganization.name
+          name:educationOrganization.name   ,
+             date:new Date().toJSON()
+
        }}})
         educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
         res.send(educationOrganization.educationOrganizationEducators)
@@ -349,7 +364,7 @@ router.get('/certificate/:id/:certificateId', async (req, res) => {
         if(educationOrganization){
            
             for(var index=0; index<educationOrganization.educationOrganizationCertificates.length;index++){
-                if(educationOrganization.educationOrganizationCertificates[index].id===req.params.certificateId){
+                if(educationOrganization.educationOrganizationCertificates[index].id==req.params.certificateId){
                     var certificate= await Certificate.findById(req.params.certificateId)
                      return res.send(certificate)
     
@@ -371,9 +386,17 @@ router.post('/certificate/:id', async (req, res) => {
     const isValidated = certificateValidator.createValidation(req.body);
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
     const certificate = await Certificate.create(req.body)
+    certificate.educationalOrganization={ 
+      id:educationOrganization._id,
+      name:educationOrganization.educationOrganizationName,
+      date:new Date().toJSON()
+    }
+    certificate.save()
         await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationCertificates:{
            id:certificate._id,
-           name:certificate.name
+           name:certificate.name,
+           date:new Date().toJSON()
+
         }}})
         educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
         res.send(educationOrganization.educationOrganizationCertificates)
@@ -449,15 +472,29 @@ router.get('/trainingProgram/:id/:trainingProgramId', async (req, res) => {
 router.post('/trainingProgram/:id', async (req, res) => {
   try {
     var educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+   
     if(educationOrganization){
     const isValidated = trainingProgramValidator.createValidation(req.body);
     if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+    console.log("ssss")
     const trainingProgram = await TrainingProgram.create(req.body)
-        await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationTrainingPrograms:{
+    console.log("ssss2")
+    trainingProgram.educationalOrganization={ 
+      id:educationOrganization._id,
+      name:educationOrganization.educationOrganizationName,
+      date:new Date().toJSON()
+    }
+    trainingProgram.save()
+    console.log("ssss3")  
+    await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{$push:{educationOrganizationTrainingPrograms:{
            id:trainingProgram._id,
-           name:trainingProgram.name
+           name:trainingProgram.name,
+           date:new Date().toJSON()
+
         }}})
+        console.log("ssss4")
         educationOrganization = await User.findOne({ _id: req.params.id, tags: 'EducationOrganization' })
+        console.log("ssss5")
         res.send(educationOrganization.educationOrganizationTrainingPrograms)
 }else{
     res.status(404).send('Not found');
@@ -466,7 +503,7 @@ router.post('/trainingProgram/:id', async (req, res) => {
 
   } catch (error) {
     
-    res.sendStatus(404).send('Not found');
+    res.sendStatus(404).send('Not ');
   }
 });
 //delete trainingProgram using mongo
@@ -476,7 +513,7 @@ router.delete('/trainingProgram/:id/:trainingProgramId', async (req, res) => {
     if(educationOrganization){
         var trainingPrograms=educationOrganization.educationOrganizationTrainingPrograms
         for(var index=0; index<trainingPrograms.length;index++){
-            if(trainingPrograms[index].id===req.params.trainingProgramId){
+            if(trainingPrograms[index].id==req.params.trainingProgramId){
                 educationOrganization.educationOrganizationTrainingPrograms.splice(index,1)
                 trainingPrograms=educationOrganization.educationOrganizationTrainingPrograms
                  educationOrganization = await User.findOneAndUpdate({ _id: req.params.id, tags: 'EducationOrganization' },{educationOrganizationTrainingPrograms:trainingPrograms})
@@ -506,18 +543,21 @@ router.put('/acceptMemberInCourse/:id',async (req, res) => {
     const courseId=req.body.courseId
     const state=req.body.state
     const course= await Course.findById(courseId);
-    if(course & course.educationalOrganization.id===educationOrganizationId){
+   
+    console.log(courseId)
+    
+    if(course & course.educationalOrganization.id==educationOrganizationId){
         const member= await User.findone({_id:memberId,tags:'Member'})
         if(member){
             for(var index=0;course.listOfApplied.length;index++){
-                if(course.listOfApplied[index].id===memberId){
+                if(course.listOfApplied[index].id==memberId){
                     course.listOfApplied.splice(index,1)
                     index--;
                 }
             }
            
             for(var index=0;member.memberCoursesAppliedIn.length;index++){
-                if(member.memberCoursesAppliedIn[index].id===courseId){
+                if(member.memberCoursesAppliedIn[index].id==courseId){
                     member.memberCoursesAppliedIn.splice(index,1)
                     index--;
                 }
@@ -558,35 +598,42 @@ router.put('/acceptMemberInCourse/:id',async (req, res) => {
     const masterClassId=req.body.masterClassId
     const state=req.body.state
     const masterClass= await MasterClass.findById(masterClassId);
-    if(masterClass & masterClass.educationalOrganization.id===educationOrganizationId){
-        const member= await User.findone({_id:memberId,tags:'Member'})
-        if(member){
+
+    if(masterClass!= undefined & masterClass.educationalOrganization.id==educationOrganizationId){
+        const member= await User.findOne({_id:memberId,tags:'Member'})
+
+        if(member){    
+          if(masterClass.listOfApplied ==undefined)masterClass.listOfApplied=[] 
+
             for(var index=0;masterClass.listOfApplied.length;index++){
-                if(masterClass.listOfApplied[index].id===memberId){
+                if(masterClass.listOfApplied[index].id==memberId){
                     masterClass.listOfApplied.splice(index,1)
                     index--;
                 }
             }
-           
+            if(member.memberMasterClassesAppliedIn ==undefined) member.memberMasterClassesAppliedIn=[] 
             for(var index=0;member.memberMasterClassesAppliedIn.length;index++){
-                if(member.memberMasterClassesAppliedIn[index].id===masterClassId){
+                if(member.memberMasterClassesAppliedIn[index].id==masterClassId){
                     member.memberMasterClassesAppliedIn.splice(index,1)
                     index--;
                 }
             }
-            
+
             if(masterClass.availablePlaces>0&state){
-             
+              if(member.memberMasterClassesAcceptedIn ==undefined) member.memberMasterClassesAcceptedIn=[] 
+
                 member.memberMasterClassesAcceptedIn.push({
                     id: masterClass._id,
                     name: masterClass.name,
-                    date: moment().format('MMMM Do YYYY, h:mm:ss a')
+                    date:  new Date().toJSON()
                   })
                   member.save()
+                  if(masterClass.listOfAccepted ==undefined)masterClass.listOfAccepted=[] 
+
                   masterClass.listOfAccepted.push({
                     id: memberId,
                     name: member.memberFullName,
-                    date: moment().format('MMMM Do YYYY, h:mm:ss a')
+                    date: new Date().toJSON()
                   })
                   masterClass.availablePlaces--;
                   masterClass.save()
@@ -601,7 +648,8 @@ router.put('/acceptMemberInCourse/:id',async (req, res) => {
             if(!member)return res.status(404).send('member not Found')
             
         }
+    }else{
+      if(!masterClass)return res.status(404).send('masterClass not Found')
     }
   });
-
 module.exports = router;

@@ -154,7 +154,7 @@ class ConsultancyForm extends Component {
                 </div>
           </button>
           <Link id={this.props.id} style={this.overRideButton()} to={{
-                        pathname: `/HomePage`,
+                        pathname: `/`,
 
                     }}> Go</Link>
           <br></br>

@@ -32,8 +32,13 @@ class PartnerAsPartner extends Component{
      
     componentDidMount() {
       
-        const  handle  = '5cab83e86b8f820fc0bcf768'
-        axios.get(`http://localhost:3333/partners/${handle}`).then(res => {
+      var id;
+      if(this.props.match!==undefined){
+        id = this.props.match.params.id
+      }else{
+        id=this.props.id
+      }
+        axios.get(`http://localhost:3333/partners/${id}`).then(res => {
           this.setState({ tags : res.data.data.tags})
           this.setState({ partnerName : res.data.data.partnerName})
           this.setState({ partnerLocation: res.data.data.partnerLocation})

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import CoWorkingSpaces from '../CoWorkingSpaces';
 // import { BrowserRouter as Router, Route } from "react-router-dom";
+var store = require('store')
 
 export class GetAllCoworkingSpace extends Component {
   state = {
@@ -11,7 +12,7 @@ export class GetAllCoworkingSpace extends Component {
     axios
       .get('http://localhost:3333/coWorkingSpaces')
       .then(res =>{ this.setState({ coWorkingSpaces: res.data.data })
-      console.log(res.data.data)
+      console.log(store.get('payload').id)
 
   }
       )

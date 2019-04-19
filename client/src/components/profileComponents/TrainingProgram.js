@@ -15,7 +15,7 @@ return{
         
         
         <div style={this.getStyle()}>
-        <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.trainingProgram.name}<Link style = {ButotnStyle} to={"/educationalOraganizations/trainingProgram/"+this.props.educationalOrganization._id+"/"+this.props.trainingProgram.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show TrainingProgram</button></Link>
+        <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.trainingProgram.name}<Link style = {ButotnStyle} to={"/educationalOraganizations/trainingProgram/"+this.props.educationalOrganization._id+"/"+this.props.trainingProgram._id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show TrainingProgram</button></Link>
         
         </p>
        

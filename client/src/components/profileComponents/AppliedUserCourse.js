@@ -10,33 +10,33 @@ return{
 }
   }
   async handleClick() {
-   const id = this.props.id
-   const masterClassId = this.props.masterClass._id
-  
-    const data = {
-      masterClassId: masterClassId,
-      memberId:this.props.apply.id,
-      state:true
-    };
-    console.log(data.memberId)
-    await axios.put(`http://localhost:3333/educationalOrganizations/acceptMemberInMasterClass/${id}`, data);
+    const id = this.props.id
+    const courseId = this.props.course._id
+   
+     const data = {
+      courseId: courseId,
+       memberId:this.props.apply.id,
+       state:true
+     };
+     console.log(data.memberId)
+     
+    await axios.put(`http://localhost:3333/educationalOrganizations/acceptMemberInCourse/${id}`, data);
     window.location.reload(); 
- 
   }
   async handleClickReject() {
     const id = this.props.id
-    const masterClassId = this.props.masterClass._id
-    
-    const data = {
-      masterClassId: masterClassId,
-      memberId:this.props.apply.id,
-      state:false
-    };
-    await axios.put(`http://localhost:3333/educationalOrganizations/acceptMemberInMasterClass/${id}`, data);
+    const courseId = this.props.course._id
+   
+     const data = {
+      courseId: courseId,
+       memberId:this.props.apply.id,
+       state:false
+     };
+    await axios.put(`http://localhost:3333/educationalOrganizations/acceptMemberInCourse/${id}`, data);
     window.location.reload(); 
   }
    
-    render() {
+  render() {
     if(this.props.id==store.get('payload')){
       return (
         
@@ -47,11 +47,15 @@ return{
       
      
     </div>
-    )}else{
+    )
+  
+  }
+  else{
      return <div style={this.getStyle()}>
  <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.apply.name}</p></div>
     }
-  }
+  
+}
 }
 const ButotnStyle = {
   backgroundColor:'#242424',

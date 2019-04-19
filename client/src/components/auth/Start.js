@@ -5,7 +5,7 @@ import './Start.css';
 import StartHeader from './StartHeader.js';
 import LoginForm from '../Forms/LoginForm'
 import SignUpForm from '../Forms/SignUpForm'
-
+const store = require('store')
 class Start extends Component {
   constructor(props) {
     super(props);
@@ -56,7 +56,7 @@ class Start extends Component {
       <div style={{
        
        
-      }}>  <LoginForm  id ={this.props.id} isClose={this.state.isClose} handleClickClose ={this.handleClickClose} logInClick={this.state.logInClick} handleChangetoken={this.props.handleChangetoken} /> 
+      }}>  <LoginForm  id ={store.get('payload').id} isClose={this.state.isClose} handleClickClose ={this.handleClickClose} logInClick={this.state.logInClick} handleChangetoken={this.props.handleChangetoken} /> 
       </div> 
         <SignUpForm  isClose={this.state.isClose} handleClickClose={this.handleClickClose} signUpClick={this.state.signUpClick} handleChangetoken={this.props.handleChangetoken}   />
       

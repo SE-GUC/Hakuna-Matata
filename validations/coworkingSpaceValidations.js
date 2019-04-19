@@ -4,11 +4,11 @@ module.exports = {
     createValidation: request => {
         const createSchema = {
             coworkingSpaceName: Joi.string().required(),
-            coworkingSpacePhoneNumber: Joi.string().required(),
-            coworkingSpaceLocation: Joi.string().required(),
-            coworkingSpaceBusinessPlans: Joi.array().required(),
+            coworkingSpacePhoneNumber: Joi.string(),
+            coworkingSpaceLocation: Joi.string(),
+            coworkingSpaceBusinessPlans: Joi.array(),
             coworkingSpaceFacilites: Joi.string(),
-            coworkingSpaceMaxNoRooms: Joi.number().integer().required()
+            coworkingSpaceMaxNoRooms: Joi.number().integer()
 
         }
 

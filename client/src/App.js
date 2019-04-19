@@ -1,18 +1,11 @@
+
+
 import React, { Component } from 'react';
 
 import './App.css';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-
-
-
-
-import adminAtomic from './components/projectTask/pages/adminAtomic';
-
-import memberatomic from './components/projectTask/pages/memberatomic';
-
-import partnerAtomic from './components/projectTask/pages/partnerAtomic';
 
 import GetAllTasks from './components/landingPage/pages/GetAllTasks';
 
@@ -40,49 +33,32 @@ import GetAllCoworkingSpace from './components/landingPage/pages/GetAllCoworking
 
 import GetSpecCoworkingSpace from './components/profiles/getSpec'
 
-import NavBar from './components/common/NavBar';
-
-import memberTask from './components/projectTask/pages/memberTask'
-
 import Start from './components/auth/Start'
 
 import StartAs from './components/auth/StartAs'
 
 // import HomePage from './components/search/HomePage'
 
-
-
-import Member from './components/profiles/Member'
-
-import UserViewMember from './components/profiles/UserViewMember';
-
-import AdminViewMember from './components/profiles/AdminViewMember';
-
-import PartnerAsPartner from './components/profiles/PartnerAsPartner'
-
-import PartnerAsUser from './components/profiles/PatnerAsUser';
-
-import AdminAsUser from './components/profiles/PartnerAsAdmin';
-
-import AdminNAProject from './components/projectTask/pages/AdminNAProject';
-
-import PartnerNAProject from './components/projectTask/pages/PartnerNAProject';
-
-import MemberNAProject from './components/projectTask/pages/MemberNAProject';
-
-import createTask from './components/Forms/CreateTask.js'
-
-import createConsultance from "./components/Forms/CreateConsultance";
-
+import createCourse from './components/Forms/CreateCourse.js'
+import createMasterClass from './components/Forms/CreateMasterClass.js'
+import createTraining from './components/Forms/CreateTraining.js'
+import createEducator from './components/Forms/CreateEducator.js'
+import createCertificate from './components/Forms/CreateCertificate.js'
+import createRoom from './components/Forms/CreateRoom.js'
 import GetCertificate from './components/profiles/GetCertificate';
 
 import GetMasterClass from './components/profiles/GetMasterClass'
-
+import GetMyProfile from './components/profiles/GetMyProfile'
 import GetSpecTask from './components/profiles/getSpecTask';
 import GetAllProjects from './components/landingPage/pages/GetAllProjects'
 import GetSpecProject from './components/projectTask/pages/MemberNAProject'
 
+import updateCo from './components/Forms/updateCo'
+import updateRoom from './components/Forms/updateRoom'
+var store = require('store')
 class App extends Component {
+  
+
 
 
 
@@ -123,9 +99,11 @@ class App extends Component {
 
 
     this.setState({ dataisLoaded: true })
-    console.log(payload.id)
+ 
+store.set('payload',payload)
+console.log(store.get('payload').tags)
 
-
+console.log(store.get('payload').id)
 
   }
 
@@ -166,12 +144,16 @@ class App extends Component {
 
 
         <Router>
+        <Route exact path="/showMyProfile" render={() => (
 
+<GetMyProfile />
+
+)} />
 
 
           <Route exact path="/HomePage" render={() => (
 
-            <GetAllTasks  id={this.state.id} tags={this.state.tags}/>
+            <GetAllTasks />
 
           )} />
 
@@ -193,21 +175,25 @@ class App extends Component {
 
           <Route exact path="/" render={() => (
 
-            <Start id={this.state.id} handleChangetoken={this.handleChangetoken} />
+            <Start  handleChangetoken={this.handleChangetoken} />
 
           )} />
-
+<Route exact path="/createCourse/:id" component={createCourse}/>
+          <Route exact path="/createMasterClass/:id" component={createMasterClass}/>
+          <Route exact path="/createTrainingProgram/:id" component={createTraining}/>
+          <Route exact path="/createEducator/:id" component={createEducator}/>
+          <Route exact path="/createCertificate/:id" component={createCertificate}/>
+          <Route exact path="/createRoom/:id" component={createRoom}/>
           <Route exact path="/task/:id" render={() => (
 
             <memberTask></memberTask>
 
           )} />
-          {console.log('here')}
-        {console.log(this.state.id)}
-        {console.log(this.state.tags)}
+          <Route exact path="/updateCoWorkingSpace/:id" component={updateCo} />
+          <Route exact path="/updateRoom/:roomId" component={updateRoom} />
           <Route exact path="/startAS" render={() => (
 
-            <StartAs id={this.state.id} tags={this.state.tags} />
+            <StartAs tags={store.get('payload').tags} />
 
           )} />
 
@@ -240,13 +226,11 @@ class App extends Component {
 
           <Route exact path="/educationalOrganizations" component={GetAllEdu} />
 
-          <Route exact path="/coWorkingSpaces" component={GetAllCoworkingSpace} />
+          <Route exact path="/coWorkingSpaces" component={GetAllCoworkingSpace} id={store.get('payload').id} tags={store.get('payload').tags} />
 
 
 
           <Route exact path="/projects" component={GetAllProjects} />
-
-
 
           <Route exact path="/projects" component={GetAllProjects} />
 

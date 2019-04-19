@@ -52,11 +52,12 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id
+        
         const currCoworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
 
         if (currCoworkingSpace) {
-            const index = currCoworkingSpace.tags.indexOf('CoworkingSpace')
-            const deletedCoworkingSpace = await User.findOneAndUpdate({ _id: id }, { tags: currCoworkingSpace.tags.splice(index, 1) })
+            const arr = currCoworkingSpace.tags.remove("CoworkingSpace")
+            const deletedCoworkingSpace = await User.findOneAndUpdate({ _id: id }, { tags: arr })
             res.json({ msg: 'CoworkingSpace was deleted successfully', data: deletedCoworkingSpace })
         } else {
             res.json({ msg: 'CoworkingSpace was deleted Already or Not Found' })

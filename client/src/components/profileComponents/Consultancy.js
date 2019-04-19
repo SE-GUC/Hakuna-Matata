@@ -11,14 +11,16 @@ return{
   }
    
     render() {
-    return (
+    
+      return (
         
-      <div style={this.getStyle()}>
-      <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.consultancy.name}<Link style = {ButotnStyle}  to={"/consultancyAgencies/"+this.props.consultancy.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Consultancy Agency</button></Link>
       
-      </p>
+     <div style={this.getStyle()}>
+     <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{this.props.consultancy.name}<Link style = {ButotnStyle} to={"/consultancyAgencies/"+this.props.consultancy.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show  Consultancy Agency</button></Link>
      
-    </div>
+     </p>
+    
+   </div>
     )
   }
 }

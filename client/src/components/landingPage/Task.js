@@ -3,15 +3,29 @@ import './Task.css'
 import { Link } from "react-router-dom";
 import KeyImagee from '../../assessments/member_icon.svg'
 import MemberIcon from '../../components/profileComponents/CardPhoto';
+var store = require('store')
 export class Task extends Component {
+ 
+  isApplyable(){
+    
+if(store.get('payload').tags.includes("Member")){
+  if(this.props.task.taskMember==null ){
+  console.log(this.props.task)
 
-  
-
+  return <button style = {ButtonStyle} >apply</button>}
+  else{
+    return <button style = {ButtonStyle1} disabled>apply</button>
+  }
+}else{
+  return <button style = {ButtonStyle1} disabled>apply</button>
+  }
+  }
   render() {
     const {
         _id,
       name,
-      requiredSkills
+      requiredSkills,
+      
     } = this.props.task;
     
 
@@ -45,7 +59,7 @@ for(let i=0 ; i<requiredSkills.length ; i++ ){
               left:'65px',
               top:'-30px'}}>
         {rskills}</p>
-      <Link  to={"/task/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link> <button style = {ButtonStyle} >apply</button>
+      <Link  to={"/task/"+_id}><button className="btn btn-danger btn-sm m-2" style = {ButtonStyle}  >visit</button></Link> {this.isApplyable()}
    
     </div>
   );
@@ -67,6 +81,21 @@ backgroundColor:'#F9BB32',
   top:'-10px'
 
 } 
+const ButtonStyle1 = {
 
+  backgroundColor:'red',
+    color :'#242424',
+    width:"130px",
+    testAlign:'center',
+    pading:'15px 32px',
+    borderRadius:'8px',
+    float :'center',
+    fontSize:'18px',
+    position:'relative',
+    left:'130px',
+    top:'-10px'
+  
+  } 
+  
  
 export default Task;

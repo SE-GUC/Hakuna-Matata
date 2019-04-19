@@ -6,12 +6,15 @@
     "axios": "^0.18.0",
     "firebase": "^5.9.4",
     "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.8",
     "react-chat-widget": "^2.1.4-1",
     "react-dom": "^16.8.6",
     "react-inlinesvg": "^0.8.4",
     "react-redux": "^7.0.2",
     "react-router-dom": "^5.0.0",
     "react-scripts": "^2.1.8",
+    "react-select": "^2.4.3",
+    "store": "^2.0.12",
     "styled-components": "^4.2.0"
   },
   "scripts": {

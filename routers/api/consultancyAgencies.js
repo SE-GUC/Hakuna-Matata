@@ -99,6 +99,7 @@ router.put('/Report/:id', async (req, res) => {
         res.status(404).send('consultancy agency not found')
     }
 })
+
 router.put('/Member/:id', async (req, res) => {
   try {
     const schema = {
@@ -210,7 +211,7 @@ router.put('/applyForTask/:id', async (req, res) => {
       const consultancyAgency = await User.findOne({ _id: consultancyAgencyId, tags: 'ConsultancyAgency' })
       if (consultancyAgency) {
         if (task.accepted) {
-          if (task.appliedConsultancies.filter(e => e.id == consultancyAgencyId).length > 0) return res.status(400).send('Applied Before')
+           // if (task.appliedConsultancies.filter(e => e.id == consultancyAgencyId).length > 0) return res.status(400).send('Applied Before')
           if (task.consultyNeeded) {
             if (task.appliedConsultancies === null) task.appliedConsultancies = []
             if (consultancyAgency.consultancyAgencyAppliedInTasks === null) consultancyAgency.consultancyAgencyAppliedInTasks = []
@@ -223,7 +224,8 @@ router.put('/applyForTask/:id', async (req, res) => {
                 }
               }
             })
-            await Task.findByIdAndUpdate({ _id: taskId }, {
+            
+          const x=  await Task.findByIdAndUpdate({ _id: taskId }, {
               $push: {
                 appliedConsultancies:
                 {
@@ -232,7 +234,8 @@ router.put('/applyForTask/:id', async (req, res) => {
                 }
               }
             })
-            res.status(200).send('Done')
+
+            res.status(200).send(x)
           } else {
             res.status(400).send('Sorry u can not Apply the task Dont need consultancy')
           }
@@ -257,7 +260,7 @@ router.put('/applyForProject/:id', async (req, res) => {
       const consultancyAgency = await User.findOne({ _id: consultancyAgencyId, tags: 'ConsultancyAgency' })
       if (consultancyAgency) {
         if (project.accepted) {
-          if (project.appliedConsultancies.filter(e => e.id == consultancyAgencyId).length > 0) return res.status(400).send('Applied Before')
+          // if (project.appliedConsultancies.filter(e => e.id == consultancyAgencyId).length > 0) return res.status(400).send('Applied Before')
 
           
           if (project.consultyNeeded) {

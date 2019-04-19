@@ -3,7 +3,7 @@ import axios from "axios";
 import Tasks from '../Tasks';
 import Chat from '../../chat/Chat';
 import '../Task.css';
-
+var store = require('store')
 // import { BrowserRouter as Router, Route } from "react-router-dom";
 
 export class GetAllTasks extends Component {
@@ -19,7 +19,10 @@ export class GetAllTasks extends Component {
   componentDidMount() {
     axios
       .get('http://localhost:3333/tasks/')
-      .then(res => this.setState({ tasks: res.data.data }))
+      .then(res => this.setState({ tasks: res.data.data}))
+      
+
+console.log(store.get('payload').id)
   }
   render() {
     return (

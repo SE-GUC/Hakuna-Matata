@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 import Skill from '../profileComponents/Skill'
 import Member from '../profileComponents/ConsultancyAgencyMembers'
 import Consultancy from '../profileComponents/Consultancy'
-
+var store = require('store')
 export class GetSpecTask extends Component {
     state = {
       
@@ -72,7 +72,7 @@ export class GetSpecTask extends Component {
       return <div> <p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> info </p> 
       <hr style={lineStyle}></hr>  <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> name:<font  color = "white"> {name} </font></p>
       <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> taskPartner:<font  color = "white"> {taskPartner.name} </font><Link style = {ButotnStyle}  to={"/partner/"+taskPartner.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >Show Partner</button></Link></p>
-      <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> project:<font  color = "white"> {project.name} </font><Link style = {ButotnStyle}  to={"/projects/"+project.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >Show project</button></Link></p>
+      {/* <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> project:<font  color = "white"> {project.name} </font><Link style = {ButotnStyle}  to={"/projects/"+project.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >Show project</button></Link></p> */}
       <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> description:<font  color = "white"> {description} </font></p>
       <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> consultyNeeded:<font  color = "white"> {consulted} </font></p>
       <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> deadline:<font  color = "white"> {deadline} </font></p>
@@ -86,13 +86,58 @@ export class GetSpecTask extends Component {
     }
     }
    
-   
+    async handleClick() {
+      const {id}=this.props.match.params
+      console.log(id)
+      const data = {
+        taskId: id
+      };
+      const memberId = store.get('payload').id
+      await axios.put(
+        `http://localhost:3333/members/applyForTask/${memberId}`,
+        data
+      );
+    }
+    async handleConsultanceClick() {
+      const {id}=this.props.match.params
+      console.log(id)
+      const data = {
+        taskId: id
+      };
+      const consultancyAgencyId = store.get('payload').id
+      await axios.put(
+        `http://localhost:3333/consultancyAgencies/applyForTask/${consultancyAgencyId}`,
+        data
+      );
+    }
+    MemberTask(){
+      if(store.get('payload').tags.includes('Member')){
+        return  <button style={{border: '0.7px solid #707070',background:'#F9BB32',width:150,height:25,borderRadius:'8px',color:'white',position:'relative'}} onClick={this.handleClick.bind(this)}> Apply For Task </button>
+
+       
+      }
+    }
+    ConsultTask(){
+      console.log(store.get('payload').tags)
+      if(store.get('payload').tags.includes('ConsultancyAgency')){
+        return    <button style={{border: '0.7px solid #707070',background:'#F9BB32',width:150,height:25,borderRadius:'8px',color:'white',position:'relative'}} onClick={this.handleConsultanceClick.bind(this)}> Apply For Consult </button>
+         
+       
+      }
+    }
     render() {
       return (
         <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
         <img className="App-img" src={task}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
-
+        <div style={{position:"realtive"}} >
+       {this.MemberTask()}
+        </div>
+        <br/>
+        <div style={{position:"realtive"}} >
+        {this.ConsultTask()}
+        </div>
+       
         <div className="getSpecRoom" style={{marginLeft:'250px',marginRight:'250px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
            {this.getData()}  
 
@@ -101,13 +146,14 @@ export class GetSpecTask extends Component {
       <hr style={lineStyle}></hr>
       {this.getSkills()}
      <br></br>
+     <p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> Consultancies Applied </p> 
+      <hr style={lineStyle}></hr>
+      {this.getConsultancies()}
       <p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> Member Applied </p> 
       <hr style={lineStyle}></hr>
       {this.getMembers()}
       <br></br>
-      <p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> Consultancies Applied </p> 
-      <hr style={lineStyle}></hr>
-      {this.getConsultancies()}
+      
       
         
 </div>

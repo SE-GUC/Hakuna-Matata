@@ -9,6 +9,7 @@ import ConsultancyAgencyLocation from '../profileComponents/ConsultancyAgencyLoc
 import ConsultancyAgencyEvent from '../profileComponents/ConsultancyAgencyEvent.js'
 import ConsultancyAgencyTask from '../profileComponents/ConsultancyAgencyTask.js'
 import ConsultancyAgencyProject from '../profileComponents/ConsultancyAgencyProject.js'
+
 export class GetSpecificAgency extends Component {
     state = {
       consultancyAgency: null,
@@ -22,8 +23,13 @@ export class GetSpecificAgency extends Component {
       consultancyAgencyAcceptedInPorjects:[]
       
     };
-    componentDidMount() {
-        const {id}=this.props.match.params
+    componentDidMount() { 
+      var id;
+      if(this.props.match!==undefined){
+        id = this.props.match.params.id
+      }else{
+        id=this.props.id
+      }
         axios
           .get(`http://localhost:3333/consultancyAgencies/${id}`)
           .then(res => {
@@ -84,7 +90,8 @@ export class GetSpecificAgency extends Component {
                     return this.state.consultancyAgencyAcceptedInPorjects.map((project)=>(
                   
                       <ConsultancyAgencyProject  project= {project} />
-                    ))}           
+                    ))}
+                            
     getData(){
       if(this.state.consultancyAgency != null){
       const {
@@ -121,8 +128,8 @@ export class GetSpecificAgency extends Component {
         
           <img className="App-img" src={consultancyAgency}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
   <br></br>
-  <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Give Feedback</button> <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Chat</button>  <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Creat new Account</button>
-         <br></br>
+
+   <br></br>
 <p></p>
           <div className="GetSpecificAgency" style={{marginLeft:'250px',marginRight:'250px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
              {this.getData()} 

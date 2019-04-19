@@ -8,6 +8,7 @@ export class getAllmembers extends Component {
     members: []
   };
   componentDidMount() {
+    
     axios
       .get('http://localhost:3333/members')
       .then(res => {this.setState({ members: res.data.data })

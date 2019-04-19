@@ -23,11 +23,12 @@ router.post('/:id', async (req, res) => {
   if (result.error) {
     return res.status(400).send({ error: result.error.details[0].message })
   } else {
+    if(req.body.skills){
     for (var skill of req.body.skills) {
       var currSkills = await Skill.findOne( skill )
       if (!currSkills) return res.status(404).send(`${skill} is not supported by the site we will handel  that and send u notification`)
     }
-
+  }
     const currUser = await User.findOne({ _id: req.params.id, tags: 'Member' })
     if (currUser) return res.status(404).send('You are already a Member on the site')
 
@@ -153,7 +154,10 @@ router.put('/applyForTask/:id', async (req, res) => {
           if (memberSkills.filter(e => e.name === task.requiredSkills[index].name).length <0) {
               matches=false
           }
-        }       
+        } 
+        console.log(matches)
+        console.log(member.experienceLevel)
+              
         if (matches & member.experienceLevel >= task.experienceLevel) {
           if (task.appliedMembers === null) task.appliedMembers = []
           if (member.appliedTasks === null) member.appliedTasks = []
@@ -184,11 +188,11 @@ router.put('/applyForTask/:id', async (req, res) => {
         }
       }
       else {
-        res.status(400).send('task id is not available')
+        res.status(400).send('task id i not available')
 
       }
     } else {
-      res.status(400).send('member id is not available')
+      res.status(400).send('member id is ot available')
     }
   } else {
     res.status(400);

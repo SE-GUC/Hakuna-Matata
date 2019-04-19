@@ -5,13 +5,16 @@ import CoWorkingSpaces from '../profileComponents/CoWorkingSpaces';
 
 export class GetAll extends Component {
   state = {
-    coWorkingSpaces: []
+    coWorkingSpaces: [],
+    tags : this.props.tags
   };
   componentDidMount() {
     axios
       .get('http://localhost:3333/coWorkingSpaces')
       .then(res =>{ this.setState({ coWorkingSpaces: res.data.data })
+      console.log(tags)
 
+   
   }
       )
       

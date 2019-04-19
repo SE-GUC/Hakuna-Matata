@@ -6,22 +6,30 @@ import Facilite from '../profileComponents/Facilite';
 import {Link} from 'react-router-dom';
 
 import BusinessPlan from '../profileComponents/BusinessPlan';
+var store = require('store')
 export class GetSpec extends Component {
     state = {
       coWorkingSpace: null,
-      rooms :[]
+      rooms :[],
+      id:null
     };
     componentDidMount() {
-        const {id}=this.props.match.params
-        axios
-          .get(`http://localhost:3333/coworkingSpaces/${id}`)
-          .then(res => {
+       
+     
+        if(this.props.match!==undefined){
+          this.state.id = this.props.match.params.id
+        }else{
+          this.state.id=this.props.id
+        }
+        axios.get(`http://localhost:3333/coworkingSpaces/${this.state.id}`)
+.then(res => {
             this.setState({ coWorkingSpace: res.data.data})
+            //console.log(res.data.data)
             console.log(res.data.data)
           }
             )
             axios
-          .get(`http://localhost:3333/coworkingSpaces/room/${id}`)
+          .get(`http://localhost:3333/coworkingSpaces/room/${this.state.id}`)
           .then(res => {
             this.setState({ rooms: res.data.data})
             console.log(res.data.data)
@@ -66,24 +74,70 @@ export class GetSpec extends Component {
        <hr style={lineStyle}></hr>
        {this.getFacilities()}
        <br></br>
-       <p style ={{color :"#F9BB32", textAlign: "left",fontSize: " 15px "}}>Rooms:<Link style = {ButotnStyle} to={"/coWorkingSpaces/createRoom/"+this.state.coWorkingSpace._id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >+</button></Link></p>
+      {/* {this.addRoomButton()} */}
+      <p style ={{color :"#F9BB32", textAlign: "left",fontSize: " 15px "}}>Rooms:<Link style = {ButotnStyle} to={"/createRoom/"+this.state.coWorkingSpace._id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >+</button></Link></p>
+     
         <hr style={lineStyle}></hr>
       <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> maxNoRooms:<font  color = "white"> {coworkingSpaceMaxNoRooms} </font></p>
        </div>
     
     }else{
+     
       return <p style={{color:'white'}}>ya mo8fl eh ele d5lk hena</p>
+      
     }
     }
+    addRoomButton(){
+      if(this.state.id==store.get('payload').id){
+        return  <p style ={{color :"#F9BB32", textAlign: "left",fontSize: " 15px "}}>Rooms:<Link style = {ButotnStyle} to={"/coWorkingSpaces/createRoom/"+this.state.coWorkingSpace._id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle1}  >+</button></Link></p>
+      }
+      else{
+return  <p style ={{color :"#F9BB32", textAlign: "left",fontSize: " 15px "}}>Rooms:</p>
+}
+     
+    }
+
+
+    
+    checkButtons(){
+      if(this.state.id==store.get('payload').id){
+        return<div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Creat new Account</button><button onClick = {this.updateFun.bind(this)} className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > update</button>
+        <button onClick = {this.deleteFun.bind(this)} className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > delete</button>
+   
+   </div> }
+      else{
+return <div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Give Feedback</button> <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Chat</button> 
+  </div>
+      }
+    }
+    deleteFun(){
+     
+
+      var url = window.location.pathname;
+      var id = url.substring(url.lastIndexOf('/') + 1);
+      axios.delete(`http://localhost:3333/coWorkingSpaces/${id}`)
+      window.alert("deleted")
+      window.location.reload(true); 
+      
+        }
+        updateFun(){
+          var url = window.location.pathname;
+      var id = url.substring(url.lastIndexOf('/') + 1);
+      window.location = `http://localhost:3000/updateCoWorkingSpace/${id}`
+        }
     render() {
+      if(this.state.coWorkingSpace!=null){
+      
       return (
       
         <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
         <img className="App-img" src={coWorkingSpace} class="center"  borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
 <br></br>
-<button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Give Feedback</button> <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Chat</button>  <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Creat new Account</button>
-    <br></br>
+
+ {this.checkButtons()}  
+ <button onClick = {this.deleteFun.bind(this)} className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > delete</button>
+ <br></br>
     <p></p>
         <div className="getSpec" style={{marginLeft:'250px',marginRight:'250px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
            {this.getData()} 
@@ -93,7 +147,9 @@ export class GetSpec extends Component {
         </div>
         </div>
        
-      );
+      )}else{
+        return "loading"
+      }
     }
   }
   const lineStyle ={

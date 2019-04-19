@@ -8,7 +8,7 @@ import PartnerForm from '../Forms/PartnerForm'
 import CoworkingSpaceForm from '../Forms/CoworkingSpaceForm'
 import EducationOrganizationForm from '../Forms/EducationOrganizationForm'
 import ConsultancyForm from '../../components/Forms/ConsultancyForm'
-
+const store = require('store')
 class StartAs extends Component {
   constructor(props) {
     super(props);
@@ -118,9 +118,9 @@ class StartAs extends Component {
   }
 
   getCards() {
-    console.log(this.props.id)
-    console.log('this.props.id')
+    
     var table = []
+    console.log(this.props.tags)
     if (!this.props.tags.includes('Member')) {
       table.push(<td style={{
         padding: '10px 25px 10px 25px'
@@ -232,8 +232,7 @@ class StartAs extends Component {
   render() {
     return (
       <div className="Start">
-        {console.log('here')}
-        {console.log(this.props.id)}
+       
         <header style={{
           padding: 0,
           margin: 0,
@@ -254,16 +253,16 @@ class StartAs extends Component {
           </tr>
         </table>
        
-        <MemberForm isClose={this.state.memberClose} handleClickClose={this.handleClickMemberClose} logInClick={this.state.memberDisplay} id={this.props.id} />
+        <MemberForm isClose={this.state.memberClose} handleClickClose={this.handleClickMemberClose} logInClick={this.state.memberDisplay} id={store.get('payload').id} />
 
 
-        <PartnerForm isClose={this.state.partnerClose} handleClickClose={this.handleClickPartnerClose} logInClick={this.state.partnerDisplay} id={this.props.id} />
+        <PartnerForm isClose={this.state.partnerClose} handleClickClose={this.handleClickPartnerClose} logInClick={this.state.partnerDisplay} id={store.get('payload').id} />
 
-        <CoworkingSpaceForm isClose={this.state.coworkingSpaceClose} handleClickClose={this.handleClickCoworkingSpaceClose} logInClick={this.state.coworkingSpaceDisplay} id={this.props.id} />
+        <CoworkingSpaceForm isClose={this.state.coworkingSpaceClose} handleClickClose={this.handleClickCoworkingSpaceClose} logInClick={this.state.coworkingSpaceDisplay} id={store.get('payload').id} />
 
-        <EducationOrganizationForm isClose={this.state.educationOrganizationClose} handleClickClose={this.handleClickEducationOrganizationClose} logInClick={this.state.educationOrganizationDisplay} id={this.props.id} />
+        <EducationOrganizationForm isClose={this.state.educationOrganizationClose} handleClickClose={this.handleClickEducationOrganizationClose} logInClick={this.state.educationOrganizationDisplay} id={store.get('payload').id} />
 
-        <ConsultancyForm isClose={this.state.consultancyClose} handleClickClose={this.handleClickConsultancyClose} logInClick={this.state.consultancyDisplay} id={this.props.id} />
+        <ConsultancyForm isClose={this.state.consultancyClose} handleClickClose={this.handleClickConsultancyClose} logInClick={this.state.consultancyDisplay} id={store.get('payload').id} />
 
       </div>
 
