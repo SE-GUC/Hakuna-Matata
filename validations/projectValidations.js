@@ -4,7 +4,7 @@ module.exports = {
     createValidation: request => {
         const createSchema = {
             name:Joi.string().required(),
-            taskPartner:Joi.string().required(),
+            projectPartner:Joi.string().required(),
             description:Joi.string().required(),
             consultyNeeded:Joi.boolean().required(),
             deadline:Joi.date().required(),
@@ -20,7 +20,7 @@ module.exports = {
     updateValidation: request => {
         const updateSchema = {
             name:Joi.string(),
-            taskPartner:Joi.string(),
+            projectPartner:Joi.string(),
             description:Joi.string(),
             consultyNeeded:Joi.boolean(),
             deadline:Joi.date(),
