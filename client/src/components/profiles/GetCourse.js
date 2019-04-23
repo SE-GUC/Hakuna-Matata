@@ -3,12 +3,14 @@ import axios from "axios";
 import course from '../profileComponents/courseicon.png'
 import AppliedUser from '../profileComponents/AppliedUserCourse'
 import AcceptedUser from '../profileComponents/AcceptedUser'
+import { Link , Redirect } from "react-router-dom";
 var store = require('store')  
 export class GetCourse extends Component {
     state = {
       course:null,
       Applied:[],
-      Accepted:[]
+      Accepted:[],
+      deleted:false
     };
   
     async handleClick() {
@@ -23,7 +25,16 @@ export class GetCourse extends Component {
       await axios.put(`http://localhost:3333/members/applyForCourse/${handle}`, data);
       window.location.reload(); 
     }
- 
+    delCourse(){ 
+      const {id,courseId}=this.props.match.params
+      axios.delete(`http://localhost:3333/educationalOrganizations/course/${id}/${courseId}`)
+      .then(res=>{
+        if(res.status==200){
+          alert("course is deleted successfully");
+         this.setState({deleted:true})
+  
+      };
+      })}
     componentDidMount() {
         const {id,courseId}=this.props.match.params
   
@@ -43,6 +54,22 @@ export class GetCourse extends Component {
         
           
     };
+    checkButtons(){
+     const {id,courseId}=this.props.match.params
+   /*   console.log(id);
+      console.log(store.get('payload').id);
+      if(id ==store.get('payload').id){*/
+        return<div>
+      
+        {" "} <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle} onClick={this.delCourse.bind(this)}  > delete </button> |
+        {" "}  <Link to={"/updateCourse/"+id+"/"+courseId}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > update </button> </Link>
+        </div>
+    }
+   /*   else{
+    return <div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Apply</button>
+    </div>
+      }
+    }*/
     GetAppliedUser(){
         return this.state.Applied.map((apply)=>(
     
@@ -91,15 +118,21 @@ export class GetCourse extends Component {
     }
 
     render() {
+      const {id,courseId}=this.props.match.params
+      if(this.state.deleted){
+      
+        return(<Redirect to=  {"/educationalOrganization/"+id}  ></Redirect>)
+        
+
+      }
+else{
       return (
         <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
         <img className="App-img" src={course}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
-        <button
-          onClick={this.handleClick.bind(this)}
-         className="btn btn-danger btn-sm m-2" style = {ButtonStyle} >
-          Apply
-        </button>
+        {this.checkButtons()}
+        
+      
         <div className="getSpecRoom" style={{position:"relative",top:"27px",marginLeft:'250px',marginRight:'250px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
            {this.getData()}  
           <p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> Users applied  </p> 
@@ -114,25 +147,22 @@ export class GetCourse extends Component {
 </div>
 
       );
+}
     }
   }
   const lineStyle ={
     backgroundColor:'black',
       borderTop: '1px solid #F9BB32'
     }
-    const ButtonStyle = {
-
+  
+  
+    const ButotnStyle = {
       backgroundColor:'#F9BB32',
         color :'#242424',
-        width:"130px",
         testAlign:'center',
         pading:'15px 32px',
-        borderRadius:'8px',
+        borderRadius:'12px',
         float :'center',
-        fontSize:'18px',
-        position:'relative',
-        left:'-120px',
-        top:'22px'
-    
-    }  
+        fontSize:'18px'
+    }
   export default GetCourse;

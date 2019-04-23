@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import axios from "axios";
 import certificate from '../profileComponents/certificateIcon.jpg'
-
+import { Link , Redirect } from "react-router-dom";
+var store = require('store')  
 export class GetCertificate extends Component {
     state = {
       certificate:null,
+      deleted:false
      
     };
     componentDidMount() {
@@ -22,6 +24,29 @@ export class GetCertificate extends Component {
         
           
     };
+    delCertificate(){
+      const {id,certificateId}=this.props.match.params
+      axios.delete(`http://localhost:3333/educationalOrganizations/certificate/${id}/${certificateId}`)
+      .then(res=>{
+        if(res.status==200){
+          alert("certificate is deleted successfully");
+         this.setState({deleted:true})
+  
+      };
+      })}
+      checkButtons(){
+        const {id,certificateId}=this.props.match.params
+        console.log(id);
+        console.log(store.get('payload').id);
+       /* if(id ==store.get('payload').id){*/
+          return<div>
+        
+          {" "} <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle} onClick={this.delCertificate.bind(this)}  > delete </button> |
+          {" "}  <Link to={"/updateCertificate/"+id+"/"+certificateId}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > update </button> </Link>
+          </div>
+     // }
+        
+      }
     
     getData(){
       if(this.state.certificate != null){
@@ -44,10 +69,19 @@ export class GetCertificate extends Component {
     }
 
     render() {
+      const {id,certificateId}=this.props.match.params
+      if(this.state.deleted){
+      
+        return(<Redirect to=  {"/educationalOrganization/"+id}  ></Redirect>)
+        
+
+      }
+else{
       return (
         <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
         <img className="App-img" src={certificate}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
+{this.checkButtons()}
 
         <div className="getSpecRoom" style={{marginLeft:'250px',marginRight:'250px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
            {this.getData()}  
@@ -56,6 +90,7 @@ export class GetCertificate extends Component {
 </div>
 
       );
+}
     }
   }
   const lineStyle ={
@@ -70,5 +105,5 @@ export class GetCertificate extends Component {
         borderRadius:'12px',
         float :'center',
         fontSize:'18px'
-    }  
+    }
   export default GetCertificate;

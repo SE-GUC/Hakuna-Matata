@@ -1,16 +1,33 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const SkillSchema = new Schema({
+    name: {
+        type: String,
+        //required: true
+    }
+},{ _id : false })
+const TrainingProgramInfoSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+       // required: true,
+    },
+    name: {
+        type: String,
+        //required: true
+    },
+    date:{
+        type:Date
+    }
 
+},{ _id : false });
+educationalOrganization:TrainingProgramInfoSchema
 // Create the schema
 const TrainingProgramSchema = new Schema({
     name: {
         type: String
     },
-    trainerId: {
-        type: Number
-    },
-    trainerName: {
-        type: String
+    trainer: {
+        type: TrainingProgramInfoSchema
     },
     description: {   
         type: String
@@ -28,8 +45,10 @@ const TrainingProgramSchema = new Schema({
         type:Date
     },
     requiredSkills: {
-        type: [String]
-    }
+        type: [SkillSchema]
+    },
+    educationalOrganization:TrainingProgramInfoSchema
+
 })
 
 const TrainingProgram = mongoose.model('trainingPrograms', TrainingProgramSchema)

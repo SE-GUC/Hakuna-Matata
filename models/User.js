@@ -1,22 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const EducatorSchema = new Schema({
-
-    id: {
-        type: mongoose.Schema.Types.ObjectId,
-    },
-    name: {
-        type: String,
-    },
-    date:{
-        type:Date
-    },
-    contact:{
-        type: String,
-    }
-
-});
 // Displayed info better than repeate it agine in each array
 const InfoSchema = new Schema({
 
@@ -25,6 +9,35 @@ const InfoSchema = new Schema({
         required: false,
     },
     name: {
+        type: String,
+    },
+    date:{
+        type:Date
+    }
+
+},{ _id : false });
+const HistorySchema = new Schema({
+
+    action: {
+        type: String,
+        required: true,
+        enum:['Apply For Task', 'Apply For Project','Follow','Give Recomendation to','Apply For Course','Apply For Master Class','Reserve a','Rate','Assign','Accept']
+    },
+    name: {
+        type: InfoSchema,
+    },
+    date:{
+        type:Date
+    }
+
+});
+const MessageSchema = new Schema({
+
+    send: {
+        type: Boolean,
+        required: false,
+    },
+    message: {
         type: String,
     },
     date:{
@@ -55,6 +68,31 @@ const ReservationSchema = new Schema({
     },
 })
 //Room for coworkingSpace
+const RoomSchema = new Schema({
+    id:{
+        type: mongoose.Schema.Types.ObjectId
+    },
+    capacity: {
+        type: Number,
+        required: true
+    },
+    slots: {
+        type: [String]
+    },
+    reviews: [{
+        reviewers: {
+            type: InfoSchema,
+         //   required: true
+        },
+        comments: {
+            type: InfoSchema,
+            //required: true
+        }
+    }],
+    reservations:[ReservationSchema]
+    
+
+},{ _id : false });
 
 // Skill Schema
 const SkillSchema = new Schema({
@@ -89,7 +127,30 @@ const TrainingProgramSchema = new Schema({
         type: [SkillSchema]
     }
 })
-
+const PlatformSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
+    type: {
+        type: String,
+        enum: ['Task','Project', 'CourseRequest'],
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    },
+    owener:{
+        type:InfoSchema,
+        required: true
+    },
+    data:{
+        type:InfoSchema,
+        required: true
+    },
+    description:String
+},{ _id : false })
 // Create the schema
 const UserSchema = new Schema({
     tags: {
@@ -250,8 +311,8 @@ const UserSchema = new Schema({
     memberCourses:[InfoSchema],
     memberCoursesAppliedIn:[InfoSchema],
     memberCoursesAcceptedIn:[InfoSchema],
-    memberMasterclassesAppliedIn:[InfoSchema],
-    memberMasterclassesAcceptedIn:[InfoSchema],
+    memberMasterClassesAppliedIn:[InfoSchema],
+    memberMasterClassesAcceptedIn:[InfoSchema],
     memberWorksIn:[InfoSchema],
     memberVerified: {
         type: Boolean,
@@ -333,6 +394,7 @@ const UserSchema = new Schema({
         type: Number,
        // required: true
     },
+    coworkingSpaceRooms: [RoomSchema],
     coworkingSpaceVerified: {
         type: Boolean,
         default: false
@@ -352,10 +414,10 @@ const UserSchema = new Schema({
         type:String
     },
     educationOrganizationCertificates: [InfoSchema],
-    educationOrganizationTrainingPrograms: [TrainingProgramSchema],
+    educationOrganizationTrainingPrograms: [InfoSchema],
     educationOrganizationCourses: [InfoSchema],
     educationOrganizationMasterClasses:[InfoSchema],
-    educationOrganizationEducators:[EducatorSchema],
+    educationOrganizationEducators:[InfoSchema],
     educationOrganizationVerified: {
         type: Boolean,
         default: false
@@ -364,7 +426,14 @@ const UserSchema = new Schema({
         type:Date
     },
     // End EducationalOrganization
-    courseRequests:[InfoSchema]
+    courseRequests:[InfoSchema],
+    history:[HistorySchema],
+    chatBot:[MessageSchema],
+    lastQuestionMatches:[],
+    recomended:[PlatformSchema],
+    currQuestion:String,
+    // test:[],
+   
 
 })
 

@@ -5,6 +5,7 @@ const router = express.Router();
 
 const TrainingProgram = require('../../models/TrainingProgram.js')
 const trainingProgramValidator = require('../../validations/trainingProgramsValidations.js')
+const User = require('../../models/User.js')
 
 //TrainingProgram CRUDS
 
@@ -58,11 +59,23 @@ router.put('/:id', async (req, res) => {
         const trainingProgramId = req.params.id
         const isValidated = trainingProgramValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
-        const updatedTrainingProgram = await TrainingProgram.findOneAndUpdate({ '_id': trainingProgramId }, req.body)
-        console.log(updatedTrainingProgram)
-        const cousreAfterUpdate = await TrainingProgram.findById(trainingProgramId)
-        console.log(cousreAfterUpdate)
-        res.json({ data: cousreAfterUpdate});
+        await TrainingProgram.findOneAndUpdate({ '_id': trainingProgramId }, req.body)
+        const updatedTrainingProgram = await TrainingProgram.findById(trainingProgramId)
+
+        if(updatedTrainingProgram.educationalOrganization != undefined){
+            const educationalOrganization= await User.findById(updatedTrainingProgram.educationalOrganization.id)
+            const index = educationalOrganization.educationOrganizationTrainingPrograms.findIndex((trainingProgram)=> trainingProgram.id == trainingProgramId )
+            if(index !=-1){
+            const oldTrainingProgram=educationalOrganization.educationOrganizationTrainingPrograms.splice(index,1)
+            educationalOrganization.educationOrganizationTrainingPrograms.push({
+                id: updatedTrainingProgram._id,
+                name: updatedTrainingProgram.name,
+                date: oldTrainingProgram.date
+            })
+            educationalOrganization.save()
+        }
+    }
+        res.json({ data: updatedTrainingProgram});
     } catch (error) {
         // We will be handling the error later
         res.status(404).send('Not found')
@@ -75,14 +88,15 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        console.log(id)
         const deletedformTrainingPrograms = await TrainingProgram.findOneAndRemove({ '_id': id })
-        console.log(id)
-        res.send(deletedformTrainingPrograms)
         if (!deletedformTrainingPrograms) return res.send('Not found')
-        console.log(id)
-        var trainingPrograms = await TrainingProgram.find()
-        res.json({ data: trainingPrograms })
+        
+        if(deletedformTrainingPrograms.educationalOrganization != undefined){
+            const educationalOrganization= await User.findById(deletedformTrainingPrograms.educationalOrganization.id)
+            educationalOrganization.educationOrganizationTrainingPrograms= educationalOrganization.educationOrganizationTrainingPrograms.filter((trainingProgram)=> trainingProgram.id!= id )
+            educationalOrganization.save()
+        }
+        res.json({ data: deletedformTrainingPrograms })
     }
     catch (error) {
         res.sendStatus(404).send('Not found');

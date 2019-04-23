@@ -6,20 +6,67 @@ import Educators from '../profileComponents/Educators'
 import MasterClasses from '../profileComponents/MasterClasses'
 import TrainingPrograms from '../profileComponents/TrainingPrograms'
 import educationalOrganization from '../profileComponents/educational_icon.jpg';
-import {Link,Redirect} from 'react-router-dom';
+import { Link , Redirect } from "react-router-dom";
+
 
 var store = require('store')
 export class GetSpecificEdu extends Component{
     state ={
         educationalOrganization:null,
+        educationOrganizationName:'',
+        educationOrganizationPhoneNumber:'',
+        educationOrganizationLocation:'',
+        educationOrganizationCertificates:'',
+        educationOrganizationTrainingPrograms:'',
+        educationOrganizationCourses:'',
+        educationOrganizationMasterClasses:'',
+        educationOrganizationEducators:'',
+
         courses :[],
         educators :[],
         certificates :[],
         masterClasses :[],
         trainingPrograms :[],
         eduId:null,
-       deleted:false, thisId:''
-     }
+        updated:false,
+    }
+
+    nameChange = (e) => {
+        this.setState({
+            educationOrganizationName: e.target.value
+        })
+    }
+    phoneChange = (e) => {
+        this.setState({
+            educationOrganizationPhoneNumber: e.target.value
+        })
+    }
+    locChange = (e) => {
+        this.setState({
+            educationOrganizationLocation: e.target.value
+        })
+    }
+    
+    onSubmit = (e) => {
+       
+
+        const {id}=this.props.match.params
+        
+            axios.put(`http://localhost:3333/educationalOrganizations/${id}`,{
+                educationOrganizationName:this.state.educationOrganizationName,
+                educationOrganizationPhoneNumber:this.state.educationOrganizationPhoneNumber,
+                educationOrganizationLocation:this.state.educationOrganizationLocation
+          
+        })
+        .then(response => { 
+          this.setState({updated:true})
+            alert('updated Sucessfully')
+        })
+        .catch(error => {
+            alert('wrong data type or missing field')
+        });
+        }
+
     componentDidMount(){
       var id;
         if(this.props.match!==undefined){
@@ -28,11 +75,12 @@ export class GetSpecificEdu extends Component{
           id=this.props.id
         }
         this.setState({eduId:id})
-   
         axios.get(`http://localhost:3333/educationalOrganizations/${id}`).then(res=>{
-            //console.log(res);
-            this.setState({educationalOrganization: res.data.data})
-            //console.log(res.data.data)
+            this.setState({
+                educationalOrganization: res.data.data,
+            educationOrganizationName:res.data.data.educationOrganizationName,
+            educationOrganizationPhoneNumber:res.data.data.educationOrganizationPhoneNumber,
+            educationOrganizationLocation:res.data.data.educationOrganizationLocation})
       })
       
       axios
@@ -76,33 +124,17 @@ export class GetSpecificEdu extends Component{
           }
             )
     }
-    delEdu(){
-      const {id}=this.props.match.params
-      axios.delete(`http://localhost:3333/educationalOrganizations/${id}`)
-      .then(res=>{
-        if(res.status==200){
-          alert("EducationalOrganization is deleted successfully");
-         this.setState({deleted:true})
-  
-      };
-      })}
-  
+
     getData(){
-        if(this.state.educationalOrganization!=null){
-            const{
-              educationOrganizationName,
-              educationOrganizationPhoneNumber,
-              educationOrganizationLocation
-            }=this.state.educationalOrganization
+        
+
+        
             return <div><p style={{ color : "#F9BB32",textAlign: "left", lineHeight:"22px", margin: "10px 0", fontSize: " 15px "}}> Personal </p> 
-            <hr style={lineStyle}></hr>  <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> Name:<font  color = "white"> {educationOrganizationName} </font></p>
-            <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> Phone Number:<font  color = "white"> {educationOrganizationPhoneNumber} </font></p>
-            <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> Location:<font  color = "white"> {educationOrganizationLocation} </font></p>
-            </div>
-        }
-        else {
-            return 'ya mo8fl eh ele d5lk hena'
-        }
+            <hr style={lineStyle}></hr>  <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}>  Name: <input type="text" placeholder={this.state.educationOrganizationName}  onChange={e => this.nameChange(e)}/></p>
+        <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> Phone Number: <input type="text" placeholder={this.state.educationOrganizationPhoneNumber}  onChange={e => this.phoneChange(e)}/></p>
+        <p style={{ color : "#A1A1A1",textAlign: "left",fontSize: " 18px "}}> Location: <input type="text" placeholder={this.state.educationOrganizationLocation}  onChange={e => this.locChange(e)}/></p>
+        </div>
+     
     }
 
     getCourses(){
@@ -200,34 +232,25 @@ if(this.state.courses!=null){
 return  <p style ={{color :"#F9BB32", textAlign: "left",fontSize: " 15px "}}>TrainingPrograms:</p>
 }
 }
-checkButtons(){
-  const {id}=this.props.match.params
-  console.log(id);
-  console.log(store.get('payload').id);
-  //if(id ==store.get('payload').id){
-    return<div>
-     <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Create new Account</button> |
-    {" "} <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle} onClick={this.delEdu.bind(this)}  > delete </button> |
-    {" "}  <Link to={"/updateEduOrg/"+id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > update </button> </Link>
-    </div>
-/*}
-  else{
-return <div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Give Feedback</button> <font color='#A1A1A1'>|</font> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Chat</button> 
-</div>
-  }*/
-}
 
-
-                     
+    checkButtons(){
+      
+        const{id}=this.props.match.params
+        return <button className="btn btn-danger btn-sm m-2" onClick={this.onSubmit} style = {ButotnStyle}  > Update </button> 
+   
+      
+    }
+                        
     render(){
-      if(this.state.educationalOrganization!=null){ 
-        if(this.state.deleted){
+      const {id}=this.props.match.params
+      if(this.state.updated){
+      
+        return(<Redirect to=  {"/educationalOrganization/"+id}  ></Redirect>)
         
-          return(<Redirect to=  {"/educationalOrganizations/"}  ></Redirect>)
-          
-  
-        }
-  else{
+
+      }
+     else{
+      if(this.state.educationalOrganization!=null){ 
       return(
             
       
@@ -235,7 +258,6 @@ return <div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}
         
           <img className="App-img" src={educationalOrganization}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
   <br></br>
-        
          {this.checkButtons()} <br></br>
           <p></p>
           <div className="getAllEdu" style={{marginLeft:'250px',marginRight:'250px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
@@ -252,7 +274,7 @@ return <div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}
       <hr style={lineStyle}></hr>
      {this.getCertificates()}
       <br></br>
-      {this.addMasterClassesButton()} <hr style={lineStyle}></hr>
+      {this.addCertificateButton()} <hr style={lineStyle}></hr>
         {this.getMasterClasses()}
       
          <br></br>
@@ -265,11 +287,11 @@ return <div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}
         </div>
           </div>
             
-        );}}else{
+        );}else{
           return "loading"
         }
 
-    }
+    }}
 }
 const lineStyle ={
   backgroundColor:'black',
@@ -294,5 +316,4 @@ const lineStyle ={
       fontSize:'18px'
   
   }
-  
 export default GetSpecificEdu

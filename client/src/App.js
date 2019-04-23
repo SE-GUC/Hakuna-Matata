@@ -56,6 +56,14 @@ import GetSpecProject from './components/projectTask/pages/MemberNAProject'
 import updateCo from './components/Forms/updateCo'
 import updateRoom from './components/Forms/updateRoom'
 
+
+import updateCourse from './components/updateProfiles/updateCourse'
+import updateEduOrg from './components/updateProfiles/updateEduOrg'
+import updateCertificate from './components/updateProfiles/updateCertificate'
+import updateMasterClass from './components/updateProfiles/updateMasterCLass';
+import  GetTrainingProgram from './components/profiles/GetTrainingProgram'
+import updateTrain from './components/updateProfiles/updateTrainingprogram';
+
 import ReserveForm from './components/Forms/ReserveForm'
 var store = require('store')
 class App extends Component {
@@ -237,6 +245,17 @@ console.log(store.get('payload').id)
           <Route exact path="/projects" component={GetAllProjects} />
 
           <Route exact path="/coWorkingSpaces/:id/showRooms/:roomId/reserve" component={ReserveForm} />
+
+          <Route exact path="/educationalOraganizations/trainingProgram/:id/:trainingProgramId" component={GetTrainingProgram} />
+          <Route exact path="/updateEduOrg/:id" component={updateEduOrg} />
+          <Route exact path="/updateCourse/:id/:courseId" component={updateCourse} />  
+          <Route exact path="/updateCertificate/:id/:certificateId" component={updateCertificate} /> 
+          <Route exact path="/updateMasterClass/:id/:masterClassId" component={updateMasterClass} />
+          <Route exact path="/updateTrain/:id/:trainingProgramId" component={updateTrain} />
+
+
+
+
 
         </Router>
 

@@ -36,6 +36,7 @@ const admins= require('./routers/api/admins');
 const rooms= require('./routers/api/rooms');
 const projects=require('./routers/api/projects');
 const certificates=require('./routers/api/certificates');
+const trainingPrograms = require('./routers/api/trainingPrograms');
 app.get('/', (req, res) => {
     res.send(`
     <h1><b>7zalqom <i>yrqod</i> hona </b></h1>
@@ -69,6 +70,7 @@ app.use('/admins',admins);
 app.use('/rooms',rooms);
 app.use('/projects',projects)
 app.use('/certificates',certificates)
+app.use('/trainingPrograms',trainingPrograms);
 app.use((req,res) => res.status(404).send(`<h1>Can not find what you're looking for</h1>`))
 
 const port = process.env.PORT || 3333

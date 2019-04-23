@@ -51,16 +51,29 @@ router.get('/:id', async (req, res) => {
 });
 
 //update certificate using mongo
-//(certificate_id => certificateId)
 //1
 router.put('/:id', async (req, res) => {
     try {
         const certificateId = req.params.id
         const isValidated = certificateValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
-        const updatedCertificate = await Certificate.findOneAndUpdate({ '_id': certificateId }, req.body)
-        const cousreAfterUpdate = await Certificate.findById(certificateId)
-        res.json({ data: cousreAfterUpdate});
+        await Certificate.findOneAndUpdate({ '_id': certificateId }, req.body)
+        const certificateAfterUpdate = await Certificate.findById(certificateId)
+
+        if(certificateAfterUpdate.educationalOrganization != undefined){
+            const educationalOrganization= await User.findById(certificateAfterUpdate.educationalOrganization.id)
+            const index = educationalOrganization.educationOrganizationCertificates.findIndex((certificate)=> certificate.id == certificateId )
+            if(index !=-1){
+            const oldCertificate=educationalOrganization.educationOrganizationCertificates.splice(index,1)
+            educationalOrganization.educationOrganizationCertificates.push({
+                id: certificateAfterUpdate._id,
+                name: certificateAfterUpdate.name,
+                date: oldCertificate.date
+            })
+            educationalOrganization.save()
+        }
+    }
+        res.json({ data: certificateAfterUpdate});
     } catch (error) {
         // We will be handling the error later
         res.status(404).send('Not found')

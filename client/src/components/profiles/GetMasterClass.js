@@ -4,6 +4,7 @@ import masterClass from '../profileComponents/masterClassIcon.png'
 import AppliedUser from '../profileComponents/AppliedUser'
 import AcceptedUser from '../profileComponents/AcceptedUser'
 import Courses from '../profileComponents/Courses'
+import { Link , Redirect } from "react-router-dom";
 var store = require('store')
 export class GetMasterClass extends Component {
     state = {
@@ -12,7 +13,8 @@ export class GetMasterClass extends Component {
       Accepted:[],
       eduId:null,
       courses:[],
-      id:null
+      id:null,
+      deleted:false
     };
     
     async handleClick() {
@@ -46,6 +48,27 @@ export class GetMasterClass extends Component {
         
           
     };
+    
+
+
+
+
+
+
+
+    delMasterClass(){
+      const {id,masterClassId}=this.props.match.params
+      axios.delete(`http://localhost:3333/educationalOrganizations/masterClass/${id}/${masterClassId}`)
+     .then(res=>{
+   if(res.status==200){
+    alert("masterClass is deleted successfully")
+    this.setState({deleted:true})
+}})
+  
+    
+    
+      };
+
     GetAppliedUser(){
         return this.state.Applied.map((apply)=>(
     
@@ -96,25 +119,42 @@ export class GetMasterClass extends Component {
       return 'ya mo8fl eh ele d5lk hena'
     }
     }
-checkApply(){
-  console.log(store.get('payload').tags)
-  if(store.get('payload').tags.includes('Member')){
-  
-return <button
-onClick={this.handleClick.bind(this)}
-className="btn btn-danger btn-sm m-2" style = {ButtonStyle} >
-Apply
-</button>
-  }else{
-return
-  }
-}
+
+    
+    checkButtons(){
+      const {id,masterClassId}=this.props.match.params
+      console.log(id);
+      console.log(store.get('payload').id);
+   // if(id ==store.get('payload').id){
+        return<div>
+      
+        {" "} <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle} onClick={this.delMasterClass.bind(this)}  > delete </button> |
+        {" "}  <Link to={"/updateMasterClass/"+id+"/"+masterClassId}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > update </button> </Link>
+        </div>
+  /*  }
+     /* else if(store.get('payload').tags.includes('Member')){
+    return <div> <button onClick={this.handleClick.bind(this)} className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Apply</button>
+    </div>
+      }*/
+    }
     render() {
+      const {id,masterClassId}=this.props.match.params
+      if(this.state.deleted){
+      
+        return(<Redirect to=  {"/educationalOrganization/"+id}  ></Redirect>)
+        
+
+      }
+else{
+
       return (
         <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
         
         <img className="App-img" src={masterClass}   borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
-        {this.checkApply()}
+      
+        <br/>
+{this.checkButtons()}
+<br/>
         <div className="getSpecRoom" style={{marginLeft:'250px',marginRight:'250px',position:'relative',top:'27px',paddingLeft:'20px',paddingRight:'20px',  border: '1px solid', borderRadius:(20,20,20,20)}} >
         
            {this.getData()}  
@@ -135,25 +175,20 @@ return
 </div>
 
       );
+}
     }
   }
   const lineStyle ={
     backgroundColor:'black',
       borderTop: '1px solid #F9BB32'
     }
-    const ButtonStyle = {
-
+    const ButotnStyle = {
       backgroundColor:'#F9BB32',
         color :'#242424',
-        width:"130px",
         testAlign:'center',
         pading:'15px 32px',
-        borderRadius:'8px',
+        borderRadius:'12px',
         float :'center',
-        fontSize:'18px',
-        position:'relative',
-        left:'-120px',
-        top:'22px'
-    
+        fontSize:'18px'
     } 
   export default GetMasterClass;

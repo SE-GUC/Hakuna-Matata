@@ -4,7 +4,7 @@ class TrainingPrograms extends React.Component {
   render() {
     return this.props.trainingPrograms.map((trainingProgram)=>(
     
-      <TrainingProgram key = {trainingProgram._id} trainingProgram= {trainingProgram} educationalOrganization={this.props.educationalOrganization}/>
+      <TrainingProgram key = {trainingProgram.id} trainingProgram= {trainingProgram} educationalOrganization={this.props.educationalOrganization}/>
 
     ));
   }
