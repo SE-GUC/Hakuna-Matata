@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import CoWorkingSpaces from '../CoWorkingSpaces';
+import Chat from '../../chat/Chat'
 // import { BrowserRouter as Router, Route } from "react-router-dom";
 var store = require('store')
 
@@ -21,6 +22,7 @@ export class GetAllCoworkingSpace extends Component {
   render() {
     return (
       <div className="GetAllCoworkingSpace">
+         <Chat   recieverName={"karim"}  senderID={1} recieverId={2}/>
         <CoWorkingSpaces
         coWorkingSpaces={this.state.coWorkingSpaces}
         />

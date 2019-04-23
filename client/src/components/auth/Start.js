@@ -56,7 +56,7 @@ class Start extends Component {
       <div style={{
        
        
-      }}>  <LoginForm  id ={store.get('payload').id} isClose={this.state.isClose} handleClickClose ={this.handleClickClose} logInClick={this.state.logInClick} handleChangetoken={this.props.handleChangetoken} /> 
+      }}>  <LoginForm    isClose={this.state.isClose} handleClickClose ={this.handleClickClose} logInClick={this.state.logInClick} handleChangetoken={this.props.handleChangetoken} /> 
       </div> 
         <SignUpForm  isClose={this.state.isClose} handleClickClose={this.handleClickClose} signUpClick={this.state.signUpClick} handleChangetoken={this.props.handleChangetoken}   />
       

@@ -14,7 +14,8 @@ class Chat extends Component {
       messageCount:0,
       chatId:0,
       messagesFetchingDone:false,
-      userId:10
+      senderID:props.senderID,
+      recieverID:props.recieverId
     }
   this.setChatObserver=this.setChatObserver.bind(this)
   }
@@ -22,15 +23,13 @@ class Chat extends Component {
   setChatObserver(chatID){
     var starCountRef = firebase.database().ref('/testchat/' + '/'+chatID);
     let newCount=this.state.messageCount;
-    let userId=this.state.userId;
+    let userId=this.state.senderID;
     let otherUserSentFlag=false;
     var alreadyfetchedList=[];
 starCountRef.on('value', function(snapshot) {
   snapshot.forEach((child) => {
     if(child.key>newCount-1){
-      console.log(child.key, child.val().sender); 
       if(child.val().sender!=userId){
-     
         if(!alreadyfetchedList.includes(child.val().message)){
           addResponseMessage(child.val().message)
           alreadyfetchedList.push(child.val().message)
@@ -54,7 +53,7 @@ if(!otherUserSentFlag){
         (snapshot)=>{
           if(snapshot.exists()){
           
-            if(snapshot.val().sender===this.state.userId){
+            if(snapshot.val().sender===this.state.senderID){
               addUserMessage(snapshot.val().message)
               const newCount=count+1
               this.setState({messageCount:newCount})
@@ -78,13 +77,21 @@ if(!otherUserSentFlag){
      
 
   }
-  getchat(userID){
+  getchat(){
     const ref = firebase.database().ref('testchat');
     var chatFound=false;
     
+    
     ref.once('value').then((snapshot) => {
       snapshot.forEach((child)=>{
-        if(child.val().userOneID===userID||child.val().userTwoID===userID){
+        if(child.val().userOneID===this.state.senderID && child.val().userTwoID===this.state.recieverID){
+          console.log("first if"+child.key);
+          this.setState({chatId:child.key})
+          this.getMessagesFromChat(child.key,0)
+          chatFound=true
+        }
+        if(child.val().userOneID===this.state.recieverID && child.val().userTwoID===this.state.senderID){
+          console.log("second if"+child.key);
           this.setState({chatId:child.key})
           this.getMessagesFromChat(child.key,0)
           chatFound=true
@@ -95,19 +102,19 @@ if(!otherUserSentFlag){
 });
 if(!chatFound){
   chatFound=false
-  this.initnewChat(10,20)
+  this.initnewChat(this.state.senderID,this.state.recieverID)
 }
 
 })}
   componentDidMount() {
   
-     this.getchat(this.state.userId)
+     this.getchat()
     
     
   }
   handleNewUserMessage = (newMessage) => {
     // Now send the message throught the backend API
-    this.addMessageToFirebase(newMessage,this.state.userId)
+    this.addMessageToFirebase(newMessage,this.state.senderID)
   }
 
   addMessageToFirebase(message,sender){
@@ -143,8 +150,8 @@ if(!chatFound){
      
       <div className="App">
       <Widget
-       title="The great chat"
-       subtitle="This chat is working greattt"
+       title={this.props.recieverName}
+       subtitle="Sart chatting now..."
           handleNewUserMessage={this.handleNewUserMessage}
         />
     

@@ -1,5 +1,22 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+
+const EducatorSchema = new Schema({
+
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    name: {
+        type: String,
+    },
+    date:{
+        type:Date
+    },
+    contact:{
+        type: String,
+    }
+
+});
 // Displayed info better than repeate it agine in each array
 const InfoSchema = new Schema({
 
@@ -38,31 +55,6 @@ const ReservationSchema = new Schema({
     },
 })
 //Room for coworkingSpace
-const RoomSchema = new Schema({
-    id:{
-        type: mongoose.Schema.Types.ObjectId
-    },
-    capacity: {
-        type: Number,
-        required: true
-    },
-    slots: {
-        type: [String]
-    },
-    reviews: [{
-        reviewers: {
-            type: InfoSchema,
-         //   required: true
-        },
-        comments: {
-            type: InfoSchema,
-            //required: true
-        }
-    }],
-    reservations:[ReservationSchema]
-    
-
-},{ _id : false });
 
 // Skill Schema
 const SkillSchema = new Schema({
@@ -341,7 +333,6 @@ const UserSchema = new Schema({
         type: Number,
        // required: true
     },
-    coworkingSpaceRooms: [RoomSchema],
     coworkingSpaceVerified: {
         type: Boolean,
         default: false
@@ -364,7 +355,7 @@ const UserSchema = new Schema({
     educationOrganizationTrainingPrograms: [TrainingProgramSchema],
     educationOrganizationCourses: [InfoSchema],
     educationOrganizationMasterClasses:[InfoSchema],
-    educationOrganizationEducators:[InfoSchema],
+    educationOrganizationEducators:[EducatorSchema],
     educationOrganizationVerified: {
         type: Boolean,
         default: false

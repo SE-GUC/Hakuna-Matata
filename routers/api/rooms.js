@@ -5,15 +5,51 @@ const Room = require('../../models/Room');
 const roomValidator = require('../../validations/roomValidations')
 const User = require('../../models/User')
 
+//create stand alone room
 router.post('/', async (req, res) => {
     try {
         const isValidated = roomValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
-        const room = await Room.create(req.body)
+       const roomobj=new Room({
+        capacity: req.body.capacity,
+        slots: req.body.slots,
+        reviews: [],
+        reservations:[],
+        coworkingSpaceID:null,
+        coworkingSpaceName:null,
+       })
+        const room = await roomobj.save()
         res.send(room);
     } catch (error) {
         // We will be handling the error later
-        res.status(404).send('Not found')
+        res.status(404).send(error.message)
+    }
+
+})
+
+
+//create a coworking space room
+router.post('/coworking/:coworkingID', async (req, res) => {
+    try {
+        const isValidated = roomValidator.createValidation(req.body);
+        if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+        const coworkingSpace = await User.findOne({ _id: req.params.coworkingID, tags: 'CoworkingSpace' })
+        if(!coworkingSpace){return res.status(400).send( 'this coworking space doesnt exist' )};
+
+
+       const roomobj=new Room({
+        capacity: req.body.capacity,
+        slots: req.body.slots,
+        reviews: [],
+        reservations:[],
+        coworkingSpaceID:req.params.coworkingID,
+        coworkingSpaceName:coworkingSpace.coworkingSpaceName,
+       })
+        const room = await roomobj.save()
+        res.send(room);
+    } catch (error) {
+        // We will be handling the error later
+        res.status(404).send(error.message)
     }
 
 })
@@ -24,6 +60,26 @@ router.get('/', async (req, res) => {
         const rooms = await Room.find()
         if (!rooms) return res.status(404).send({ error: 'rooms do not exist' })
         res.send(rooms);
+    }
+    catch (error) {
+        res.status(404).send('Not found')
+    }
+
+})
+
+// show all coworking space rooms  
+router.get('/coworking/:coworkingID', async (req, res) => {
+    try {
+        const rooms = await Room.find()
+        if (!rooms) return res.status(404).send({ error: 'rooms do not exist' })
+        var coRooms=[]
+        rooms.map(room=>{
+            if(room.coworkingSpaceID==req.params.coworkingID) {coRooms.push(room)}
+        })
+       
+
+
+        res.send(coRooms);
     }
     catch (error) {
         res.status(404).send('Not found')
@@ -42,6 +98,8 @@ router.get('/:id', async (req, res) => {
         res.sendStatus(404)
     }
 })
+
+
 // update room
 router.put('/:id', async (req, res) => {
     try {
@@ -80,6 +138,8 @@ router.put('/:id', async (req, res) => {
 
 })
 
+
+
 // Delete Room
 router.delete('/:id', async (req, res) => {
     try {
@@ -91,4 +151,74 @@ router.delete('/:id', async (req, res) => {
         res.status(404).send('Cannot find it ')
     }
 })
+
+
+// reserve room
+router.put('/:id/reserve', async (req, res) => {
+    try {
+        const isValidated = roomValidator.reserveValidation(req.body)
+ 
+        if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+       const room= await Room.findOneAndUpdate({_id:req.params.id}, { $push: { reservations: req.body } })
+        res.send(room)
+    } catch (err) {
+        res.status(400).send({ error: err.message })
+    }
+})
+
+
+
+
+
+//accept reservation
+router.put('/:id/accept/:reservationID', async (req, res) => {
+    const oldroom = await Room.findById(req.params.id)
+    var reservationfound;
+    var oldReservationIndex;
+    if ( oldroom) {
+       oldroom.reservations.map((reservation,index)=>{
+           if(reservation._id==req.params.reservationID){
+            reservationfound=reservation;
+            reservationfound.isAccpted=true;
+            oldReservationIndex=index;
+           }
+       });
+       if (!reservationfound) return res.status(400).send( 'reservation not found' )
+       oldroom.reservations.splice(oldReservationIndex,1)
+       oldroom.reservations.push(reservationfound)
+      oldroom.save().then((room)=>{
+        res.status(200).send(room)
+      }
+      ).catch((error)=>{
+        res.status(404).send(error)
+      })
+         }
+
+})
+
+//delete reservation
+router.delete('/:id/delete/:reservationID', async (req, res) => {
+    const oldroom = await Room.findById(req.params.id)
+    var reservationfound;
+    var oldReservationIndex;
+    if ( oldroom) {
+       oldroom.reservations.map((reservation,index)=>{
+           if(reservation._id==req.params.reservationID){
+            reservationfound=reservation;
+            oldReservationIndex=index;
+           }
+       });
+       if (!reservationfound) return res.status(400).send( 'reservation not found' )
+       oldroom.reservations.splice(oldReservationIndex,1)
+    
+      oldroom.save().then((room)=>{
+        res.status(200).send(room)
+      }
+      ).catch((error)=>{
+        res.status(404).send(error)
+      })
+         }
+
+})
+
 module.exports = router

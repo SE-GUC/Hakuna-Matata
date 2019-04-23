@@ -31,7 +31,7 @@ console.log(store.get('payload').id)
         <Tasks
           tasks={this.state.tasks} 
         />
-                  <Chat/>
+                
 
       </div>
     );

@@ -55,6 +55,8 @@ import GetSpecProject from './components/projectTask/pages/MemberNAProject'
 
 import updateCo from './components/Forms/updateCo'
 import updateRoom from './components/Forms/updateRoom'
+
+import ReserveForm from './components/Forms/ReserveForm'
 var store = require('store')
 class App extends Component {
   
@@ -226,13 +228,15 @@ console.log(store.get('payload').id)
 
           <Route exact path="/educationalOrganizations" component={GetAllEdu} />
 
-          <Route exact path="/coWorkingSpaces" component={GetAllCoworkingSpace} id={store.get('payload').id} tags={store.get('payload').tags} />
+          <Route exact path="/coWorkingSpaces" component={GetAllCoworkingSpace} />
 
 
 
           <Route exact path="/projects" component={GetAllProjects} />
 
           <Route exact path="/projects" component={GetAllProjects} />
+
+          <Route exact path="/coWorkingSpaces/:id/showRooms/:roomId/reserve" component={ReserveForm} />
 
         </Router>
 

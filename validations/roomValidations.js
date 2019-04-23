@@ -4,10 +4,7 @@ module.exports = {
     createValidation: request => {
         const createSchema = {
             capacity: Joi.number().integer().required(),
-            slots: Joi.array().required(),
-            reviews: Joi.array(),
-            reservations: Joi.array(),
-            coworkingSpace: Joi.object()
+            slots: Joi.array().required()
         }
 
         return Joi.validate(request, createSchema)
@@ -29,8 +26,9 @@ module.exports = {
     reserveValidation: request => {
         const reserveSchema = {
             slot: Joi.string().required(),
-            reservationDate: Joi.date().required(),
-            reserver: Joi.object().required(),
+            reservationDate: Joi.string().required(),
+            reserverID:Joi.string(),
+            reserverName:Joi.string(),
             isAccpted: Joi.boolean()
         }
 

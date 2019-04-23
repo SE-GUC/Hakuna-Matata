@@ -90,10 +90,10 @@ router.put('/:id', async (req,res) => {
 router.post('/login', async (req, res) => {
 	try {
         const isValidated = userValidator.loginValidation(req.body);
-		if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+		if (isValidated.error) return res.status(402).send({ error: isValidated.error.details[0].message });
 		const { email, password } = req.body;
 		const userfound = await User.findOne({ email });
-		if (!userfound) return res.status(404).json({ email: 'Email does not exist' });
+		if (!userfound) return res.status(409).json({ error: 'Email does not exist' });
 		const match = bcrypt.compareSync(password, userfound.password);
 		if (match) {            
             const user = {
@@ -103,7 +103,7 @@ router.post('/login', async (req, res) => {
             const token = jwt.sign(user, tokenKey, { expiresIn: '1h' })
             return res.json({token: `Bearer ${token}`,id:userfound._id, tags:userfound.tags})
         }
-		else return res.status(400).send({ password: 'Wrong password' });
+		else return res.status(404).send({ error: 'Wrong password' });
 	} catch (e) {}
 });
 

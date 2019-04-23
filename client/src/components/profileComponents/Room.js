@@ -13,7 +13,7 @@ return{
     render() {
     return (
       <div style={this.getStyle()}>
-        <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>ROOM<Link style = {ButotnStyle} to={"/coWorkingSpaces/"+this.props.coWorkingSpace._id+"/showRooms/"+this.props.room.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Room</button></Link>
+        <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>ROOM<Link style = {ButotnStyle} to={"/coWorkingSpaces/"+this.props.coWorkingSpace._id+"/showRooms/"+this.props.room._id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Room</button></Link>
         
         </p>
        

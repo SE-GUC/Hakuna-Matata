@@ -4,6 +4,7 @@ import Rooms from '../profileComponents/Rooms';
 import coWorkingSpace from '../profileComponents/coworkingspace_icon.jpg';
 import Facilite from '../profileComponents/Facilite';
 import {Link} from 'react-router-dom';
+import Chat from '../chat/Chat'
 
 import BusinessPlan from '../profileComponents/BusinessPlan';
 var store = require('store')
@@ -14,25 +15,20 @@ export class GetSpec extends Component {
       id:null
     };
     componentDidMount() {
-       
-     
-        if(this.props.match!==undefined){
-          this.state.id = this.props.match.params.id
-        }else{
-          this.state.id=this.props.id
-        }
-        axios.get(`http://localhost:3333/coworkingSpaces/${this.state.id}`)
+    console.log("the id"+store.get('payload').id)
+      const {id}=this.props.match.params
+        axios.get(`http://localhost:3333/coworkingSpaces/${id}`)
 .then(res => {
             this.setState({ coWorkingSpace: res.data.data})
-            //console.log(res.data.data)
-            console.log(res.data.data)
+        
           }
             )
             axios
-          .get(`http://localhost:3333/coworkingSpaces/room/${this.state.id}`)
+          .get(`http://localhost:3333/rooms/coworking/${id}`)
           .then(res => {
-            this.setState({ rooms: res.data.data})
-            console.log(res.data.data)
+            this.setState({ rooms: res.data})
+           console.log(this.state.rooms)
+           
           }
             )
         
@@ -126,12 +122,12 @@ return <div> <button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}
       window.location = `http://localhost:3000/updateCoWorkingSpace/${id}`
         }
     render() {
-      if(this.state.coWorkingSpace!=null){
+      if(this.state.coWorkingSpace!=null && this.state.rooms!=[]){
       
       return (
       
         <div style={{ width: '100%' , background : "#242424",margin:'0',textAlign:"center"}} >
-        
+       
         <img className="App-img" src={coWorkingSpace} class="center"  borderRadius='12px' width= "120px" margin= "20px" alt="this is  here :("/>
 <br></br>
 
