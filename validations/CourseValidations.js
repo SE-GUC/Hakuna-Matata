@@ -4,16 +4,18 @@ module.exports = {
     createValidation: request => {
         const createSchema = {
             name:Joi.string().required(),
-            educatorName:Joi.string().required(),
+            educator:Joi.object().required(),
             description:Joi.string().required(),
             places:Joi.number().integer().required(),
             availablePlaces:Joi.number().integer().required(),
             payment:Joi.number().required(),
-            courseDuration:Joi.number().required(),
+            courseDuration:Joi.string().required(),
             startDate:Joi.date().required(),
             endDate:Joi.date().required(),
-            categories:Joi.string().required(),
-            available:Joi.boolean().required()
+            category:Joi.string().required(),
+            isAvailable:Joi.boolean().required(),
+            listOfApplied:Joi.array(),
+            listOfAccepted:Joi.array()
         }
 
         return Joi.validate(request, createSchema)},
@@ -21,16 +23,18 @@ module.exports = {
         updateValidation:request=>{
         const updateschema={
             name:Joi.string(),
-            educatorName:Joi.string(),
+            educator:Joi.object(),
             description:Joi.string(),
             places:Joi.number().integer(),
             availablePlaces:Joi.number().integer(),
             payment:Joi.number(),
-            courseDuration:Joi.number(),
+            courseDuration:Joi.string(),
             startDate:Joi.date(),
             endDate:Joi.date(),
-            categories:Joi.string(),
-            available:Joi.boolean()
+            category:Joi.string(),
+            isAvailable:Joi.boolean(),
+            listOfApplied:Joi.array(),
+            listOfAccepted:Joi.array()
         }
         return Joi.validate(request,updateschema)
    }

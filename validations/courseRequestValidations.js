@@ -3,9 +3,9 @@ const Joi = require('joi')
 module.exports = {
     createValidation: request => {
         const createSchema = {
-            description:Joi.string(),
-            categories:Joi.string(),
-            applyingMemberId:Joi.string()
+            description:Joi.string().required(),
+            category:Joi.string().required(),
+            applyingMemberId:Joi.string().required()
         }
 
         return Joi.validate(request, createSchema)
@@ -14,7 +14,7 @@ module.exports = {
     updateValidation: request => {
         const updateSchema = {
             description:Joi.string(),
-            categories:Joi.string(),
+            category:Joi.string(),
             active:Joi.boolean()
         }
 
