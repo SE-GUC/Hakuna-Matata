@@ -15,6 +15,38 @@ const InfoSchema = new Schema({
     }
 
 },{ _id : false });
+<<<<<<< HEAD
+const HistorySchema = new Schema({
+
+    action: {
+        type: String,
+        required: true,
+        enum:['Apply For Task', 'Apply For Project','Follow','Give Recomendation to','Apply For Course','Apply For Master Class','Reserve a','Rate','Assign','Accept','Accept Reservation of Room']
+    },
+    name: {
+        type: InfoSchema,
+    },
+    date:{
+        type:Date
+    }
+
+});
+const MessageSchema = new Schema({
+
+    send: {
+        type: Boolean,
+        required: false,
+    },
+    message: {
+        type: String,
+    },
+    date:{
+        type:Date
+    }
+
+},{ _id : false });
+=======
+>>>>>>> master
 // reservation Schema
 const ReservationSchema = new Schema({
     slot:{
@@ -36,7 +68,11 @@ const ReservationSchema = new Schema({
         default:false
        // required:true
     },
+<<<<<<< HEAD
+})
+=======
 },{ _id : false })
+>>>>>>> master
 //Room for coworkingSpace
 const RoomSchema = new Schema({
     id:{
@@ -97,7 +133,34 @@ const TrainingProgramSchema = new Schema({
         type: [SkillSchema]
     }
 })
+<<<<<<< HEAD
+const PlatformSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
+    type: {
+        type: String,
+        enum: ['Task','Project', 'CourseRequest','postRequest'],
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    },
+    owner:{
+        type:InfoSchema,
+        required: true
+    },
+    data:{
+        type:InfoSchema,
+        required: true
+    },
+    description:String
+},{ _id : false })
+=======
 
+>>>>>>> master
 // Create the schema
 const UserSchema = new Schema({
     tags: {
@@ -207,7 +270,12 @@ const UserSchema = new Schema({
         type: String,
         //required: true
     },
+<<<<<<< HEAD
+    secretToken:String,
+    displayedName:String,
+=======
 
+>>>>>>> master
     memberLocation:{
         type:String
     },
@@ -258,8 +326,14 @@ const UserSchema = new Schema({
     memberCourses:[InfoSchema],
     memberCoursesAppliedIn:[InfoSchema],
     memberCoursesAcceptedIn:[InfoSchema],
+<<<<<<< HEAD
+    memberMasterClassesAppliedIn:[InfoSchema],
+    memberMasterClassesAcceptedIn:[InfoSchema],
+    // memberMasterClasses:[InfoSchema],
+=======
     memberMasterclassesAppliedIn:[InfoSchema],
     memberMasterclassesAcceptedIn:[InfoSchema],
+>>>>>>> master
     memberWorksIn:[InfoSchema],
     memberVerified: {
         type: Boolean,
@@ -361,7 +435,11 @@ const UserSchema = new Schema({
         type:String
     },
     educationOrganizationCertificates: [InfoSchema],
+<<<<<<< HEAD
+    educationOrganizationTrainingPrograms: [InfoSchema],
+=======
     educationOrganizationTrainingPrograms: [TrainingProgramSchema],
+>>>>>>> master
     educationOrganizationCourses: [InfoSchema],
     educationOrganizationMasterClasses:[InfoSchema],
     educationOrganizationEducators:[InfoSchema],
@@ -373,6 +451,18 @@ const UserSchema = new Schema({
         type:Date
     },
     // End EducationalOrganization
+<<<<<<< HEAD
+    courseRequests:[InfoSchema],
+    posts:[InfoSchema],
+    history:[HistorySchema],
+    chatBot:[MessageSchema],
+    lastQuestionMatches:[],
+    recomended:[PlatformSchema],
+    currQuestion:String,
+    // test:[],
+   
+=======
+>>>>>>> master
 
 })
 

@@ -1,0 +1,43 @@
+.Btn {
+    border-radius:0px;
+      font-weight: 400;
+      height:35px;
+      width:140px;
+      color: white;
+      text-align: center;
+      vertical-align: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      background-color:white;
+      border: 1px solid grey;
+      float: right;
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .Btn {
+        transition: none;
+      }
+    }
+    
+    .Btn:hover {
+      background-color:grey;
+      text-decoration: none;
+    }
+    
+    .Btn:focus, .Btn.focus {
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .Btn.disabled, .btn:disabled {
+      opacity: 0.65;
+    }
+    
+    a.Btn.disabled,
+    fieldset:disabled a.btn {
+      pointer-events: none;
+    }

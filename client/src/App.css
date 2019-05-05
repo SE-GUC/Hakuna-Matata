@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+.App {
+  /* background-image: url("./logo.jpg"); */
+  /* background:'#000000'; */
+
+    min-height: 100vh;
+    background-size:cover;
+
+    
+
+=======
 .App-header {
     background-color: #242424;
     min-height: 100vh;
@@ -8,4 +19,5 @@
     color: white;
     margin: 0%;
     padding: 0%;
+>>>>>>> master
   }

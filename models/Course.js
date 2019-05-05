@@ -21,7 +21,11 @@ const CourseSchema = new Schema({
         type: String,
         required: true
     },
+<<<<<<< HEAD
+    educator: CourseInfoSchema,
+=======
     educatorName: CourseInfoSchema,
+>>>>>>> master
     description: {
         type: String,
         required: true
@@ -32,7 +36,7 @@ const CourseSchema = new Schema({
     },
     availablePlaces: {
         type: Number,
-        required: true
+        required: false
     },
     payment: {
         type: Number,
@@ -40,7 +44,11 @@ const CourseSchema = new Schema({
     },
     courseDuration: {
         type: String,
+<<<<<<< HEAD
+        required: false
+=======
         required: true
+>>>>>>> master
     },
     startDate: {
         type: Date,
@@ -61,7 +69,7 @@ const CourseSchema = new Schema({
     // },
     isAvailable: {
         type: Boolean,
-        required: true
+        required: false
     },
     // add reference to members when created
     listOfApplied: {
@@ -75,4 +83,8 @@ const CourseSchema = new Schema({
 })
 
 const Course= mongoose.model('courses', CourseSchema)
+<<<<<<< HEAD
+module.exports = Course 
+=======
 module.exports.Course = Course 
+>>>>>>> master

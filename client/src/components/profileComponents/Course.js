@@ -14,7 +14,11 @@ return{
     return (
         
       <div style={this.getStyle()}>
+<<<<<<< HEAD
+      <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.course.name}<Link style = {ButotnStyle}  to={"/educationalOrganizations/course/"+this.props.educationalOrganizationId+"/"+this.props.course.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Course</button></Link>
+=======
       <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.course.name}<Link style = {ButotnStyle}  to={"/educationalOrganizations/course/"+this.props.educationalOrganization._id+"/"+this.props.course.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Course</button></Link>
+>>>>>>> master
       
       </p>
      

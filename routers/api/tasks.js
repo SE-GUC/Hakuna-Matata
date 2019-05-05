@@ -4,14 +4,25 @@ const Joi = require('joi');
 
 const Task = require('../../models/Task.js')
 const taskValidator = require('../../validations/taskValidations.js')
+<<<<<<< HEAD
+const User = require('../../models/User.js');
+const Skills = require('../../models/Skill.js');
+const { sendTaskNotification } = require('../../models/Notification.js');
+const Platform = require('../../models/Platform')
+=======
 const  User  = require('../../models/User.js');
 const  Skills  = require('../../models/Skill.js');
 const { sendTaskNotification } = require('../../models/Notification.js');
+>>>>>>> master
 
 
 
 //get all skills
+<<<<<<< HEAD
+router.get('/skills', async (req, res) => {
+=======
 router.get('/skills',async (req,res)=>{
+>>>>>>> master
     const skill = await Skills.find()
     res.json({ data: skill });
 })
@@ -22,7 +33,11 @@ router.post('/', async (req, res) => {
         const isValidated = taskValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const task = {
+<<<<<<< HEAD
+            tag: 'Task',
+=======
             tag:'Task',
+>>>>>>> master
             name: req.body.name,
             taskPartner: req.body.taskPartner,
             project: req.body.project,
@@ -39,7 +54,11 @@ router.post('/', async (req, res) => {
     }
     catch (error) {
         // we will handling the error later
+<<<<<<< HEAD
+        return res.status(400).send({ error: error})
+=======
         console.log(error)
+>>>>>>> master
     }
 })
 
@@ -66,6 +85,20 @@ router.put('/:id', async (req, res) => {
         const id = req.params.id
         const oldTask = await Task.findById(id)
         if (!oldTask) return res.status(404).send({ error: 'task does not exist ' })
+<<<<<<< HEAD
+        if (oldTask.accepted === false || oldTask.accepted == null || oldTask.taskMember==undefined) {
+            const isValidated = taskValidator.updateValidation(req.body);
+            if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+            await Task.findOneAndUpdate({ '_id': req.params.id }, req.body)
+            res.json({ msg: 'task updated successfully' })
+        } else {
+            
+            return res.status(400).json({ msg: 'Cannot Update ' })
+        }
+    }
+    catch (error) {
+        return res.status(400).json({ msg: 'Cannot Update ' })
+=======
         if (oldTask.accepted === false || oldTask.accepted == null) {
             const isValidated = taskValidator.updateValidation(req.body);
             if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
@@ -78,6 +111,7 @@ router.put('/:id', async (req, res) => {
     }
     catch (error) {
         console.log(error)
+>>>>>>> master
     }
 })
 
@@ -98,15 +132,88 @@ router.delete('/:id', async (req, res) => {
 router.put('/edit/:id/:adminId', async (req, res) => {
     const adminId = req.params.adminId
     const taskId = req.params.id
+<<<<<<< HEAD
+    const acceptancy = req.body.acceptancy
+    try {
+        const vartask = await Task.findById(taskId)
+        if (vartask) {
+=======
     const acceptancy = req.body.accepted
     try {
         const vartask = await Task.findById(taskId)
         if (vartask) {
             //   vartask.accepted = acceptancy
+>>>>>>> master
             if (acceptancy === true) {
                 vartask.adminId = adminId
                 vartask.accepted = acceptancy
                 vartask.save()
+<<<<<<< HEAD
+                const partner = await User.findOneAndUpdate({ _id: vartask.taskPartner.id, tags: 'Partner' },{$push:{partnerTasks:{
+                    id: vartask._id,
+                    name: vartask.name,
+                    date: new Date().toJSON()
+                }}})
+                if(vartask.consultyNeeded){
+                      await Platform.create({
+                        tags: ['Partner', 'ConsultancyAgency'],
+                        type: 'Task',
+                        date: new Date().toJSON(),
+                        owener: {
+                            id: partner._id,
+                            name: partner.partnerName
+                        },
+                        data: {
+                            id: vartask._id,
+                            name: vartask.name,
+                        },
+                        description: vartask.description
+    
+                    })
+                }else{
+             const platformItem=   await Platform.create({
+                    tags: ['Partner', 'Member', 'ConsultancyAgency'],
+                    type: 'Task',
+                    date: new Date().toJSON(),
+                    owener: {
+                        id: partner._id,
+                        name: partner.partnerName
+                    },
+                    data: {
+                        id: vartask._id,
+                        name: vartask.name,
+                    },
+                    description: vartask.description
+
+                })
+                
+                const members = await User.find({ tags: 'Member', skills: { $all: vartask.requiredSkills } })
+                members.map((member) => {
+                    member.recomended.push({
+                        id:platformItem._id,
+                        type: 'Task',
+                        date: new Date().toJSON(),
+                        owener: {
+                            id: partner._id,
+                            name: partner.partnerName
+                        },
+                        data: {
+                            id: vartask._id,
+                            name: vartask.name,
+                        },
+                        description: vartask.description
+
+                    })
+
+                    member.save()
+                })
+            }
+             sendTaskNotification(taskId, vartask.taskPartner.id, 'Your task has been accepted');
+                res.json({ data: vartask })
+            }
+            else {
+                var e = sendTaskNotification(taskId, vartask.taskPartner.id, 'Your task has been rejected');
+=======
                 //
                 console.log("here")
                 const partner =await User.findOne({_id:vartask.taskPartner.id ,tags: 'Partner'})
@@ -122,6 +229,7 @@ router.put('/edit/:id/:adminId', async (req, res) => {
             }
             else {
                 var e = sendTaskNotification(taskId, vartask.partnerId, 'Your task has been rejected');
+>>>>>>> master
                 const temptask = await Task.findByIdAndRemove(taskId)
                 res.json({ data: temptask })
             }
@@ -130,6 +238,13 @@ router.put('/edit/:id/:adminId', async (req, res) => {
             res.send('there is not such task')
         }
 
+<<<<<<< HEAD
+    } catch (err){
+        console.log(err)
+    }
+
+})
+=======
     } catch{
         res.status(400).send("Error");
     }
@@ -137,10 +252,68 @@ router.put('/edit/:id/:adminId', async (req, res) => {
 })
 //s
 
+>>>>>>> master
 router.put('/assignMemberToTask/:id', async (req, res) => {
     const taskId = req.params.id
     const memberId = req.body.memberId
     const ownerId = req.body.ownerId
+<<<<<<< HEAD
+    const state=req.body.state
+
+    try {
+        const task = await Task.findById(taskId)
+        if(!task) return  res.json({ msg: 'This Task Dosent Exist' })
+        const member = await User.findOne({ _id: memberId, tags: 'Member' })
+        if (task.taskPartner.id == ownerId || task.taskConsultancyAgency.id == ownerId) {
+            if(!member){
+                task.appliedMembers.filter(member => member.id != memberId)
+                task.save()
+               return  res.json({ msg: 'This Member Dosent Exist' })
+            }
+            var indexOfMember = task.appliedMembers.findIndex(member => member.id == memberId)
+            var indexOfTask = member.appliedInTasks.findIndex(task => task.id == taskId)
+            if (indexOfMember > -1 & indexOfTask > -1) {
+                task.appliedMembers.splice(indexOfMember, 1)
+                member.appliedInTasks.splice(indexOfTask, 1)
+                if(state){
+                task.taskMember = {
+                    name: member.memberFullName,
+                    id: member._id,
+                    date: new Date().toJSON()
+                }
+                task.workCycle = 0
+                member.acceptedInTasks.push({ name: task.name, id: task._id, date: new Date().toJSON() })    
+                await User.findOneAndUpdate({ _id: ownerId },{$push:{history:{
+                    action:'Assign',
+                    name:{
+                        name: member.memberFullName,
+                        id: member._id,
+                    },
+                    date: new Date().toJSON()
+                }}})
+                sendTaskNotification(taskId, memberId, 'You have been assigned!')
+                sendTaskNotification(taskId, task.partnerId, 'You task has been assigned to a member!')
+                member.save()
+                task.save()
+                res.json({ msg:'Accepted', data: task })
+            }else{
+                sendTaskNotification(taskId, memberId, 'You have been assigned!')
+                sendTaskNotification(taskId, task.partnerId, 'You task has been assigned to a member!')
+                member.save()
+                task.save()
+                res.json({ msg:'Rejected', data: task })
+            }
+
+            } else res.status(404).send('the task or member is not applied') 
+        } else res.status(400).send('You are not the partner or consultancy')      
+    }catch (err) {
+        res.status(400).send('error')
+    }
+})
+router.put('/updateWorkCycle/:id', async (request, response) => {
+    const taskId = request.params.id;
+    const newWorkCycle = request.body.workCycle;
+=======
 
     const task = await Task.findById(taskId)
     const member = await User.findOne({ _id: memberId, tags: 'Member' })
@@ -189,11 +362,26 @@ router.put('/updateWorkCycle/:id', async (request, response) => {
     const taskId = request.params.id;
     const newWorkCycle = request.body.workCycle;
 
+>>>>>>> master
     const schema = {
         workCycle: Joi.number().valid(25, 50, 75, 100).required(),
     }
     const result = Joi.validate(request.body, schema);
     if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+<<<<<<< HEAD
+    const updatedTask= await Task.findOneAndUpdate({ _id: taskId }, { workCycle: newWorkCycle })
+    if (updatedTask ) {
+        const memberId = updatedTask.taskMember.id
+        if (newWorkCycle === 100) {
+            const member = await User.findOneAndUpdate({ _id: memberId }, {$push: {completedTasks: {id: taskId,name: updatedTask.name}}})
+            if ( member.acceptedInTasks == undefined)  member.acceptedInTasks = []
+            member.acceptedInTasks= member.acceptedInTasks.filter((task) => task.id != taskId)
+            member.save()
+        }           
+        const returnedTask = await Task.findById(taskId)
+
+        response.send(returnedTask);
+=======
 
     const updatedTask0 = await Task.findOneAndUpdate({ _id: taskId }, { workCycle: newWorkCycle })
 
@@ -221,6 +409,7 @@ router.put('/updateWorkCycle/:id', async (request, response) => {
         const updatedTask = await Task.findById(taskId )
 
         response.send(updatedTask);
+>>>>>>> master
 
     }
     else {
@@ -239,22 +428,35 @@ router.put("/giveRate/:id/:partnerId", async (req, res) => {
             return res.status(400).send(result.error.details[0].message)
         }
         else {
+<<<<<<< HEAD
+            await Task.findOneAndUpdate({ _id: req.params.id }, { rate: req.body.rate })
+            const updatedTask = await Task.findById(req.params.id)
+=======
             await Task.findOneAndUpdate({ _id: req.params.id }, {rate: req.body.rate })
             const updatedTask = await Task.findById(req.params.id)
 
+>>>>>>> master
             res.send(updatedTask)
         }
 
     }
+<<<<<<< HEAD
+    else res.send("YOU CANT RATE THIS TASK");
+=======
     else
         res.send("YOU CANT RATE THIS TASK");
+>>>>>>> master
 })
 // Get a All member of specific task
 router.get('/membersTask/:id', async (req, res) => {
     const taskId = req.params.id
     const task = await Task.findById(taskId);
     if (task.appliedMembers !== null) {
+<<<<<<< HEAD
+        res.send(task.appliedMembers)
+=======
         res.send(task.appliedMembers )
+>>>>>>> master
     } else {
         res.send('No members applied yo this task')
     }

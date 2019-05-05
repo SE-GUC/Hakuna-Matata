@@ -9,6 +9,15 @@ module.exports = {
       description: Joi.string().required(),
       payment: Joi.string().required(),
       places: Joi.number().integer().required(),
+<<<<<<< HEAD
+      availablePlaces: Joi.number().integer(),
+      MasterClassDuration: Joi.string(),
+      startDate: Joi.date().required(),
+      endDate: Joi.date().required(),
+      levelOfStudents: Joi.string().required(),
+      effort: Joi.string(),
+      isAvailable: Joi.boolean(),
+=======
       availablePlaces: Joi.number().integer().required(),
       MasterClassDuration: Joi.string().required(),
       startDate: Joi.date().required(),
@@ -16,6 +25,7 @@ module.exports = {
       levelOfStudents: Joi.string().required(),
       effort: Joi.string().required(),
       isAvailable: Joi.boolean().required(),
+>>>>>>> master
       courses:Joi.array(),
       listOfApplied:Joi.array(),
       listOfAccepted:Joi.array(),

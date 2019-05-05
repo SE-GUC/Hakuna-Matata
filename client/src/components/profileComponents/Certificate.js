@@ -15,7 +15,11 @@ export class Certificate extends Component {
     return (
      
     <div style={this.getStyle()}>
+<<<<<<< HEAD
+    <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.certificate.name}<Link style = {ButotnStyle}   to={"/educationalOraganizations/certificate/"+this.props.educationalOrganization._id+"/"+this.props.certificate.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Certificate</button></Link>
+=======
     <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.certificate.name}<Link style = {ButotnStyle}   to={"/educationalOraganizations/certificate/"+this.props.educationalOrganization._id+"/"+this.props.certificate.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Course</button></Link>
+>>>>>>> master
     
     </p>
    

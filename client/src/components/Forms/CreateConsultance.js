@@ -122,7 +122,10 @@ export class CreateTask extends Component {
     if(this.state.skills.length>0){
       data.requiredSkills=arr
     }
+<<<<<<< HEAD
+=======
     console.log(data)
+>>>>>>> master
     await axios.put(`http://localhost:3333/tasks/${id}`, data);
   }
   getStyle = () => {

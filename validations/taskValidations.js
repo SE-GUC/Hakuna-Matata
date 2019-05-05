@@ -56,7 +56,7 @@ module.exports = {
             description: Joi.string(),
             requiredSkills: Joi.array(),
             monetaryCompensation: Joi.number(),
-            deadline: Joi.string(),
+            deadline: Joi.date(),
             deadlineForApply: Joi.string(),
             experienceLevel: Joi.number().integer().min(1).max(5),
             commitLevel: Joi.number().integer().min(1).max(5)

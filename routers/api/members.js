@@ -1,3 +1,17 @@
+<<<<<<< HEAD
+//Here
+const express = require('express')
+const router = express.Router();
+const Joi = require('joi');
+const passport = require('passport')
+
+
+const User = require('../../models/User.js');
+const Skill = require('../../models/Skill.js');
+const Task = require('../../models/Task')
+const Course = require('../../models/Course')
+const MasterClass = require('../../models/MasterClass')
+=======
 const express = require('express')
 const router = express.Router();
 const Joi = require('joi');
@@ -8,6 +22,7 @@ const User = require('../../models/User.js');
 const { Skill } = require('../../models/Skill.js');
 const Task = require('../../models/Task')
 const {Course} = require('../../models/Course')
+>>>>>>> master
 const Project = require('../../models/Project')
 const { sendToAdminRequestNotification } = require('../../models/Notification.js')
 
@@ -19,6 +34,46 @@ router.post('/:id', async (req, res) => {
     skills: Joi.array().items()
   }
   const result = Joi.validate(req.body, schema);
+<<<<<<< HEAD
+  if (result.error) return res.status(400).send({ error: result.error.details[0].message })
+  if(req.body.skills){
+  for (var skill of req.body.skills) {
+    var currSkills = await Skill.findOne(skill)
+    if (!currSkills) return res.status(404).send(`${skill} is not supported by the site we will handel  that and send u notification`)
+  }
+  }
+  const currUser = await User.findOne({ _id: req.params.id, tags: 'Member' })
+  if (currUser) return res.status(404).send('You are already a Member on the site')
+
+  const memberSchema = {
+    memberFullName: req.body.memberFullName,
+    memberWebName: req.body.memberFullName.split(' ')[0],
+    completedTasksId: [],
+    appliedTasksId: [],
+    experienceLevel: 0,
+    memberRating: 0,
+    allRatedReco: 0,
+    averageRecoRate: 0,
+    allRatedTasks: 0,
+    skills: req.body.skills,
+    memberWorksIn: [],
+    memberMasterclasses: [],
+    memberCertificates: [],
+    memberEvents: [],
+    memberHirePerHour: 0,
+    memberPhoneNumber: '',
+    memberDateJoined: new Date().toJSON(),
+    memberLocation: ''
+
+  }
+  await User.findByIdAndUpdate(req.params.id, memberSchema)
+  await User.findByIdAndUpdate(req.params.id, { $push: { tags: 'Member' } })
+  const member = await User.findById(req.params.id)
+  res.json({ msg: 'Member Created successfully' ,data:member})
+
+  res.send();
+
+=======
   if (result.error) {
     return res.status(400).send({ error: result.error.details[0].message })
   } else {
@@ -57,6 +112,7 @@ router.post('/:id', async (req, res) => {
     const member = await User.findById(req.params.id)
     res.send(member);
   }
+>>>>>>> master
 })
 //get all members
 router.get('/', async (req, res) => {
@@ -76,12 +132,20 @@ router.put('/:id', async (req, res) => {
   }
   const result = Joi.validate(req.body, schema);
   if (result.error) return res.status(400).send(result.error.details[0].message)
+<<<<<<< HEAD
+  try {
+    const member = await User.findOneAndUpdate({ _id: req.params.id, tags: 'Member' }, { memberFullName: req.body.memberFullName })
+    const updatedMember = await User.findById(req.params.id)
+    res.json({ msg: 'Member updated successfully' })
+    } catch (error) {
+=======
 
   try {
     const member = await User.findOneAndUpdate({ _id: req.params.id, tags: 'Member' }, { memberFullName: req.body.memberFullName })
     const updatedMember = await User.findById(req.params.id)
     res.send(updatedMember)
   } catch (error) {
+>>>>>>> master
 
   }
 })
@@ -92,9 +156,15 @@ router.delete('/:id', async (req, res) => {
     const currMember = await User.findOne({ _id: req.params.id, tags: 'Member' })
     if (currMember) {
       const index = currMember.tags.indexOf('Member')
+<<<<<<< HEAD
+      currMember.tags.splice(index, 1)
+      currMember.save()
+      res.json({ msg: 'Member was deleted successfully' })
+=======
       currMember.tags.splice(index, 1) 
       currMember.save()
       res.json({ msg: 'Member was deleted successfully'})
+>>>>>>> master
     } else {
       res.json({ msg: 'Member was deleted Already or Not Found' })
     }
@@ -109,7 +179,11 @@ router.delete('/:id', async (req, res) => {
 
 
 
+<<<<<<< HEAD
+router.put('/rate/:id',passport.authenticate('jwt', {session: false}), async (req, res) => {
+=======
 router.put('/rate/:id', async (req, res) => {
+>>>>>>> master
   var id = req.params.id;
   const newRate = req.body.newRate;
   var noofTasks;
@@ -121,22 +195,135 @@ router.put('/rate/:id', async (req, res) => {
 
   var member = await User.findById(id)
   if (member !== null) {
+<<<<<<< HEAD
+    if (member.allRatedTasks == undefined || member.allRatedTasks == null) member.allRatedTasks = 0
+    if (member.memberRating == undefined || member.memberRating == null) member.rating = 0
+=======
     if (member.allRatedTasks == null) member.allRatedTasks = []
     if (member.memberRating == undefined) member.rating = 0
+>>>>>>> master
     noofTasks = member.allRatedTasks;
     const x = member.allRatedTasks + 1;
     var tempRate
     if ((((member.memberRating * noofTasks) + newRate) / x) > 5) tempRate = 5
+<<<<<<< HEAD
+    else
+      tempRate = (((member.memberRating * noofTasks) + newRate) / x)
+
+=======
 
     else {
       tempRate = (((member.memberRating * noofTasks) + newRate) / x)
     }
+>>>>>>> master
     member = await User.findOneAndUpdate({ '_id': id, tags: 'Member' }, { allRatedTasks: x, memberRating: tempRate })
     res.send('Done')
   } else {
     res.send('Not found')
   }
 })
+<<<<<<< HEAD
+router.put('/applyForTask/:id', passport.authenticate('jwt', {session: false}),async (req, res) => {
+  const memberId = req.params.id
+  const taskId = req.body.taskId
+  console.log(memberId)
+  const task = await Task.findOne({ _id: taskId, accepted: true })
+  if (task) {
+    let member=null
+    if(task.requiredSkills.length ===0) member = await User.findOne({ _id: memberId, tags: 'Member' })
+    else member = await User.findOne({ _id: memberId, tags: 'Member', skills: { $all: task.requiredSkills } })
+      if (member) {
+      if (member.experienceLevel >= task.experienceLevel) {
+        if (task.appliedMembers == undefined|| task.appliedMembers ==null) task.appliedMembers = []
+        if ( member.appliedTasks ==undefined||member.appliedTasks == null) member.appliedTasks = []
+        if (task.appliedMembers.filter(e => e.id == memberId).length > 0) return res.status(400).send({error:'Applied Before'})
+
+        await User.findByIdAndUpdate({ _id: memberId }, {$push: {
+          appliedInTasks:{
+            name: task.name,
+            id: task._id,
+            date: new Date().toJSON()
+          }
+        }})
+        await Task.findByIdAndUpdate({ _id: taskId }, {$push: {
+            appliedMembers:{
+              name: member.memberFullName,
+              id: member._id,
+              date: new Date().toJSON()
+            }
+          }})
+          await User.findOneAndUpdate({ _id: memberId },{$push:{history:{
+            action:'Apply For Task',
+            name:{
+              name: task.name,
+              id: task._id,
+            },
+            date: new Date().toJSON()
+        }}})
+        res.status(200).json({msg :'Done'})
+      } else {
+        res.status(400).send({error:'Sorry u can not Apply , u Dont have the required Specifications'})
+      }
+    } else {
+      res.status(400).send({error: 'Sorry u can not Apply , u Dont have the required Skills'})
+    }
+  } else {
+    res.status(404).send({error:' task is not available'})
+  }
+
+})
+router.put('/applyForProject/:id',passport.authenticate('jwt', {session: false}), async (req, res) => {
+  const memberId = req.params.id
+  const projectId = req.body.projectId
+  const project = await Project.findOne({ _id: projectId, accepted: true })
+
+  if (project) {
+    let member=null
+    if(project.requiredSkills.length ===0) member = await User.findOne({ _id: memberId, tags: 'Member' })
+    else member = await User.findOne({ _id: memberId, tags: 'Member', skills: { $all: project.requiredSkills } })
+    if (member) {
+      if (member.experienceLevel >= project.experienceLevel) {
+        if (project.appliedMembers == undefined|| project.appliedMembers ==null) project.appliedMembers = []
+        if ( member.appliedProjects ==undefined||member.appliedProjects == null) member.appliedProjects = []
+        if (project.appliedMembers.filter(e => e.id == memberId).length > 0) return res.status(400).send('Applied Before')
+
+        await User.findByIdAndUpdate({ _id: memberId }, {$push: {
+          appliedInProjects:{
+            name: project.name,
+            id: project._id,
+            date: new Date().toJSON()
+          }
+        }})
+        await Project.findByIdAndUpdate({ _id: projectId }, {$push: {
+            appliedMembers:{
+              name: member.memberFullName,
+              id: member._id,
+              date: new Date().toJSON()
+            }
+          }})
+          await User.findOneAndUpdate({ _id: memberId },{$push:{history:{
+            action:'Apply For Project',
+            name:{
+              name: project.name,
+              id: project._id,
+            },
+            date: new Date().toJSON()
+        }}})
+        res.status(200).send('Done')
+      } else {
+        res.status(400).send({error:'Sorry u can not Apply , u Dont have the required Specifications'})
+      }
+    } else {
+      res.status(400).send({error: 'Sorry u can not Apply , u Dont have the required Skills'})
+    }
+  } else {
+    res.status(404).send({error: ' project is not available'})
+  }
+
+})
+
+router.put('/applyForCourse/:id', passport.authenticate('jwt', {session: false}),async (request, response) => {
+=======
 router.put('/applyForTask/:id', async (req, res) => {
   const memberId = req.params.id
   const taskId = req.body.taskId
@@ -250,6 +437,7 @@ router.post('/editRequest/:id', (req, res) => {
   res.sendStatus(200);
 })
 router.put('/applyForCourse/:id', async (request, response) => {
+>>>>>>> master
   const memberId = request.params.id;
   const courseId = request.body.courseId;
   const schema = {
@@ -263,6 +451,91 @@ router.put('/applyForCourse/:id', async (request, response) => {
   //console.log(member &course)
 
   if (member) {
+<<<<<<< HEAD
+    if (course) {
+      if (course.availablePlaces > 0 & course.isAvailable) {
+        if (course.listOfApplied == undefined) course.listOfApplied = []
+        if (member.memberCoursesAppliedIn == undefined) member.memberCoursesAppliedIn = []
+        if (course.listOfApplied.filter(e => e.id == memberId).length > 0) return res.status(400).send('Applied Before')
+
+        course.listOfApplied.push({
+          id: memberId,
+          name: member.memberFullName,
+          date: new Date().toJSON()
+        })
+        course.save()
+        member.memberCoursesAppliedIn.push({
+          id: course._id,
+          name: course.name,
+          date: new Date().toJSON()
+        })
+        await User.findOneAndUpdate({ _id: memberId },{$push:{history:{
+          action:'Apply For Course',
+          name:{
+            id: course._id,
+            name: course.name,
+          },
+          date: new Date().toJSON()
+      }}})
+        member.save()
+        response.sendStatus(200);
+      } else return response.status(404).send('this course is not availabe right now its Full');     
+    } else return response.status(404).send('there is not such course in the site'); 
+  } else return response.status(404).send('there is not such member in the site');
+  
+});
+router.put('/applyForMasterClass/:id',passport.authenticate('jwt', {session: false}), async (req, res) => {
+  const memberId = req.params.id;
+  const masterClassId = req.body.masterClassId;
+  const schema = {
+    masterClassId: Joi.string().required()
+  }
+  const result = Joi.validate(req.body, schema);
+  if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+  const masterClass = await MasterClass.findById(masterClassId)
+  var member = await User.findOne({ _id: memberId, tags: 'Member' })
+  if (member) {
+    if (masterClass) {
+      if (masterClass.availablePlaces > 0 & masterClass.isAvailable) {
+        if (masterClass.listOfApplied == undefined) masterClass.listOfApplied = []
+        if (member.memberMasterClassesAppliedIn == undefined) member.memberMasterClassesAppliedIn = []
+        if (masterClass.listOfApplied.filter(e => e.id == memberId).length > 0) return res.status(400).send('Applied Before')
+
+        masterClass.listOfApplied.push({
+          id: memberId,
+          name: member.memberFullName,
+          date: new Date().toJSON()
+        })
+        masterClass.save()
+
+        member.memberMasterclassesAppliedIn.push({
+          id: masterClass._id,
+          name: masterClass.name,
+          date: new Date().toJSON()
+        })
+        await User.findOneAndUpdate({ _id: memberId },{$push:{history:{
+          action:'Apply For Master Class',
+          name:{
+            id: masterClass._id,
+            name: masterClass.name,
+          },
+          date: new Date().toJSON()
+      }}})
+        member.save()
+
+        res.sendStatus(200);
+      } else return res.status(404).send('this masterClass is not availabe right now its Full');
+    } else return res.status(404).send('there is not such masterClass in the site');  
+  } else return res.status(404).send('Your are not member in the site');
+
+  
+});
+router.post('/editRequest/:id', (req, res) => {
+  var id = req.params.id;
+  var e = sendToAdminRequestNotification('Member ' + id + ' wants to edit his profile')
+  res.sendStatus(200);
+})
+=======
     if ( course){
     if (course.availablePlaces > 0 & course.isAvailable) {
       course.listOfApplied.push({
@@ -327,4 +600,5 @@ router.put('/applyForMasterClass/:id', async (request, response) => {
   }
 });
 
+>>>>>>> master
 module.exports = router

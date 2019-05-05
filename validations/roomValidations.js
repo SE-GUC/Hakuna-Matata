@@ -4,7 +4,11 @@ module.exports = {
     createValidation: request => {
         const createSchema = {
             capacity: Joi.number().integer().required(),
+<<<<<<< HEAD
+            slots: Joi.array().required(),
+=======
             slots: Joi.array().string().required(),
+>>>>>>> master
             reviews: Joi.array(),
             reservations: Joi.array(),
             coworkingSpace: Joi.object()

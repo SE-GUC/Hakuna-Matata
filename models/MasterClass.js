@@ -8,6 +8,12 @@ const MasterClassInfoSchema = new Schema({
     name: {
         type: String,
         //required: true
+<<<<<<< HEAD
+    },
+    date:{
+        type:Date
+=======
+>>>>>>> master
     }
 
 },{ _id : false });
@@ -32,14 +38,14 @@ const MasterClassSchema = new Schema({
     },
     availablePlaces: {
         type: Number,
-        required: true
+        required: false
     },
     courses: {
         type: [MasterClassInfoSchema] 
     },
     MasterClassDuration: {
         type: String,
-        required: true
+        required: false
     },
     startDate: {
         type: String,
@@ -49,18 +55,20 @@ const MasterClassSchema = new Schema({
         type: String,
         required: true
     },
+        // what is the use of that 
+
     levelOfStudents: {
         type: String,
-        required: true
+        required: false
     },
     // what is the use of that 
     effort: {
         type: String,
-        required: true
+        required: false
     },
     isAvailable: {
         type: Boolean,
-        required: true
+        required: false
     },
     listOfApplied:{
         type: [MasterClassInfoSchema]

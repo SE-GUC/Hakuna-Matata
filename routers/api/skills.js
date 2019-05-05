@@ -4,14 +4,22 @@ const router = express.Router();
 
 
 const Skill = require('../../models/Skill.js')
+<<<<<<< HEAD
+const skillValidator = require('../../validations/skillsValidations.js')
+=======
 const SkillValidator = require('../../validations/SkillsValidations.js')
+>>>>>>> master
 
 //Skill CRUDS
 
 //creat Skill 
 router.post('/', async (req, res) => {
     try {
+<<<<<<< HEAD
+        const isValidated = skillValidator.createValidation(req.body);
+=======
         const isValidated = SkillValidator.createValidation(req.body);
+>>>>>>> master
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const skill = await Skill.create(req.body)
         res.send({ msg: 'Skill is created ', data: skill });
@@ -56,11 +64,19 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const skillId = req.params.id
+<<<<<<< HEAD
+        const isValidated = skillValidator.updateValidation(req.body);
+        if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+        await Skill.findOneAndUpdate({ '_id': skillId }, req.body)
+        const updatedSkill = await Skill.findById(skillId)
+        res.json({ data: updatedSkill});
+=======
         const isValidated = SkillValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
         const updatedSkill = await Skill.findOneAndUpdate({ '_id': skillId }, req.body)
         const cousreAfterUpdate = await Skill.findById(skillId)
         res.json({ data: cousreAfterUpdate});
+>>>>>>> master
     } catch (error) {
         // We will be handling the error later
         res.status(404).send('Not found')
@@ -74,7 +90,10 @@ router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
         const deletedformSkills = await Skill.findOneAndRemove({ '_id': id })
+<<<<<<< HEAD
+=======
         res.send(deletedformSkills)
+>>>>>>> master
         if (!deletedformSkills) return res.send('Not found')
         var Skills = await Skill.find()
         res.json({ data: Skills })

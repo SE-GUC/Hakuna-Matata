@@ -10,7 +10,11 @@ export class  ApplyData extends Component{
     render (){
 const{data}=this.props
 
+<<<<<<< HEAD
+        
+=======
 
+>>>>>>> master
 const  dataStyle= {
     fontSize: '25px',
     color: '#FFFFFF',

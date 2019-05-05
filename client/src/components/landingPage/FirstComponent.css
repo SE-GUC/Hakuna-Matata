@@ -1,0 +1,23 @@
+/* .Badge {
+  display: inline-block;
+  background-color: gray;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 2;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+} */
+.image{
+  text-align: center
+}
+.rounded-circle {
+  border-radius: 50% !important;
+  text-align: center;
+}

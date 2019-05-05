@@ -1,9 +1,16 @@
 
 import React, { Component } from 'react';
 import axios from 'axios'
+<<<<<<< HEAD
+import {Form , Button,Image} from 'react-bootstrap'
+import { BrowserRouter as Router, Route,Redirect } from 'react-router-dom';
+import '../../bootstrap.css'
+import { connect } from 'react-redux'
+=======
 import { Link } from 'react-router-dom';
 
 
+>>>>>>> master
 
 // x
 
@@ -12,10 +19,17 @@ class ConsultancyForm extends Component {
     super(props);
     this.state = {
      name: '',
+<<<<<<< HEAD
+      token: '',
+      isClose: false,
+      isLoaded:false,
+      redirect:false
+=======
      managerName:'',
       token: '',
       isClose: false,
       isLoaded:false
+>>>>>>> master
 
     }
     this.onChange = this.onChange.bind(this)
@@ -25,6 +39,59 @@ class ConsultancyForm extends Component {
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value })
+<<<<<<< HEAD
+  }
+
+  handleSubmit(event) {
+    const id=this.props.auth.user._id
+
+    event.preventDefault();
+    axios.post(`http://localhost:3333/consultancyAgencies/${id}`, {
+        consultancyAgencyName: this.state.name,
+    }).then(res => {
+      alert('Done')
+      window.location.href="http://localhost:3000/HomePage"
+    }).catch(e => {
+      alert('error ')
+    })
+
+  }
+  
+  getLoginStyle() {
+    return {
+      borderRadius: (15, 50, 30, 5),
+      height: 200,
+      background: 'transparent',
+      width: 250,
+      testAlign:'center'
+
+    }
+  } 
+
+
+  render() {   const {redirect} = this.state;
+  if(redirect){
+   return <Redirect push to={'/HomePage'} /> }
+  return (
+<div style={this.getLoginStyle()} >
+<Form onSubmit={this.handleSubmit}>
+<Form.Group controlId="formBasicEmail">
+<div class="container">
+<h1 style={{textAlign: "center"}}>consultancy Agency Creation</h1>
+</div>
+
+<Form.Label style={{textAlign:'left'}}>Full Name</Form.Label>
+  <Form.Control  placeholder="Enter full name"  name="name"style={{
+    backgroundColor:'transparent'}} onChange={this.onChange} value={this.state.name}/>
+
+</Form.Group>
+<Button variant="outline-info"  type="create" block >
+ Create
+</Button>
+</Form>
+</div>
+
+=======
     console.log(this.state.fullName)
   }
 
@@ -161,8 +228,19 @@ class ConsultancyForm extends Component {
 
         </form>
       </div>
+>>>>>>> master
     );
   }
 }
 
+<<<<<<< HEAD
+const mapStateToProps =(state)=>({
+  auth:state.auth,
+  errors:state.errors,
+  info:state.info
+})
+export default connect(mapStateToProps,{})(ConsultancyForm)
+// export default ConsultancyForm;
+=======
 export default ConsultancyForm;
+>>>>>>> master
