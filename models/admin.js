@@ -7,10 +7,30 @@ const AdminSchema = new Schema({
         type: String,
         required: true
     },
+    dateOfBirth: {
+        type: Date 
+    },
+    department: {
+        type: String,
+        required: true
+    },
+    salary: {
+        type: Number
+        },
     id: {
         type: Number,
         required: true
-    }
+    },
+//     email:{
+//         type: String,
+//         required: true
+//     },
+//     password:{
+//     type: String,
+//     required: true
+// },
+
 })
 
-module.exports = Admin = mongoose.model('admins', AdminSchema)
+const Admin = mongoose.model('admins', AdminSchema)
+module.exports = Admin

@@ -1,16 +1,27 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const CourseInfoSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+       // required: true,
+    },
+    name: {
+        type: String,
+        //required: true
+    },
+    date:{
+        type: Date,
+        //required: true
+    }
 
+},{ _id : false });
 // Create the schema
 const CourseSchema = new Schema({
     name: {
         type: String,
         required: true
     },
-    educatorName: {
-        type: String,
-        required: true
-    },
+    educator: CourseInfoSchema,
     description: {
         type: String,
         required: true
@@ -21,38 +32,47 @@ const CourseSchema = new Schema({
     },
     availablePlaces: {
         type: Number,
-        required: true
+        required: false
     },
     payment: {
         type: Number,
         required: true
     },
     courseDuration: {
-        type: Number,
-        required: true
+        type: String,
+        required: false
     },
     startDate: {
         type: Date,
         required: true
     },
     endDate: {
-        type: Date
+        type: Date,
+        required:true
     },
-    categories: {
+    category: {
         type: String,
         required: true
-    },
-    available: {
+    },   
+// what is the mean of that
+    // categories: {
+    //     type: String,
+    //     required: true
+    // },
+    isAvailable: {
         type: Boolean,
-        required: true
+        required: false
     },
     // add reference to members when created
-    listOfApplies: {
-        type: []
+    listOfApplied: {
+        type: [CourseInfoSchema]
     },
-    acceptedMembers: { 
-        type: []
-    }
+    listOfAccepted: { 
+        type: [CourseInfoSchema]
+    },
+    educationalOrganization:CourseInfoSchema
+
 })
 
-module.exports = Course = mongoose.model('courses', CourseSchema)
+const Course= mongoose.model('courses', CourseSchema)
+module.exports = Course 

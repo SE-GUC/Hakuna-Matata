@@ -1,6 +1,19 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema
+const CertificateInfoSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+       // required: true,
+    },
+    name: {
+        type: String,
+        //required: true
+    },
+    date:{
+        type:Date
+    }
 
+},{ _id : false });
 // Create the schema
 const CertificateSchema = new Schema({
     name: {
@@ -11,7 +24,10 @@ const CertificateSchema = new Schema({
     },
     accreditation: {
         type: String
-    }
+    },
+    educationalOrganization:CertificateInfoSchema
+
 })
 
-module.exports = Certificate = mongoose.model('certificates', CertificateSchema)
+const Certificate= mongoose.model('certificates', CertificateSchema)
+module.exports = Certificate 

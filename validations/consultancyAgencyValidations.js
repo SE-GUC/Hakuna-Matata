@@ -3,11 +3,19 @@ const Joi = require('joi')
 module.exports = {
     createValidation: request => {
         const createSchema = {
-            name: Joi.string().required(),
-            information: Joi.string().required(),
-            partners: Joi.array(),
-            members: Joi.array(),
-            reports: Joi.array()
+            consultancyAgencyName: Joi.string().required(),
+            consultancyAgencyManager: Joi.string(),
+            consultancyAgencyHeadquarters: Joi.string(),
+            consultancyAgencyRate: Joi.number(),
+            consultancyAgencyRevenues: Joi.number(),
+            consultancyAgencyRevenuePerEmployee: Joi.number(),
+            consultancyAgencyLocation: Joi.array(),
+            consultancyAgencyPhoneNumber: Joi.string(),
+            consultancyAgencyPartners: Joi.array(),
+            consultancyAgencyMembers: Joi.array(),
+            consultancyAgencyEvents: Joi.array(),
+            consultancyAgencyOffers: Joi.array(),
+            consultancyAgencyFiscalYear: Joi.date(),
          };
 
         return Joi.validate(request, createSchema)
@@ -15,11 +23,20 @@ module.exports = {
 
     updateValidation: request => {
         const updateSchema = {
-            name: Joi.string(),
-            information: Joi.string(),
-            partners: Joi.array(),
-            members: Joi.array(),
-            reports: Joi.array()
+            consultancyAgencyName: Joi.string(),
+            consultancyAgencyManager: Joi.string(),
+            consultancyAgencyHeadquarters: Joi.string(),
+            consultancyAgencyRate: Joi.number(),
+            consultancyAgencyRevenues: Joi.number(),
+            consultancyAgencyRevenuePerEmployee: Joi.number(),
+            consultancyAgencyLocation: Joi.array(),
+            consultancyAgencyPhoneNumber: Joi.string(),
+            consultancyAgencyPartners: Joi.array(),
+            consultancyAgencyMembers: Joi.array(),
+            consultancyAgencyEvents: Joi.array(),
+            consultancyAgencyReports: Joi.array(),
+            consultancyAgencyOffers: Joi.array(),
+            consultancyAgencyFiscalYear: Joi.date(),
         }
 
         return Joi.validate(request, updateSchema)

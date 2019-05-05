@@ -1,0 +1,16 @@
+.Bg-text3 {
+    background-color: rgb(255,255,255); /* Fallback color */
+    background-color: rgba(255,255,255); /* Black w/opacity/see-through */
+    color: white;
+    font-weight: bold;
+   
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    width: 30%;
+    height: 30%;
+    padding: 20px;
+    text-align: center;
+  }

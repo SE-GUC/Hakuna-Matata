@@ -1,5 +1,19 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const MasterClassInfoSchema = new Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+       // required: true,
+    },
+    name: {
+        type: String,
+        //required: true
+    },
+    date:{
+        type:Date
+    }
+
+},{ _id : false });
 
 // Create the schema
 const MasterClassSchema = new Schema({
@@ -21,14 +35,14 @@ const MasterClassSchema = new Schema({
     },
     availablePlaces: {
         type: Number,
-        required: true
+        required: false
     },
     courses: {
-        type: Array 
+        type: [MasterClassInfoSchema] 
     },
-    courseDuration: {
+    MasterClassDuration: {
         type: String,
-        required: true
+        required: false
     },
     startDate: {
         type: String,
@@ -38,21 +52,29 @@ const MasterClassSchema = new Schema({
         type: String,
         required: true
     },
+        // what is the use of that 
+
     levelOfStudents: {
         type: String,
-        required: true
+        required: false
     },
+    // what is the use of that 
     effort: {
         type: String,
-        required: true
+        required: false
     },
-    available: {
+    isAvailable: {
         type: Boolean,
-        required: true
+        required: false
     },
-    studentsAssigened:{
-        type: []
-    }
+    listOfApplied:{
+        type: [MasterClassInfoSchema]
+    },
+    listOfAccepted:{
+        type: [MasterClassInfoSchema]
+    },
+    educationalOrganization:MasterClassInfoSchema
 })
 
-module.exports = MasterClass = mongoose.model('masterClasses', MasterClassSchema)
+const MasterClass = mongoose.model('masterClasses', MasterClassSchema)
+module.exports = MasterClass

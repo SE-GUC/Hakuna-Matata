@@ -1,0 +1,218 @@
+//Here
+const express = require('express')
+const router = express.Router()
+const passport = require('passport')
+
+const User = require('../../models/User')
+const Project = require('../../models/Project')
+const Task = require('../../models/Task')
+const partnerValidator = require('../../validations/partnerValidations.js')
+
+ const { sendToAdminRequestNotification,NotSummary } = require('../../models/Notification.js')
+
+// Partner CRUD
+router.post('/:id', async (req, res) => {
+    try {
+        const isValidated = partnerValidator.createValidation(req.body);
+        if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+        
+            const currUser = await User.findOne({ _id: req.params.id, tags: 'Partner' })
+            if (currUser) return res.status(404).send('You are already a Partner on the site')
+            await User.findByIdAndUpdate(req.params.id ,req.body)
+            await User.findByIdAndUpdate(req.params.id ,{partnerDateJoined:new Date().toJSON(),$push:{tags:'Partner'}})            // console.log(3)
+            const partner = await User.findById(req.params.id)
+            res.send(partner);
+          
+    } catch (err) {
+        // We will be handling the error later
+        res.status(404).send('error')
+    }  
+    })
+
+
+  //get all Partners
+  router.get('/', async (req, res) => {
+    const partners = await User.find({ tags: 'Partner' })
+    res.json({ data: partners })
+  })
+  //get Certin partner
+  router.get('/:id', async (req,res) => {
+    const partner = await User.findOne({_id:req.params.id ,tags: 'Partner' })
+    res.json({ data: partner })
+  
+  })
+  
+  // update partner name 
+  router.put('/:id', async (req, res) => {
+    const isValidated = partnerValidator.updateValidation(req.body);
+    if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+  
+    try {
+      const partner = await User.findOneAndUpdate({_id:req.params.id ,tags: 'Partner' } ,req.body)
+      const updatedPartner = await User.findById(req.params.id)
+      res.send(updatedPartner)
+    } catch (error) {
+  
+    }
+  })
+  // delete Partner 
+  // Delete Partner delete 
+  router.delete('/:id', async (req, res) => {
+    try {
+      const currPartner = await User.findOne({_id:req.params.id ,tags: 'Partner' })     
+      if (currPartner) {
+        const index=currPartner.tags.indexOf('Partner')
+          currPartner.tags.splice(index,1)
+       currPartner.save()
+        res.json({ msg: 'Partner was deleted successfully'})
+      } else {
+        res.json({ msg: 'Partner was deleted Already or Not Found' })
+      }
+    }
+    catch (error) {
+      // We will be handling the error later
+      console.log(error)
+    }
+  })
+// End Partner CRUD
+
+
+
+  // get partner projects
+router.get('/project/:id', async (req,res) => {
+    const partner = await User.findOne({_id:req.params.id ,tags: 'Partner' })
+    res.send( partner.partnerProjects)
+  
+})
+  // get partner projects
+  router.get('/task/:id', async (req,res) => {
+    const partner = await User.findOne({_id:req.params.id ,tags: 'Partner' })
+    res.send( partner.partnerTasks)
+  
+})
+//1
+router.get('/acceptedTask/:id', async (req, res) => {
+  const not = await NotSummary.find({ 'sent_to': req.params.id, 'title': 'Your task has been accepted' });
+  res.send( not);
+})
+//3
+router.get('/assignedTask/:id', async (req, res) => {
+  const not = await NotSummary.find({ 'sent_to': req.params.id, 'title': 'You task has been assigned to a member!' });
+  res.send({
+    data: not
+  })
+})
+//1
+router.post('/editRequest/:id', (req, res) => {
+  var id = req.params.id
+  var e = sendToAdminRequestNotification('Partner ' + id + ' wants to edit his profile')
+  res.sendStatus(200)
+})
+
+  
+//s
+router.put('/assignConstlancyAgencyToTask/:id', passport.authenticate('jwt', {session: false}),async (req, res) => {
+  const partnerId=req.params.id
+  const taskId=req.body.taskId
+  const consultancyAgencyId=req.body.consultancyAgencyId
+  const state=req.body.state
+  var task =await Task.findOne({_id:taskId, accepted:true})
+  if(task){
+    if(task.taskPartner.id ==partnerId){
+      const assignedConsultancyAgency=await User.findOne({_id:consultancyAgencyId, tags:'ConsultancyAgency' })
+      var consultancyAgency= task.appliedConsultancies.find((consultancyAgency)=>consultancyAgency.id==consultancyAgencyId)
+      if(state===false){
+        task.appliedConsultancies.filter((consultancyAgency)=>consultancyAgency.id!=consultancyAgencyId)
+        assignedConsultancyAgency.consultancyAgencyAppliedInTasks.filter((task)=>task.id!=taskId)
+        task.save()
+        assignedConsultancyAgency.save()
+        return res.sendStatus(200)
+      }
+      if(consultancyAgency !=undefined){
+        task.consultancyAgency=consultancyAgency
+        assignedConsultancyAgency.consultancyAgencyAcceptedInTasks.push({
+                id:task._id,
+                name:task.name,
+                date:new Date().toJSON()
+              })
+      }
+      // for(var consultancyAgency of  task.appliedConsultancies){
+      //   if(consultancyAgency.id==consultancyAgencyId){
+      //     task.consultancyAgency=consultancyAgency
+      //     assignedConsultancyAgency.consultancyAgencyAcceptedInTasks.push({
+      //       id:task._id,
+      //       name:task.name,
+      //       date:new Date().toJSON()
+      //     })
+      //   }else{
+      //     //should here  notify or/ and delete that task form other consultancy 
+      //   }
+      // }
+      //Should be Remove from PlateForm and notify consultancy
+      task.appliedConsultancies=[]
+      task.save()
+      assignedConsultancyAgency.save()
+      res.sendStatus(200)
+
+    }else{
+      res.status(404).send('You are not the owner')
+
+    }
+  }else{
+    res.status(404).send('this task not found')
+  }
+})
+router.put('/assignConstlancyAgencyToProject/:id', passport.authenticate('jwt', {session: false}),async (req, res) => {
+  const partnerId=req.params.id
+  const projectId=req.body.projectId
+  const consultancyAgencyId=req.body.consultancyAgencyId
+  const state=req.body.state
+  var project =await Project.findOne({_id:projectId, accepted:true})
+  if(project){
+    if(project.projectPartner.id==partnerId){
+      const assignedConsultancyAgency=await User.findOne({_id:consultancyAgencyId, tags:'ConsultancyAgency' })
+      var consultancyAgency= project.appliedConsultancies.find((consultancyAgency)=>consultancyAgency.id==consultancyAgencyId)
+      if(state===false){
+        project.appliedConsultancies.filter((consultancyAgency)=>consultancyAgency.id!=consultancyAgencyId)
+        assignedConsultancyAgency.consultancyAgencyAppliedInPorjects.filter((project)=>project.id!=projectId)
+        project.save()
+        assignedConsultancyAgency.save()
+        return res.sendStatus(200)
+      }
+  
+
+      if(consultancyAgency !=undefined){
+        project.consultancyAgency=consultancyAgency
+        assignedConsultancyAgency.consultancyAgencyAcceptedInPorjects.push({
+                id:project._id,
+                name:project.name,
+                date:new Date().toJSON()
+              })
+      }
+
+      // for(var consultancyAgency of  project.appliedConsultancies){
+      //   if(consultancyAgency.id==consultancyAgencyId){
+      //     project.consultancyAgency=consultancyAgency
+      //     assignedConsultancyAgency.consultancyAgencyAcceptedInPorjects.push({
+      //       id:project._id,
+      //       name:project.name,
+      //       date:new Date().toJSON()
+      //     })
+      //   }
+      // }
+      project.appliedConsultancies=[]
+      //Should be Remove from PlateForm and notify consultancy
+      project.save()
+      assignedConsultancyAgency.save()
+      res.sendStatus(200)
+    }else{
+      res.status(404).send('You are not the owner')
+
+    }
+  }else{
+    res.status(404).send('this porject not found')
+  }
+})
+
+
+module.exports = router;

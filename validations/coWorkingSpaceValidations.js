@@ -3,12 +3,12 @@ const Joi = require('joi')
 module.exports = {
     createValidation: request => {
         const createSchema = {
-            name: Joi.string().required(),
-            phoneNumber: Joi.string().required(),
-            location: Joi.string().required(),
-            businessPlans: Joi.string().required(),
-            facilites: Joi.string().required(),
-            maxNoRooms: Joi.number().integer().required()
+            coworkingSpaceName: Joi.string().required(),
+            coworkingSpacePhoneNumber: Joi.string(),
+            coworkingSpaceLocation: Joi.string(),
+            coworkingSpaceBusinessPlans: Joi.array(),
+            coworkingSpaceFacilites: Joi.string(),
+            coworkingSpaceMaxNoRooms: Joi.number().integer(),
 
         }
 
@@ -17,15 +17,14 @@ module.exports = {
 
     updateValidation: request => {
         const updateSchema = {
-            partnerId: Joi.string(),
-            name: Joi.string(),
-            phoneNumber: Joi.string(),
-            location: Joi.string(),
-            businessPlans: Joi.string(),
-            facilites: Joi.string(),
-            rooms: Joi.array(),
-            maxNoRooms: Joi.number().integer()
-        }
+            coworkingSpaceName: Joi.string(),
+            coworkingSpacePhoneNumber: Joi.string(),
+            coworkingSpaceLocation: Joi.string(),
+            coworkingSpaceBusinessPlans: Joi.array(),
+            coworkingSpaceFacilites: Joi.string(),
+            coworkingSpaceMaxNoRooms: Joi.number().integer(),
+            coworkingSpaceRooms: Joi.array()
+                }
 
         return Joi.validate(request, updateSchema)
     }, 

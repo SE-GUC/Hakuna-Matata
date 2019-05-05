@@ -1,0 +1,113 @@
+
+.Button-Icon{
+
+  color: #212529;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: green;
+  border: 1px solid red;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 50%;
+
+  /* //background-image: url(./1.png) */
+
+}
+@media (prefers-reduced-motion: reduce) {
+.Button-Icon {
+transition: none;
+}
+}
+
+.Button-Icon:hover {
+color: #212529;
+text-decoration: none;
+}
+
+.Button-Icon:focus, .Button-Icon.focus {
+outline: 0;
+box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.Button-Icon.disabled, .Button-Icon:disabled {
+opacity: 0.65;
+}
+.Form-Control {
+  display: none;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color:transparent;
+  background-clip: padding-box;
+ 
+  border-radius: 0.5rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .Form-Control {
+    transition: none;
+  }
+}
+
+.Form-Control::-ms-expand {
+  background-color: transparent;
+  border: 0;
+}
+
+.Form-Control:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.Form-Control::-webkit-input-placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.Form-Control::-moz-placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.Form-Control:-ms-input-placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.Form-Control::-ms-input-placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.Form-Control::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.Form-Control:disabled, .form-control[readonly] {
+  background-color: #e9ecef;
+  opacity: 1;
+}
+
+Select.Form-Control:focus::-ms-value {
+  color: #495057;
+  background-color: #fff;
+}
+
+.Form-Control-File,
+.Form-Control-Range {
+  display: block;
+  width: 100%;
+}
