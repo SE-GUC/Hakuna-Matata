@@ -3,6 +3,11 @@ const Schema = mongoose.Schema
 
 // Create the schema
 const AdminSchema = new Schema({
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        default: null
+
+    }, 
     name: {
         type: String,
         required: true
@@ -20,16 +25,7 @@ const AdminSchema = new Schema({
     id: {
         type: Number,
         required: true
-    },
-//     email:{
-//         type: String,
-//         required: true
-//     },
-//     password:{
-//     type: String,
-//     required: true
-// },
-
+    }
 })
 
 const Admin = mongoose.model('admins', AdminSchema)

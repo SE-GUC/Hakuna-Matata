@@ -8,9 +8,6 @@ const TaskInfoSchema = new Schema({
     name: {
         type: String,
         required: true
-    },
-    date:{
-        type:Date
     }
 
 },{ _id : false });
@@ -39,22 +36,22 @@ const TaskSchema = new Schema({
     project:TaskInfoSchema,
     taskMember: TaskInfoSchema,
     adminId:mongoose.Schema.Types.ObjectId,
-    consultancyAgency: TaskInfoSchema,
-    appliedConsultancies: [TaskInfoSchema],
+    taskConsultancyAgency: TaskInfoSchema,
+    appliedConsultancyAgencies: [TaskInfoSchema],
     appliedMembers: [TaskInfoSchema],
     description: {
         type: String,
-        required: true
+        required: false
     },
     // why array ?
     requiredSkills: [SkillSchema],
     monetaryCompensation: {
         type: Number,
-        required: true
+        required: false
     },
     deadline: {
         type: Date,
-        required: true
+        required: false
     },
     deadlineForApply: {
         type: Date,
@@ -96,6 +93,10 @@ const TaskSchema = new Schema({
         type: Number,
         required: false
     },
+    // consultyNeeded: {
+    //     type: Boolean,
+    //     required: false
+    // },
     consultancyChanges: ChangedTaskFieldSchema,
     isChanged:  {
         type: Boolean,
@@ -103,7 +104,7 @@ const TaskSchema = new Schema({
     },
     consultyNeeded:{
         type: Boolean,
-        required: true
+        required: false
     },
     changeIsAccpted:  {
         type: Boolean,

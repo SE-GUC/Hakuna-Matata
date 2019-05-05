@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-
 // Displayed info better than repeate it agine in each array
 const InfoSchema = new Schema({
 

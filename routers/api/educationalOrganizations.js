@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 router.use(express.json())
-
 const courseValidator = require('../../validations/courseValidations.js')
 const masterClassValidator = require('../../validations/masterClassValidations.js')
 const trainingProgramValidator = require('../../validations/trainingProgramsValidations.js')

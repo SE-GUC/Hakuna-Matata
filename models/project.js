@@ -10,8 +10,6 @@ const PorjectInfoSchema = new Schema({
     name: {
         type: String,
         //required: true
-    },date:{
-        type:Date 
     }
 
 },{ _id : false });
@@ -28,6 +26,7 @@ const ChangedProjectFieldSchema = new Schema({
 const ProjectSchema = new Schema({
     name:String,
     projectPartner: PorjectInfoSchema,
+    projectConsultancyAgency: PorjectInfoSchema,
     projectMember: PorjectInfoSchema,
     consultancyAgency: PorjectInfoSchema,
     adminId:mongoose.Schema.Types.ObjectId,
@@ -98,9 +97,6 @@ const ProjectSchema = new Schema({
     consultancyAgencyProject: ChangedProjectFieldSchema,
     //Some info about consultancies that will be in the project
     projectManager: String,
-    appliedMembers: [PorjectInfoSchema],
-
-
 
 })
 const Project = mongoose.model('projects', ProjectSchema)
