@@ -8,9 +8,12 @@ const MasterClassInfoSchema = new Schema({
     name: {
         type: String,
         //required: true
+<<<<<<< HEAD
     },
     date:{
         type:Date
+=======
+>>>>>>> master
     }
 
 },{ _id : false });

@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
+<<<<<<< HEAD
 import axios from "axios";
 var store = require('store')
+=======
+
+>>>>>>> master
 export class AppliedUser extends Component {
   getStyle = () =>{
 return{
@@ -9,6 +13,7 @@ return{
    testAlign:'left'
 }
   }
+<<<<<<< HEAD
   async handleClick() {
    const id = this.props.id
    const masterClassId = this.props.masterClass._id
@@ -51,6 +56,19 @@ return{
      return <div style={this.getStyle()}>
  <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.apply.name}</p></div>
     }
+=======
+   
+    render() {
+    return (
+        
+      <div style={this.getStyle()}>
+      <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{ this.props.apply.name}<button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  > Accept/Reject</button>
+      
+      </p>
+     
+    </div>
+    )
+>>>>>>> master
   }
 }
 const ButotnStyle = {

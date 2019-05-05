@@ -1,3 +1,4 @@
+<<<<<<< HEAD
  
 const express = require('express');
 const router = express.Router();
@@ -6,6 +7,16 @@ const router = express.Router();
 const Certificate = require('../../models/Certificate.js')
 const certificateValidator = require('../../validations/CertificateValidations.js')
 const User = require('../../models/User.js')
+=======
+
+const express = require('express');
+const router = express.Router();
+var moment = require('moment');
+const Joi = require('joi');
+
+const Certificate = require('../../models/Certificate.js')
+const certificateValidator = require('../../validations/CertificateValidations.js')
+>>>>>>> master
 
 //Certificate CRUDS
 
@@ -22,6 +33,12 @@ router.post('/', async (req, res) => {
     }
 
 })
+<<<<<<< HEAD
+=======
+
+//get Show all Certificates
+//1
+>>>>>>> master
 router.get('/', async (req, res) => {
     try {
         const certificates = await Certificate.find();
@@ -33,6 +50,12 @@ router.get('/', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
+=======
+//(id  => CertificateId)
+//get certificate by id using mongo
+//1
+>>>>>>> master
 router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id
@@ -45,11 +68,18 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
+=======
+//update certificate using mongo
+//(certificate_id => certificateId)
+//1
+>>>>>>> master
 router.put('/:id', async (req, res) => {
     try {
         const certificateId = req.params.id
         const isValidated = certificateValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+<<<<<<< HEAD
         await Certificate.findOneAndUpdate({ '_id': certificateId }, req.body)
         const certificateAfterUpdate = await Certificate.findById(certificateId)
 
@@ -67,6 +97,11 @@ router.put('/:id', async (req, res) => {
         }
     }
         res.json({ data: certificateAfterUpdate});
+=======
+        const updatedCertificate = await Certificate.findOneAndUpdate({ '_id': certificateId }, req.body)
+        const cousreAfterUpdate = await Certificate.findById(certificateId)
+        res.json({ data: cousreAfterUpdate});
+>>>>>>> master
     } catch (error) {
         // We will be handling the error later
         res.status(404).send('Not found')
@@ -80,6 +115,7 @@ router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
         const deletedformCertificates = await Certificate.findOneAndRemove({ '_id': id })
+<<<<<<< HEAD
         if (!deletedformCertificates) return res.status(404).send({ error: 'certificates do not exist' })
         if(deletedformCertificates.educationalOrganization != undefined){
             const educationalOrganization= await User.findById(deletedformCertificates.educationalOrganization.id)
@@ -87,6 +123,11 @@ router.delete('/:id', async (req, res) => {
             educationalOrganization.save()
         }
         res.json({ msg: 'You delete the certificate', data: deletedformCertificates })
+=======
+        res.send(deletedformCertificates)
+        if (!deletedformCertificates) return res.send('Not found')
+        res.json({ data: deletedformCertificates })
+>>>>>>> master
     }
     catch (error) {
         res.sendStatus(404).send('Not found');

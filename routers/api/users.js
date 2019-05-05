@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
+<<<<<<< HEAD
 const Joi = require('joi');
 const rendomstring=require('randomstring')
 const  User  = require('../../models/User.js');
@@ -30,6 +31,22 @@ router.get('/platform/:id',passport.authenticate('jwt', {session: false}),async 
 
 //get Certin user
 router.get('/:id', passport.authenticate('jwt', {session: false}),async (req,res) => {
+=======
+
+const  User  = require('../../models/User.js');
+const userValidator = require('../../validations/userValidations.js')
+
+const tokenKey = require('../../config/keys').secretOrKey
+
+//get all users
+router.get('/',passport.authenticate('jwt', {session: false}), async (req,res) => {
+    const users = await User.find()
+      return res.json(users)
+})
+
+//get Certin user
+router.get('/:id', async (req,res) => {
+>>>>>>> master
     const id = req.params.id
     const user = await User.findById(id)
     res.json({msg:'get the user successfully', data: user})
@@ -83,6 +100,7 @@ router.put('/:id', async (req,res) => {
 	try {
 		const isValidated = userValidator.registerValidation(req.body);
 		if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+<<<<<<< HEAD
 		const { email, password,displayedName} = req.body;
 		const user = await User.findOne({ email });
 		if (user) return res.status(400).json({ msg: 'Email already exists' });
@@ -200,19 +218,43 @@ router.post('/verify',async(req,res)=>{
     
 });
 
+=======
+		const { email,  fullName, password } = req.body;
+		const user = await User.findOne({ email });
+		if (user) return res.status(400).json({ email: 'Email already exists' });
+		const salt = bcrypt.genSaltSync(10);
+        const hashedPassword = bcrypt.hashSync(password, salt);
+        
+		const newUser = new User({
+			memberFullName:fullName,
+			password: hashedPassword,
+			email,
+		});
+		await User.create(newUser);
+		res.json({ msg: 'User created successfully', data: newUser });
+	} catch (error) {
+		res.status(422).send({ error: 'Can not create user' });
+	}
+});
+>>>>>>> master
 router.post('/login', async (req, res) => {
 	try {
         const isValidated = userValidator.loginValidation(req.body);
 		if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
 		const { email, password } = req.body;
 		const userfound = await User.findOne({ email });
+<<<<<<< HEAD
 		if (!userfound) return res.status(404).json({ msg: 'Email does not exist' });
+=======
+		if (!userfound) return res.status(404).json({ email: 'Email does not exist' });
+>>>>>>> master
 		const match = bcrypt.compareSync(password, userfound.password);
 		if (match) {            
             const user = {
                 id: userfound._id,
                 email: userfound.email
             }   
+<<<<<<< HEAD
             const token = jwt.sign(user, tokenKey, { expiresIn: '24h' })
             return res.json({token: `Bearer ${token}`,id:userfound._id, tags:userfound.tags,data:userfound})
         }
@@ -243,6 +285,15 @@ router.get('/history/:id',async (req,res)=>{
         res.status(400).send('error with the data base')
     }
 })
+=======
+            const token = jwt.sign(user, tokenKey, { expiresIn: '1h' })
+            return res.json({token: `Bearer ${token}`})
+        }
+		else return res.status(400).send({ password: 'Wrong password' });
+	} catch (e) {}
+});
+
+>>>>>>> master
 function verifyToken(req, res, next) {
     // Get auth header value
     const bearerHeader = req.headers['authorization'];

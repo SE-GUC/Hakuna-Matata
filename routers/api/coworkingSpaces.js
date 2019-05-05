@@ -14,7 +14,12 @@ router.post('/:id', async (request, response) => {
         const currUser = await User.findOne({ _id: request.params.id, tags: 'CoworkingSpace' })
         if (currUser) return response.status(404).send('You are already a CoworkingSpace on the site')
         await User.findByIdAndUpdate(request.params.id, request.body)
+<<<<<<< HEAD
         await User.findByIdAndUpdate(request.params.id, { coworkingSpaceDateJoined: new Date().toJSON(), $push: { tags: 'CoworkingSpace' } })
+=======
+        await User.findByIdAndUpdate(request.params.id, { coworkingSpaceDateJoined: new Date().getDate() })
+        await User.findByIdAndUpdate(request.params.id, { $push: { tags: 'CoworkingSpace' } })
+>>>>>>> master
         const coworkingSpace = await User.findById(request.params.id)
         response.send(coworkingSpace);
 
@@ -55,8 +60,12 @@ router.delete('/:id', async (req, res) => {
 
         if (currCoworkingSpace) {
             const index = currCoworkingSpace.tags.indexOf('CoworkingSpace')
+<<<<<<< HEAD
             const deletedCoworkingSpace = currCoworkingSpace.tags.splice(index, 1)
             currCoworkingSpace.save()
+=======
+            const deletedCoworkingSpace = await User.findOneAndUpdate({ _id: id }, { tags: currCoworkingSpace.tags.splice(index, 1) })
+>>>>>>> master
             res.json({ msg: 'CoworkingSpace was deleted successfully', data: deletedCoworkingSpace })
         } else {
             res.json({ msg: 'CoworkingSpace was deleted Already or Not Found' })
@@ -76,10 +85,15 @@ router.delete('/:id', async (req, res) => {
 // change in the body of Coworking Space and new body in Room so it should be put or post 
 router.post('/room/:id', async (req, res) => {
     try {
+<<<<<<< HEAD
 
         const isValidated = roomValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
 
+=======
+        const isValidated = roomValidator.createValidation(req.body);
+        if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
+>>>>>>> master
         const room = await Room.create(req.body)
         const coworkingSpaceOld = await User.findOneAndUpdate({ _id: req.params.id, tags: 'CoworkingSpace' }, {
             $push: {
@@ -94,10 +108,17 @@ router.post('/room/:id', async (req, res) => {
             }
         })
         coworkingSpaceOld.save()
+<<<<<<< HEAD
         res.status(201).send(coworkingSpaceOld);
 
     } catch (err) {
         res.status(404).send(err);
+=======
+        res.status(200).send(coworkingSpaceOld);
+
+    } catch(err){
+        res.status(404).send('Not found');
+>>>>>>> master
 
     }
 })
@@ -105,23 +126,42 @@ router.post('/room/:id', async (req, res) => {
 // I thought that room id should send in req body not in params
 router.get('/room/:id', async (req, res) => {
     const coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
+<<<<<<< HEAD
     if (coworkingSpace) return res.json({ data: coworkingSpace.coworkingSpaceRooms })
     res.status(404).send('Not found');
 
+=======
+    if (coworkingSpace) {
+        res.json({ data: coworkingSpace.coworkingSpaceRooms })
+    } else {
+        res.status(404).send('Not found');
+    }
+>>>>>>> master
 })
 // show specific room
 // I thought that room id should send in req body not in params
 router.get('/room/:id/:roomId', async (req, res) => {
     const coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
+<<<<<<< HEAD
     if (!coworkingSpace) return res.status(404).send('Not found');
     const room = coworkingSpace.coworkingSpaceRooms.find(room => room.id == req.params.roomId);
     res.json({ data: room })
+=======
+    if (coworkingSpace) {
+        const room = coworkingSpace.coworkingSpaceRooms.find(room => room.id == req.params.roomId);
+        res.json({ data: room })
+    } else {
+        res.status(404).send('Not found');
+
+    }
+>>>>>>> master
 })
 // delete room
 router.delete('/room/:id/:roomId', async (req, res) => {
     const coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
     var isExsits = false
     if (coworkingSpace) {
+<<<<<<< HEAD
         const oldlength = coworkingSpace.coworkingSpaceRooms.length
         coworkingSpace.coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms.filter((room) => room.id != req.params.roomId)
         console.log(oldlength)
@@ -141,6 +181,18 @@ router.delete('/room/:id/:roomId', async (req, res) => {
         //         return res.status(200).send(room)
         //     }
         // }
+=======
+        const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
+        for (var index = 0; index < coworkingSpaceRooms.length; index++) {
+            if (coworkingSpaceRooms[index].id == req.params.roomId) {
+                const newRooms = coworkingSpaceRooms.splice(index, 1)
+                const coworkingSpaceNew = await User.findOneAndUpdate({ _id: req.params.id }, { coworkingSpaceRooms: coworkingSpaceRooms })
+                const room = await Room.findByIdAndRemove(req.params.roomId)
+                isExsits = true
+                return res.status(200).send(room)
+            }
+        }
+>>>>>>> master
     }
     if (!isExsits) return res.status(404).send('Not found');
 
@@ -152,6 +204,7 @@ router.put('/room/:id/:roomId', async (req, res) => {
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const coworkingSpace = await User.findById(req.params.id)
         var isExsits = false
+<<<<<<< HEAD
         const roomId = req.params.roomId
         if (coworkingSpace) {
             const oldroom = await Room.findOneAndUpdate({ _id: roomId }, req.body)
@@ -193,6 +246,34 @@ router.put('/room/:id/:roomId', async (req, res) => {
                 if (!isExsits) return res.status(404).send('room not found in co');
             } else res.status(404).send('room not found')
         } else res.status(404).send('coworking room not found')
+=======
+        if (coworkingSpace) {
+            const oldroom = await Room.findOneAndUpdate({ _id: req.params.roomId }, req.body)
+            if (oldroom) {
+                const room = await Room.findById(req.params.roomId)
+                const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
+                for (var index = 0; index < coworkingSpaceRooms.length; index++) {
+                    if (coworkingSpaceRooms[index].id === room._id) {
+                        coworkingSpaceRooms.splice(index, 1)
+                        const newRooms = coworkingSpaceRooms.push({
+                            id: room._id,
+                            capacity: room.capacity,
+                            slots: room.slots,
+                            reviews: room.reviews,
+                            comments: room.comments,
+                            reservations: room.reservations
+                        })
+                        const coworkingSpaceNew = await User.findOneAndUpdate({ _id: req.params.id }, { coworkingSpaceRooms: newRooms })
+                        isExsits = true
+                        return res.status(200).send(room)
+                    }
+                }
+                if (!isExsits) return res.status(404).send('room not found');
+            } else
+                res.status(404).send('room not found')
+        } else
+            res.status(404).send('room not found')
+>>>>>>> master
     } catch (err) {
         console.log(err)
     }
@@ -204,6 +285,7 @@ router.put('/room/reserve/:id/:roomId', async (req, res) => {
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const coworkingSpace = await User.findById(req.params.id)
         var isExsits = false
+<<<<<<< HEAD
         const roomId = req.params.roomId
 
         if (coworkingSpace) {
@@ -237,6 +319,27 @@ router.put('/room/reserve/:id/:roomId', async (req, res) => {
                 if (!isExsits) return res.status(404).send('room not found1');
             } else res.status(404).send('room not found2')
         } else res.status(404).send('room not found')
+=======
+        if (coworkingSpace) {
+            const oldroom = await Room.findById( req.params.roomId)
+            if (oldroom) {                
+                const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
+                for (var index = 0; index < coworkingSpaceRooms.length; index++) {
+                    if (coworkingSpaceRooms[index].id === oldroom._id) {
+                        coworkingSpace.coworkingSpaceRooms.reservations.push(req.body)
+                        oldroom.reservations.push(req.body)
+                        oldroom.save()
+                        coworkingSpace.save()
+                        isExsits = true
+                        return res.status(200).send(oldroom)
+                    }
+                }
+                if (!isExsits) return res.status(404).send('room not found');
+            } else
+                res.status(404).send('room not found')
+        } else
+            res.status(404).send('room not found')
+>>>>>>> master
     } catch (err) {
         console.log(err)
     }
@@ -246,6 +349,7 @@ router.put('/reservation/:id/:roomId', async (req, res) => {
 
     try {
         const state = req.body.state
+<<<<<<< HEAD
         const reservationId= req.body.reservationId
         if (!state) {
             var coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
@@ -281,10 +385,28 @@ router.put('/reservation/:id/:roomId', async (req, res) => {
                     if (roomReservations[pos]._id == reservationId) return res.status(200).send('you have already reserve it ');
                     isResverved = true
                     return res.status(404).send('is already accepted');
+=======
+        const index = req.body.index
+        if (!state) {
+            //here we should send notifcation  
+            return res.status(200).send('Notification of reject reservation is sent')
+        } else {
+            var coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
+            var isResverved = false
+            // const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
+            var room = coworkingSpace.coworkingSpaceRooms.find(room => room.id === req.params.roomId)
+            const roomReservations = room.reservations
+            var reserved = room.reservations[index]
+            for (var pos = 0; pos < roomReservations.length; pos++) {
+                if (pos != index & roomReservations[pos].slot === reserved.slot & roomReservations[pos].reservationDate === reserved.reservationDate & roomReservations[pos].isAccpted) {
+                    isResverved = true
+                    return res.status(404).send('Not found');
+>>>>>>> master
                 }
             }
             if (!isResverved) {
                 reserved.isAccpted = state
+<<<<<<< HEAD
                 room.reservations.splice(pos - 1, 1)
                 room.reservations.splice(pos - 1, 0, reserved)
                 for (var i = 0; i < room.reservations.length; i++) {
@@ -296,6 +418,15 @@ router.put('/reservation/:id/:roomId', async (req, res) => {
                 }
                 coworkingSpace.save()
                 await Room.findOneAndUpdate({ _id: req.params.roomId }, { reservations: room.reservations })
+=======
+
+                room.reservations.splice(index, 1)
+                room.reservations.splice(index, 0, reserved)
+                //this may not work so i should loop on rooms to updated this room reservations explictly
+                coworkingSpace.save()
+                //coworkingSpace = await User.findOneAndUpdate({ _id: req.params.id, tags: 'CoworkingSpace' },{coworkingSpaceRooms:room})
+                const updateRoom = await Room.findOneAndUpdate({ _id: req.params.roomId }, { reservations: room.reservations })
+>>>>>>> master
                 coworkingSpace = await User.findOne({ _id: req.params.id, tags: 'CoworkingSpace' })
                 return res.status(200).send(coworkingSpace);
 

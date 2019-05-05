@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
 import {Link} from 'react-router-dom';
+<<<<<<< HEAD
 import axios from "axios";
 var store = require('store')
+=======
+
+>>>>>>> master
 export class ConsultancyAgencyMembers extends Component {
     getStyle = () =>{
         return{
@@ -10,6 +14,7 @@ export class ConsultancyAgencyMembers extends Component {
              testAlign:'left'
         }
           }
+<<<<<<< HEAD
           async handleClick() {
             const id=this.props.task._id
             console.log(id)
@@ -39,6 +44,16 @@ export class ConsultancyAgencyMembers extends Component {
             return (
               <div style={this.getStyle()}>
               {this.getMembers()}
+=======
+           
+            render() {
+            return (
+              <div style={this.getStyle()}>
+                <p style ={{color :"white", textAlign: "left" , fontSize :'18px'}}>{this.props.member.name}<Link style = {ButotnStyle} to={"/members/"+this.props.member.id}><button className="btn btn-danger btn-sm m-2" style = {ButotnStyle}  >Show Profile</button></Link>
+                
+                </p>
+               
+>>>>>>> master
               </div>
             )
           }

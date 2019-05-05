@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
+<<<<<<< HEAD
 
 
 const MasterClass = require('../../models/MasterClass.js')
 const masterClassValidator = require('../../validations/masterClassValidations.js')
 const User = require('../../models/User.js')
+=======
+var moment = require('moment');
+const Joi = require('joi');
+
+const MasterClass = require('../../models/MasterClass.js')
+const masterClassValidator = require('../../validations/MasterClassValidations.js')
+>>>>>>> master
 
 //MasterClass CRUDS
 
@@ -58,6 +66,7 @@ router.put('/:id', async (req, res) => {
         const masterClassId = req.params.id
         const isValidated = masterClassValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+<<<<<<< HEAD
         await MasterClass.findOneAndUpdate({ '_id': masterClassId }, req.body)
         const masterClassAfterUpdate = await MasterClass.findById(masterClassId)
 
@@ -75,6 +84,13 @@ router.put('/:id', async (req, res) => {
         }
     }
         res.json({ data: masterClassAfterUpdate});
+=======
+        const updatedMasterClass = await MasterClass.findOneAndUpdate({ '_id': masterClassId }, req.body)
+        console.log(updatedMasterClass)
+        const cousreAfterUpdate = await MasterClass.findById(masterClassId)
+        console.log(cousreAfterUpdate)
+        res.json({ data: cousreAfterUpdate});
+>>>>>>> master
     } catch (error) {
         // We will be handling the error later
         res.status(404).send('Not found')
@@ -89,12 +105,15 @@ router.delete('/:id', async (req, res) => {
         const id = req.params.id;
         const deletedformMasterClass = await MasterClass.findOneAndRemove({ '_id': id })
         if (!deletedformMasterClass) return res.send('Not found')
+<<<<<<< HEAD
 
         if(deletedformMasterClass.educationalOrganization != undefined){
             const educationalOrganization= await User.findById(deletedformMasterClass.educationalOrganization.id)
             educationalOrganization.educationOrganizationMasterClasses= educationalOrganization.educationOrganizationMasterClasses.filter((masterClass)=> masterClass.id!= id )
             educationalOrganization.save()
         }
+=======
+>>>>>>> master
         res.send(deletedformMasterClass)
 
     }
@@ -105,4 +124,26 @@ router.delete('/:id', async (req, res) => {
 });
 
 // End of MasterClass CRUDS
+<<<<<<< HEAD
+=======
+
+
+
+//Badr
+
+router.put('/applyforamasterClass/:id', async (request, response) => {
+    const masterClassId = request.params.id;
+    const memberId = request.body.memberId;
+    const schema = {
+        memberId: Joi.number().required(),
+    }
+    const result = Joi.validate(request.body, schema);
+    if (result.error) return response.status(400).send({ error: result.error.details[0].message });
+    const masterClass = await MasterClass.findById(masterClassId)
+    masterClass.listOfApplies.push({ 'memberId': memberId, dateofapply: moment().format('MMMM Do YYYY, h:mm:ss a') })
+    masterClass.save()
+    response.sendStatus(200);
+});
+//End Badr
+>>>>>>> master
 module.exports = router;

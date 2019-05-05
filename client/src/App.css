@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .App {
   /* background-image: url("./logo.jpg"); */
   /* background:'#000000'; */
@@ -7,4 +8,16 @@
 
     
 
+=======
+.App-header {
+    background-color: #242424;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    margin: 0%;
+    padding: 0%;
+>>>>>>> master
   }

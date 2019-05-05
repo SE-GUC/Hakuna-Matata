@@ -54,8 +54,13 @@ router.put('/:id', async (req, res) => {
             const coworkingSpace = await User.findById(room.coworkingSpace.id)
             const coworkingSpaceRooms = coworkingSpace.coworkingSpaceRooms
             for (var index = 0; index < coworkingSpaceRooms.length; index++) {
+<<<<<<< HEAD
                 if (coworkingSpaceRooms[index].id == room._id) {
                     oworkingSpace.coworkingSpaceRooms.splice(index, 1)
+=======
+                if (coworkingSpaceRooms[index].id === room._id) {
+                    coworkingSpaceRooms.splice(index, 1)
+>>>>>>> master
                     coworkingSpace.coworkingSpaceRooms.push({
                         id: room._id,
                         capacity: room.capacity,

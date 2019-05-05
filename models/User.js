@@ -15,6 +15,7 @@ const InfoSchema = new Schema({
     }
 
 },{ _id : false });
+<<<<<<< HEAD
 const HistorySchema = new Schema({
 
     action: {
@@ -44,6 +45,8 @@ const MessageSchema = new Schema({
     }
 
 },{ _id : false });
+=======
+>>>>>>> master
 // reservation Schema
 const ReservationSchema = new Schema({
     slot:{
@@ -65,7 +68,11 @@ const ReservationSchema = new Schema({
         default:false
        // required:true
     },
+<<<<<<< HEAD
 })
+=======
+},{ _id : false })
+>>>>>>> master
 //Room for coworkingSpace
 const RoomSchema = new Schema({
     id:{
@@ -126,6 +133,7 @@ const TrainingProgramSchema = new Schema({
         type: [SkillSchema]
     }
 })
+<<<<<<< HEAD
 const PlatformSchema = new Schema({
     id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -150,6 +158,9 @@ const PlatformSchema = new Schema({
     },
     description:String
 },{ _id : false })
+=======
+
+>>>>>>> master
 // Create the schema
 const UserSchema = new Schema({
     tags: {
@@ -259,8 +270,12 @@ const UserSchema = new Schema({
         type: String,
         //required: true
     },
+<<<<<<< HEAD
     secretToken:String,
     displayedName:String,
+=======
+
+>>>>>>> master
     memberLocation:{
         type:String
     },
@@ -311,9 +326,14 @@ const UserSchema = new Schema({
     memberCourses:[InfoSchema],
     memberCoursesAppliedIn:[InfoSchema],
     memberCoursesAcceptedIn:[InfoSchema],
+<<<<<<< HEAD
     memberMasterClassesAppliedIn:[InfoSchema],
     memberMasterClassesAcceptedIn:[InfoSchema],
     // memberMasterClasses:[InfoSchema],
+=======
+    memberMasterclassesAppliedIn:[InfoSchema],
+    memberMasterclassesAcceptedIn:[InfoSchema],
+>>>>>>> master
     memberWorksIn:[InfoSchema],
     memberVerified: {
         type: Boolean,
@@ -415,7 +435,11 @@ const UserSchema = new Schema({
         type:String
     },
     educationOrganizationCertificates: [InfoSchema],
+<<<<<<< HEAD
     educationOrganizationTrainingPrograms: [InfoSchema],
+=======
+    educationOrganizationTrainingPrograms: [TrainingProgramSchema],
+>>>>>>> master
     educationOrganizationCourses: [InfoSchema],
     educationOrganizationMasterClasses:[InfoSchema],
     educationOrganizationEducators:[InfoSchema],
@@ -427,6 +451,7 @@ const UserSchema = new Schema({
         type:Date
     },
     // End EducationalOrganization
+<<<<<<< HEAD
     courseRequests:[InfoSchema],
     posts:[InfoSchema],
     history:[HistorySchema],
@@ -436,6 +461,8 @@ const UserSchema = new Schema({
     currQuestion:String,
     // test:[],
    
+=======
+>>>>>>> master
 
 })
 

@@ -24,7 +24,11 @@ module.exports = {
         const registerSchema = {
             email: Joi.string().email().required(),
             password: Joi.string().required(),
+<<<<<<< HEAD
             displayedName: Joi.string().min(2).max(30),
+=======
+            fullName: Joi.string().min(2).max(30).required(),
+>>>>>>> master
         }
 
         return Joi.validate(request, registerSchema)

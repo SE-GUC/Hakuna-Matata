@@ -5,7 +5,10 @@ const router = express.Router();
 
 const TrainingProgram = require('../../models/TrainingProgram.js')
 const trainingProgramValidator = require('../../validations/trainingProgramsValidations.js')
+<<<<<<< HEAD
 const User = require('../../models/User.js')
+=======
+>>>>>>> master
 
 //TrainingProgram CRUDS
 
@@ -59,6 +62,7 @@ router.put('/:id', async (req, res) => {
         const trainingProgramId = req.params.id
         const isValidated = trainingProgramValidator.updateValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message });
+<<<<<<< HEAD
         await TrainingProgram.findOneAndUpdate({ '_id': trainingProgramId }, req.body)
         const updatedTrainingProgram = await TrainingProgram.findById(trainingProgramId)
 
@@ -76,6 +80,13 @@ router.put('/:id', async (req, res) => {
         }
     }
         res.json({ data: updatedTrainingProgram});
+=======
+        const updatedTrainingProgram = await TrainingProgram.findOneAndUpdate({ '_id': trainingProgramId }, req.body)
+        console.log(updatedTrainingProgram)
+        const cousreAfterUpdate = await TrainingProgram.findById(trainingProgramId)
+        console.log(cousreAfterUpdate)
+        res.json({ data: cousreAfterUpdate});
+>>>>>>> master
     } catch (error) {
         // We will be handling the error later
         res.status(404).send('Not found')
@@ -88,6 +99,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
+<<<<<<< HEAD
         const deletedformTrainingPrograms = await TrainingProgram.findOneAndRemove({ '_id': id })
         if (!deletedformTrainingPrograms) return res.send('Not found')
         
@@ -97,6 +109,16 @@ router.delete('/:id', async (req, res) => {
             educationalOrganization.save()
         }
         res.json({ data: deletedformTrainingPrograms })
+=======
+        console.log(id)
+        const deletedformTrainingPrograms = await TrainingProgram.findOneAndRemove({ '_id': id })
+        console.log(id)
+        res.send(deletedformTrainingPrograms)
+        if (!deletedformTrainingPrograms) return res.send('Not found')
+        console.log(id)
+        var trainingPrograms = await TrainingProgram.find()
+        res.json({ data: trainingPrograms })
+>>>>>>> master
     }
     catch (error) {
         res.sendStatus(404).send('Not found');

@@ -7,7 +7,11 @@ body {
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+<<<<<<< HEAD
     background: #8b2525;
+=======
+    background: #242424
+>>>>>>> master
   }
   
   code {

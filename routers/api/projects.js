@@ -8,19 +8,33 @@ const Task = require('../../models/Task.js')
 const taskValidator = require('../../validations/taskValidations.js')
 const  User  = require('../../models/User.js');
 const { sendTaskNotification } = require('../../models/Notification.js');
+<<<<<<< HEAD
 const Platform = require('../../models/Platform')
+=======
+>>>>>>> master
 
 // CRUD
 //create project
 
+<<<<<<< HEAD
 router.post('/', async (req, res) => {
+=======
+router.post('/:id', async (req, res) => {
+>>>>>>> master
     try {
         const isValidated = projectValidator.createValidation(req.body);
         if (isValidated.error) return res.status(400).send({ error: isValidated.error.details[0].message })
         const project = {
             name: req.body.name,
+<<<<<<< HEAD
             projectPartner: req.body.projectPartner
             ,
+=======
+            projectPartner: {
+                id: req.params.id,
+                name: req.body.projectPartner
+            },
+>>>>>>> master
             project: req.body.project,
             description: req.body.description,
             consultyNeeded: req.body.consultyNeeded,
@@ -31,12 +45,21 @@ router.post('/', async (req, res) => {
             requiredSkills: req.body.requiredSkills,
         }
         const newProject = await Project.create(project)
+<<<<<<< HEAD
         res.json({ msg: 'Project was created successfully', data: newProject })
     }
     catch (error) {
         // we will handling the error later
         res.status(400).send({ error: 'Network Error' })
         }
+=======
+        res.json({ msg: 'project was created successfully', data: newProject })
+    }
+    catch (error) {
+        // we will handling the error later
+        console.log(error)
+    }
+>>>>>>> master
 })
 
 // get a specific project      (id =>projectId)
@@ -94,7 +117,11 @@ router.delete('/:id', async (req, res) => {
 router.put('/edit/:id/:adminId', async (req, res) => {
     const adminId = req.params.adminId
     const projectId = req.params.id
+<<<<<<< HEAD
     const acceptancy = req.body.acceptancy
+=======
+    const acceptancy = req.body.accepted
+>>>>>>> master
     try {
         const varproject = await Project.findById(projectId)
         if (varproject) {
@@ -108,6 +135,7 @@ router.put('/edit/:id/:adminId', async (req, res) => {
                     name:varproject.name
                 })
                 partner.save()
+<<<<<<< HEAD
               if(varproject.consultyNeeded){
                 await Platform.create({
                     tags:['Partner','ConsultancyAgency'],
@@ -161,6 +189,8 @@ router.put('/edit/:id/:adminId', async (req, res) => {
                        member.save()
                    })
               }
+=======
+>>>>>>> master
                 varproject.save()
                 var e = sendTaskNotification(projectId, varproject.partnerId, 'Your project has been accepted');
                 res.json({ data: varproject })
@@ -176,7 +206,10 @@ router.put('/edit/:id/:adminId', async (req, res) => {
         }
 
     } catch(err){
+<<<<<<< HEAD
         console.log(err)
+=======
+>>>>>>> master
         res.status(400).send('Error');
     }
 
@@ -185,6 +218,7 @@ router.put('/assignMemberToProject/:id', async (req, res) => {
     const projectId = req.params.id
     const memberId = req.body.memberId
     const ownerId = req.body.ownerId
+<<<<<<< HEAD
     const state=req.body.state
 try{
 
@@ -225,6 +259,30 @@ try{
         project.save()
         res.json({msg:'Rejected' ,data: project })
     }
+=======
+
+    const project = await Project.findById(projectId)
+    const member = await User.findOne({ _id: memberId, tags: 'Member' })
+   if(project.projectPartner.id===ownerId||project.projectConsultancyAgency.id===ownerId){
+    var indexOfMember = project.appliedMembers.findIndex(member => member.id === memberId)
+    var indexOfProject = member.appliedInProjects.findIndex(project => project.id === projectId)
+    if(indexOfMember >-1&indexOfProject>-1 ){
+    project.appliedMembers.splice(indexOfMember, 1)
+    member.appliedInProjects.splice(indexOfProject, 1)
+    project.projectMember = {
+        name: member.memberFullName,
+        id: member._id
+    }
+    project.workCycle=0
+    member.acceptedInProjects.push({ name: project.name, id: project._id })
+    
+    var e = sendTaskNotification(projectId, memberId, 'You have been assigned!')
+    var e = sendTaskNotification(projectId, project.partnerId, 'You project has been assigned to a member!')
+    member.save()
+    project.save()
+    res.json({ data: project })
+
+>>>>>>> master
 }else{
     res.status(404).send('the project or member is not applied')
 
@@ -232,9 +290,12 @@ try{
 }else{
     res.status(400).send('You are not the partner or consultancy')
 }
+<<<<<<< HEAD
 }catch(err){
 
 }
+=======
+>>>>>>> master
 
 })
 router.put('/updateWorkCycle/:id', async (request, response) => {
@@ -316,11 +377,19 @@ router.get('/membersProject/:id', async (req, res) => {
 router.get('/viewCycle/:id', async (req, res) => {
     const project = await Project.findById(req.params.id);
     if (project !== undefined)
+<<<<<<< HEAD
         if (project.workCycle == null || project.workCycle == undefined)
             res.send(null)
         else
         res.status(200).send({data:project.workCycle})
             else {
+=======
+        if (project.workCycle === null)
+            res.send(null)
+        else
+            res.send(project.workCycle)
+    else {
+>>>>>>> master
         res.send('This project not Found !')
     }
 
@@ -360,7 +429,11 @@ router.post('/task/:id', async (req, res) => {
     }
     catch (error) {
         // we will handling the error later
+<<<<<<< HEAD
         return res.status(400).send({ error: error })
+=======
+        console.log(error)
+>>>>>>> master
     }
 })
 

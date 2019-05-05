@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { Component } from "react";
 import axios from "axios";
 import {Form, Col,Button} from 'react-bootstrap';
@@ -17,12 +18,61 @@ const styles = theme => ({
     }
   },
   checked: {},
+=======
+import React, { Component } from "../../../../node_modules/react";
+import axios from "../../../../node_modules/axios";
+import "./CreateTask.css";
+import { withStyles } from "../../../../node_modules/@material-ui/core/styles";
+import TextField from "../../../../node_modules/@material-ui/core/TextField";
+import Radio from "../../../../node_modules/@material-ui/core/Radio";
+import Select from "../../../../node_modules/react-select";
+import "./CreateTask.css";
+import { Form } from "../../../../node_modules/react-bootstrap";
+import { Next } from "../../../../node_modules/react-bootstrap/PageItem";
+const styles = theme => ({
+  dropdown: {
+    color: "black",
+    selectarrowcolor: "green",
+    padding: "4px 200px",
+    width: 800
+  },
+  root: {
+    padding: "4px 200px",
+    display: "flex"
+  },
+  Radio: {
+    width: 0,
+    height: 0,
+    background: "white",
+    color: "white",
+    "&$checked": {
+      background: "gold",
+      color: "gold"
+    }
+  },
+  checked: {},
+  root1: {
+    width: 400
+  },
+
+  cssLabel: {
+    color: "gray"
+  },
+
+  cssOutlinedInput: {
+    color: "white"
+  }
+>>>>>>> master
 });
 export class CreateTask extends Component {
   state = {
     title: null,
     description: "",
+<<<<<<< HEAD
     selectedValue: null,
+=======
+    selectedValue: "a",
+>>>>>>> master
     monetaryCompensation: null,
     techCompanies: [],
     experienceLevels: [
@@ -52,7 +102,10 @@ export class CreateTask extends Component {
   };
   titleChange = event => {
     this.setState({ title: event.target.value });
+<<<<<<< HEAD
     console.log(this.state.title)
+=======
+>>>>>>> master
   };
   monetaryChange = event => {
     this.setState({ monetaryCompensation: event.target.value });
@@ -81,12 +134,20 @@ export class CreateTask extends Component {
   };
   async handleClick() {
     var arr = [];
+<<<<<<< HEAD
     const  {id}  = this.props.match.params
     var name = "";
     console.log('helloo')
     await axios
       .get(`http://localhost:3333/partners/${id}`)
       .then(res => (name = res.data.data.partnerName));
+=======
+    const { id } = this.props.match.params;
+    var name="";
+    await axios
+      .get(`http://localhost:3333/partners/${id}`)
+      .then(res => name=res.data.data.partnerName);
+>>>>>>> master
     this.state.skills.map(m => arr.push({ name: m.label }));
     const data = {
       name: this.state.title,
@@ -102,10 +163,14 @@ export class CreateTask extends Component {
       monetaryCompensation: this.state.monetaryCompensation,
       requiredSkills: arr
     };
+<<<<<<< HEAD
     console.log(data)
      await axios.post("http://localhost:3333/tasks/", data).catch(e => {
         alert('error ')
       }).then(alert('Done: '));
+=======
+    await axios.post("http://localhost:3333/tasks/", data);
+>>>>>>> master
   }
   getStyle = () => {
     return {
@@ -154,6 +219,7 @@ export class CreateTask extends Component {
   render() {
     const { classes } = this.props;
     return (
+<<<<<<< HEAD
         <div style={{background:'white',minHeight:'100vh'}}>
       <Col md={{ span: 5, offset: 3 }} >
       <form >
@@ -171,6 +237,78 @@ export class CreateTask extends Component {
         </Form.Group>
         <Form.Label> Do you wish to have consultancy ?</Form.Label>
         <div >
+=======
+      <div style={this.getStyle()}>
+        <div>
+          <text style={this.upper()}>
+            Please fill the fields below and our admins will get back to you.
+          </text>
+          <br />
+          <div className={classes.root}>
+            <TextField
+              id="Title"
+              label="Name"
+              margin="normal"
+              onChange={this.titleChange}
+              className={classes.root1}
+              InputLabelProps={{
+                classes: {
+                  root: classes.cssLabel
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.cssOutlinedInput
+                }
+              }}
+            />
+          </div>
+          <div className={classes.root}>
+            <TextField
+              id="Description"
+              label="Description"
+              margin="normal"
+              onChange={this.descriptionChange}
+              className={classes.root1}
+              InputLabelProps={{
+                classes: {
+                  root: classes.cssLabel
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.cssOutlinedInput
+                }
+              }}
+            />
+          </div>
+
+          <div className={classes.root}>
+            <TextField
+              id="Monetary Compensation"
+              label="Monetary Compensation"
+              margin="normal"
+              onChange={this.monetaryChange}
+              className={classes.root1}
+              InputLabelProps={{
+                classes: {
+                  root: classes.cssLabel
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.cssOutlinedInput
+                }
+              }}
+            />
+          </div>
+
+          <text style={this.consultancy()}>
+            Do you wish to have consultancy ?
+          </text>
+        </div>
+        <div style={this.consultancy()}>
+>>>>>>> master
           <Radio
             checked={this.state.selectedValue === "yes"}
             onChange={this.handleChange}
@@ -182,7 +320,11 @@ export class CreateTask extends Component {
               checked: classes.checked
             }}
           />
+<<<<<<< HEAD
           <text style={{ color: "black", width: 50, height: 50 ,padding:'4px'}}>Yes</text>
+=======
+          <text style={{ color: "gray", width: 50, height: 50 }}>Yes</text>
+>>>>>>> master
           <Radio
             checked={this.state.selectedValue === "no"}
             onChange={this.handleChange}
@@ -194,42 +336,83 @@ export class CreateTask extends Component {
               checked: classes.checked
             }}
           />
+<<<<<<< HEAD
           <text style={{ color: "black", width: 50, height: 50 ,padding:'4px'}}>No</text>
           <br></br>
           <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>What skills do you wish for ?</Form.Label>
           <Select
+=======
+          <text style={{ color: "gray", width: 50, height: 50 }}>No</text>
+        </div>
+        <text style={this.consultancy()}>What skills do you wish for ?</text>
+        <Select
+>>>>>>> master
           className={classes.dropdown}
           onChange={this.skillsChange}
           icon={classes.dropdownIndicator}
           options={this.getOptions()}
           isMulti
         />
+<<<<<<< HEAD
         </Form.Group>
         <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>What is the commitement level you wish for ?</Form.Label>
           <Select
+=======
+        <text style={this.consultancy()}>
+          What is the commitement level you wish for ?
+        </text>
+        <Select
+          className={classes.dropdown}
+>>>>>>> master
           onChange={this.commitChange}
           icon={classes.dropdownIndicator}
           options={this.state.commitementLevels}
         />
+<<<<<<< HEAD
         </Form.Group>
         <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>What is the experience level you wish for ?</Form.Label>
           <Select
+=======
+        <text style={this.consultancy()}>
+          What is the experience level you wish for ?
+        </text>
+        <Select
+          className={classes.dropdown}
+>>>>>>> master
           onChange={this.experienceChange}
           icon={classes.dropdownIndicator}
           options={this.state.experienceLevels}
         />
+<<<<<<< HEAD
         </Form.Group>
         <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>Deadline</Form.Label>
           <Form.Control
           required
+=======
+        <div>
+          <p
+            style={{
+              color: "white",
+              fontSize: 25,
+              padding: "4px 200px",
+              display: "flex"
+            }}
+          >
+            Deadline
+          </p>
+          <div style={{ position: "absolute", left: "33%" }}>
+          <Form.Group controlId="formGriddeadline">
+            <Form.Control
+>>>>>>> master
               type="date"
               selected={this.state.startDate}
               onChange={evt => this.updateDeadline(evt)}
             />
+<<<<<<< HEAD
         </Form.Group >
         <div style={{textAlign:'right'}}>
         <Button onClick={this.handleClick.bind(this)} variant="outline-secondary">Submit</Button>
@@ -237,6 +420,25 @@ export class CreateTask extends Component {
         </div>
         </form>
       </Col>
+=======
+          </Form.Group>
+          >
+          </div>
+        </div>
+        <button
+          onClick={this.handleClick.bind(this)}
+          style={{
+            background: "#F9BB32",
+            borderRadius: "10%",
+            width: 100,
+            height: 20,
+            position:'absolute',
+            left:'50%',
+          }}
+        >
+          submit
+        </button>
+>>>>>>> master
       </div>
     );
   }
